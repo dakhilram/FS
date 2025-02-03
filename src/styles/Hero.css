@@ -1,0 +1,45 @@
+.hero {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 90vh;
+    background-color: white;
+  }
+  
+  .hero-content {
+    background: #e0e0e0;
+    padding: 40px;
+    border-radius: 10px;
+    text-align: center;
+    width: 60%;
+  }
+  
+  .hero h1 {
+    color: #007fae;
+    font-size: 36px;
+    font-weight: bold;
+  }
+  
+  .hero p {
+    color: gray;
+    font-style: italic;
+  }
+  
+  .buttons {
+    margin-top: 20px;
+  }
+  
+  .btn {
+    background: black;
+    color: white;
+    padding: 10px 20px;
+    margin: 0 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .btn:hover {
+    background: gray;
+  }
+  
