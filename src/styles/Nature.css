@@ -1,0 +1,29 @@
+.nature-page {
+    text-align: center;
+    padding: 40px;
+    background-color: #f8f8f8;
+    min-height: 100vh;
+}
+
+.nature-page h1 {
+    color: #007fae;
+    font-size: 32px;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+.nature-image {
+    width: 70%;
+    max-width: 600px;
+    border-radius: 10px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+    margin-bottom: 20px;
+}
+
+.nature-page p {
+    font-size: 18px;
+    color: #444;
+    max-width: 800px;
+    margin: 0 auto;
+    line-height: 1.6;
+}

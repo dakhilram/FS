@@ -1,4 +1,25 @@
+/* ✅ Hide Scrollbar but Keep Functionality */
 body {
   margin: 0;
   font-family: Arial, sans-serif;
+  overflow-y: scroll;  /* Ensures scrollbar is always visible to prevent layout shift */
+  scrollbar-width: thin; /* Firefox: Makes scrollbar thinner */
+}
+
+/* ✅ For Webkit Browsers (Chrome, Edge, Safari) */
+::-webkit-scrollbar {
+  width: 8px;  /* Make scrollbar thinner */
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;  /* Light background */
+}
+
+::-webkit-scrollbar-thumb {
+  background: #888;  /* Scrollbar color */
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #555;  /* Darker color on hover */
 }

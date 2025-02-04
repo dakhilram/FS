@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom"; // ✅ Use Link for proper routing
 import "../styles/Hero.css"; // Import CSS
 
 const Hero = () => {
@@ -8,8 +9,8 @@ const Hero = () => {
         <h1>ForeSight</h1>
         <p>Predicting disasters ahead</p>
         <div className="buttons">
-          <button className="btn">Login</button>
-          <button className="btn">Signup</button>
+          <Link to="/login" className="btn">Login</Link> {/* ✅ Fix: Absolute Path */}
+          <Link to="/register" className="btn">Signup</Link> {/* ✅ Fix: Absolute Path */}
         </div>
       </div>
     </div>

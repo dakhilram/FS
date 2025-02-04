@@ -1,48 +1,101 @@
+/* ✅ Make Navbar Fixed at Top */
 .navbar {
-    background: black;
-    color: white;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 15px 30px;
-  }
-  
-  .logo {
-    font-size: 24px;
-    color: lightblue;
-    font-weight: bold;
-  }
-  
-  .nav-links {
-    display: flex;
-    margin-left: auto;  /* Moves links to the right */
-  }
-  
-  .nav-links a {
-    color: white;
-    text-decoration: none;
-    margin: 0 15px;
-  }
-  
-  .nav-links a:hover {
-    color: gray;
-  }
-  
-  .auth-links {
-    display: flex;
-    gap: 10px;
-  }
-  
-  .btn {
-    background: black;
-    color: white;
-    padding: 10px 15px;
-    border: 1px solid white;
-    border-radius: 5px;
-    text-decoration: none;
-  }
-  
-  .btn:hover {
-    background: gray;
-  }
-  
+  background: black;
+  color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 15px 30px;
+  position: fixed;  /* ✅ Keep navbar at the top */
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 1000; /* ✅ Ensure it's always on top */
+  transition: all 0.3s ease-in-out;
+}
+
+/* ✅ Shadow Effect when Scrolled */
+.navbar.scrolled {
+  background: rgba(0, 0, 0, 0.9); /* Slight transparency */
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
+}
+
+/* ✅ Adjust body to prevent content hiding behind navbar */
+body {
+  padding-top: 70px; /* Adjust this based on navbar height */
+}
+
+.logo {
+  position: absolute;
+  left: 30px;
+  font-size: 24px;
+  color: lightblue;
+  font-weight: bold;
+}
+
+.nav-links {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+}
+
+.nav-links a {
+  color: white;
+  text-decoration: none;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.nav-links a:hover {
+  color: gray;
+}
+
+/* ✅ Dropdown Styling */
+.dropdown {
+  position: relative;
+}
+
+.dropbtn {
+  background: none;
+  color: white;
+  font-size: 16px;
+  border: none;
+  cursor: pointer;
+  padding: 10px;
+}
+
+.dropdown-content {
+  display: none;
+  position: absolute;
+  background: rgb(255, 255, 255);
+  min-width: 150px;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+  border-radius: 5px;
+  top: 100%;
+  left: 0;
+}
+
+.dropdown-content a {
+  color: rgb(0, 0, 0);
+  padding: 10px;
+  text-decoration: none;
+  display: block;
+}
+
+.dropdown-content a:hover {
+  color: white;
+  background: rgb(140, 161, 168);
+}
+
+/* Show dropdown on hover */
+.dropdown:hover .dropdown-content {
+  display: block;
+}
+
+/* ✅ Keep Auth Buttons to the Right */
+.auth-links {
+  position: absolute;
+  right: 30px;
+  display: flex;
+  gap: 10px;
+}
