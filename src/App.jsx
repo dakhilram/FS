@@ -2,7 +2,7 @@ import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import Home from "./pages/Home";
-import Hero from "./pages/Hero";
+import Hero from "./components/Hero";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Earthquake from "./pages/Earthquake";
