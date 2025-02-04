@@ -1,8 +1,8 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Navbar from "./components/Navbar";
-import Home from "./pages/Home"; // New Home Page
-import Hero from "./components/Hero";
+import Home from "./pages/Home";
+import Hero from "./pages/Hero";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Earthquake from "./pages/Earthquake";
@@ -14,7 +14,7 @@ import Alerts from "./pages/Alerts";
 
 function App() {
   return (
-    <Router>
+    <Router basename="/FS"> {/* ✅ Fix: Set basename to match GitHub repo */}
       <Navbar />
       <Routes>
         <Route path="/" element={<Home />} />
