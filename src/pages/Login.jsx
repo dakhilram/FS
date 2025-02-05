@@ -9,8 +9,15 @@ const Login = () => {
 
   const handleLogin = (e) => {
     e.preventDefault();
-    // Fake authentication - Replace with actual API call
-    localStorage.setItem("username", email.split("@")[0]); // Extract username
+    
+    // ✅ Simulate authentication (Replace with actual API logic)
+    const username = email.split("@")[0]; // Extract username from email
+    
+    // ✅ Store user in localStorage
+    localStorage.setItem("username", username);
+    localStorage.setItem("isLoggedIn", "true");
+
+    // ✅ Redirect to Home
     navigate("/");
   };
 
@@ -18,17 +25,19 @@ const Login = () => {
     <div className="auth-container">
       <h2>Login</h2>
       <form onSubmit={handleLogin}>
-        <input
-          type="email"
-          placeholder="Email"
-          required
-          onChange={(e) => setEmail(e.target.value)}
+        <input 
+          type="email" 
+          placeholder="Email" 
+          required 
+          value={email} 
+          onChange={(e) => setEmail(e.target.value)} 
         />
-        <input
-          type="password"
-          placeholder="Password"
-          required
-          onChange={(e) => setPassword(e.target.value)}
+        <input 
+          type="password" 
+          placeholder="Password" 
+          required 
+          value={password} 
+          onChange={(e) => setPassword(e.target.value)} 
         />
         <button type="submit">Login</button>
       </form>

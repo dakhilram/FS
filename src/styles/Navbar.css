@@ -1,53 +1,57 @@
-/* ✅ Make Navbar Fixed at Top */
+/* ✅ Navbar Container */
 .navbar {
   background: black;
   color: white;
   display: flex;
-  justify-content: center;
+  justify-content: space-between;
   align-items: center;
   padding: 15px 30px;
-  position: fixed;  /* ✅ Keep navbar at the top */
+  position: fixed;
   top: 0;
   left: 0;
-  width: 100%;
-  z-index: 1000; /* ✅ Ensure it's always on top */
+  right: 0;
+  z-index: 1000;
   transition: all 0.3s ease-in-out;
 }
 
-/* ✅ Shadow Effect when Scrolled */
+/* ✅ Navbar Shadow When Scrolled */
 .navbar.scrolled {
-  background: rgba(0, 0, 0, 0.9); /* Slight transparency */
+  background: rgba(0, 0, 0, 0.9);
   box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
 }
 
-/* ✅ Adjust body to prevent content hiding behind navbar */
-body {
-  padding-top: 70px; /* Adjust this based on navbar height */
-}
-
+/* ✅ Logo Styling */
 .logo {
-  position: absolute;
-  left: 30px;
   font-size: 24px;
   color: lightblue;
   font-weight: bold;
+  margin-right: auto;
 }
 
+/* ✅ Navbar Links */
 .nav-links {
   display: flex;
   gap: 20px;
   align-items: center;
+  margin: 0 auto;
+  justify-content: center;
+  flex: 1;
 }
 
-.nav-links a {
+/* ✅ Soft Font for Navbar Links */
+.nav-links a,
+.dropbtn {
+  font-family: "Poppins", sans-serif;
+  font-weight: 400;
+  font-size: 16px;
   color: white;
   text-decoration: none;
-  font-size: 16px;
-  font-weight: bold;
+  transition: color 0.3s ease;
 }
 
-.nav-links a:hover {
-  color: gray;
+.nav-links a:hover,
+.dropbtn:hover {
+  color: lightgray;
 }
 
 /* ✅ Dropdown Styling */
@@ -67,7 +71,7 @@ body {
 .dropdown-content {
   display: none;
   position: absolute;
-  background: rgb(255, 255, 255);
+  background: white;
   min-width: 150px;
   box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
   border-radius: 5px;
@@ -75,27 +79,96 @@ body {
   left: 0;
 }
 
+/* ✅ Dropdown Text Styling */
 .dropdown-content a {
-  color: rgb(0, 0, 0);
+  color: black;
   padding: 10px;
   text-decoration: none;
   display: block;
+  font-family: "Poppins", sans-serif;
+  font-size: 14px;
+  transition: background 0.3s, color 0.3s;
 }
 
 .dropdown-content a:hover {
+  background: gray;
   color: white;
-  background: rgb(140, 161, 168);
 }
 
-/* Show dropdown on hover */
+/* ✅ Show Dropdown on Hover */
 .dropdown:hover .dropdown-content {
   display: block;
 }
 
-/* ✅ Keep Auth Buttons to the Right */
-.auth-links {
-  position: absolute;
-  right: 30px;
+/* ✅ Profile Section */
+.profile-section {
+  position: relative;
   display: flex;
-  gap: 10px;
+  align-items: center; /* Centers icon and username vertically */
+  cursor: pointer;
+  gap: 8px;
+}
+
+/* ✅ User Icon */
+.user-icon {
+  font-size: 24px;
+  color: white;
+}
+
+/* ✅ Username Styling */
+.username {
+  color: white;
+  font-weight: bold;
+  font-family: "Poppins", sans-serif;
+  font-size: 14px;
+  line-height: 1; /* Ensures proper vertical centering */
+}
+
+/* ✅ Dropdown Menu for Profile */
+.profile-dropdown {
+  position: absolute;
+  top: calc(100% + 5px); /* Adjusted positioning to align dropdown below the profile icon */
+  right: 0;
+  background: white;
+  color: black;
+  border-radius: 5px;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  z-index: 1000;
+  min-width: 120px;
+}
+
+/* ✅ Dropdown Links */
+.profile-dropdown .dropdown-link {
+  color: black;
+  padding: 8px 12px;
+  text-decoration: none;
+  font-size: 14px;
+  font-family: "Poppins", sans-serif;
+  transition: background 0.3s ease, color 0.3s ease;
+}
+
+.profile-dropdown .dropdown-link:hover {
+  background: gray;
+  color: white;
+}
+
+/* ✅ Dropdown Buttons */
+.profile-dropdown button {
+  background: none;
+  border: none;
+  color: black;
+  padding: 8px 12px;
+  cursor: pointer;
+  text-align: left;
+  font-size: 14px;
+  width: 100%;
+  transition: background 0.3s ease;
+}
+
+.profile-dropdown button:hover {
+  background: gray;
+  color: white;
 }

@@ -1,3 +1,4 @@
+/* ✅ Hero Section */
 .hero {
   display: flex;
   justify-content: center;
@@ -6,43 +7,139 @@
   background-color: white;
 }
 
+/* ✅ Hero Content */
 .hero-content {
   background: #e0e0e0;
-  padding: 150px; /* ✅ Increased padding for a bigger block */
-  border-radius: 15px; /* ✅ Slightly rounded corners */
+  padding: 50px;
+  border-radius: 15px;
   text-align: center;
-  width: 90%; /* ✅ Slightly wider */
-  max-width: 1000px; /* ✅ Ensures it doesn't get too wide */
+  width: 70%;
+  max-width: 700px;
   position: relative;
-  top: -30px; /* ✅ Moves the content higher */
+  top: -30px;
 }
 
+/* ✅ Hero Title */
 .hero h1 {
   color: #007fae;
-  font-size: 40px; /* ✅ Slightly bigger title */
+  font-size: 40px;
   font-weight: bold;
+  margin-bottom: 10px; /* Reduced from 20px */
 }
 
 .hero p {
   color: gray;
   font-style: italic;
-  font-size: 18px; /* ✅ Slightly bigger text */
+  font-size: 18px;
+  margin-top: 10px; /* Reduced from 20px if needed */
 }
 
+
+/* ✅ Button Section */
 .buttons {
-  margin-top: 25px; /* ✅ More spacing */
+  margin-top: 25px;
 }
 
 .btn {
   background: black;
   color: white;
-  padding: 12px 24px; /* ✅ Bigger buttons */
+  padding: 12px 24px;
   margin: 0 10px;
   border: none;
   border-radius: 5px;
   cursor: pointer;
+  font-size: 16px;
 }
 
 .btn:hover {
+  background: gray;
+}
+
+/* ✅ File Upload Section */
+.file-upload {
+  margin-top: 20px;
+  text-align: center;
+}
+
+.file-upload label {
+  font-size: 16px;
+  font-weight: bold;
+  color: #333;
+}
+
+.file-upload input {
+  margin-top: 10px;
+  padding: 8px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+/* ✅ File Preview */
+.file-preview {
+  margin-top: 10px;
+  background: #f8f8f8;
+  padding: 10px;
+  border-radius: 5px;
+  max-height: 150px;
+  overflow-y: auto;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.file-preview pre {
+  font-size: 12px;
+  color: #333;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+/* ✅ File Upload Section */
+.file-upload {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 20px; /* Add spacing above */
+}
+
+.file-upload label {
+  font-size: 16px;
+  font-weight: bold;
+  margin-bottom: 10px; /* Add spacing below the label */
+}
+
+/* ✅ File Preview Box */
+.file-preview {
+  background: white;
+  border: 1px solid lightgray;
+  border-radius: 8px;
+  padding: 15px; /* Add padding for better content alignment */
+  margin-bottom: 20px; /* Add spacing below the preview */
+  width: 90%; /* Ensure it's responsive */
+  max-width: 500px; /* Limit the preview box width */
+  text-align: left;
+  overflow: auto;
+  font-family: "Courier New", Courier, monospace; /* Monospace font for JSON */
+  color: #333;
+}
+
+.file-preview pre {
+  white-space: pre-wrap; /* Prevent horizontal scrolling */
+  word-wrap: break-word;
+}
+
+/* ✅ Generate Report Button */
+.file-upload .btn {
+  margin-top: 10px; /* Add spacing above the button */
+  padding: 10px 20px;
+  background: black;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.file-upload .btn:hover {
   background: gray;
 }

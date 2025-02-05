@@ -11,9 +11,12 @@ const Register = () => {
   const handleRegister = (e) => {
     e.preventDefault();
     
-    // Fake authentication logic (Replace with actual API call)
-    localStorage.setItem("username", fullName); // Store the username
-    navigate("/"); // Redirect to Home after signup
+    // ✅ Simulate user creation (Replace with real API logic)
+    localStorage.setItem("username", fullName);
+    localStorage.setItem("isLoggedIn", "true");
+
+    // ✅ Redirect to Home
+    navigate("/");
   };
 
   return (
