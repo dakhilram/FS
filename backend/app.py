@@ -1,10 +1,9 @@
+import os
 from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_migrate import Migrate
-
-
 
 # Initialize Flask app
 app = Flask(__name__)
@@ -13,12 +12,13 @@ CORS(app, resources={r"/*": {"origins": "http://localhost:5173"}})
 # Enable CORS for the frontend origin
 CORS(app, supports_credentials=True, origins=["http://localhost:5173"])
 
-# PostgreSQL configuration
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:1234@localhost/foresight'
+# PostgreSQL configuration (Uses Render DATABASE_URL)
+app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv("DATABASE_URL", "postgresql://postgres:1234@localhost/foresight")
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 # Initialize database
 db = SQLAlchemy(app)
+migrate = Migrate(app, db)  # ✅ Moved to correct place
 
 # User Model
 class User(db.Model):
@@ -27,7 +27,7 @@ class User(db.Model):
     email = db.Column(db.String(120), unique=True, nullable=False)
     password = db.Column(db.String(255), nullable=False)
 
-# Create tables
+# Create tables (Only runs locally, not on Render)
 with app.app_context():
     db.create_all()
 
@@ -72,7 +72,4 @@ def home():
     return "Flask Backend Running!"
 
 if __name__ == '__main__':
-    app.run(debug=True)
-
-# Initialize Flask-Migrate
-migrate = Migrate(app, db)
+    app.run(host="0.0.0.0", port=5000, debug=True)  # ✅ Updated for Render
