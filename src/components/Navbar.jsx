@@ -9,14 +9,33 @@ const Navbar = () => {
   const dropdownRef = useRef(null);
   const navigate = useNavigate();
 
+  // ✅ Check if user is logged in on component mount and when localStorage changes
   useEffect(() => {
-    // ✅ Check if user is logged in
     const storedUser = localStorage.getItem("username");
     const isLoggedIn = localStorage.getItem("isLoggedIn");
 
     if (storedUser && isLoggedIn === "true") {
       setUsername(storedUser);
     }
+  }, []);
+
+  // ✅ Add an event listener to update username dynamically
+  useEffect(() => {
+    const updateUsername = () => {
+      const storedUser = localStorage.getItem("username");
+      const isLoggedIn = localStorage.getItem("isLoggedIn");
+
+      if (storedUser && isLoggedIn === "true") {
+        setUsername(storedUser);
+      } else {
+        setUsername(null);
+      }
+    };
+
+    window.addEventListener("storage", updateUsername);
+    return () => {
+      window.removeEventListener("storage", updateUsername);
+    };
   }, []);
 
   const handleLogout = () => {
@@ -26,11 +45,11 @@ const Navbar = () => {
     setUsername(null);
     setShowDropdown(false);
 
-    // ✅ Redirect to initial page
-    navigate("/");
+    // ✅ Redirect to login page
+    navigate("/login");
   };
 
-  // ✅ Close Dropdown When Clicking Outside
+  // ✅ Close dropdown when clicking outside
   useEffect(() => {
     function handleClickOutside(event) {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -63,22 +82,36 @@ const Navbar = () => {
 
       <div className="auth-links">
         <div className="profile-section" ref={dropdownRef}>
-          {username && <span className="username">{username}</span>}
-          <FaUserCircle
-            className="user-icon"
-            onClick={() => setShowDropdown(!showDropdown)}
-          />
-          {showDropdown && (
-            <div className="profile-dropdown">
-              {username ? (
-                <button onClick={handleLogout}>Logout</button>
-              ) : (
-                <>
-                  <Link to="/login" className="dropdown-link">Login</Link>
-                  <Link to="/register" className="dropdown-link">Signup</Link>
-                </>
+          {username ? (
+            <>
+              <span className="username">{username}</span>
+              <FaUserCircle
+                className="user-icon"
+                onClick={() => setShowDropdown(!showDropdown)}
+              />
+              {showDropdown && (
+                <div className="profile-dropdown">
+                  <button onClick={handleLogout}>Logout</button>
+                </div>
               )}
-            </div>
+            </>
+          ) : (
+            <>
+              <FaUserCircle
+                className="user-icon"
+                onClick={() => setShowDropdown(!showDropdown)}
+              />
+              {showDropdown && (
+                <div className="profile-dropdown">
+                  <Link to="/login" className="dropdown-link">
+                    Login
+                  </Link>
+                  <Link to="/register" className="dropdown-link">
+                    Signup
+                  </Link>
+                </div>
+              )}
+            </>
           )}
         </div>
       </div>
