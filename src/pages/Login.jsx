@@ -10,20 +10,22 @@ const Login = () => {
   const navigate = useNavigate();
 
   const handleLogin = async (e) => {
-    e.preventDefault(); // Prevent form submission refresh
-    try {
-      const response = await axios.post("https://fs-51ng.onrender.com/login", { email, password });
+    e.preventDefault(); // Prevent form refresh
 
-      const { username } = response.data; // Destructure username from the response
+    try {
+      const response = await axios.post(
+        "https://fs-51ng.onrender.com/login",
+        { email, password },
+        { withCredentials: true }
+      );
+
+      const { username } = response.data;
       if (username) {
-        // Store username and login status in localStorage
         localStorage.setItem("username", username);
         localStorage.setItem("isLoggedIn", "true");
 
-        // Trigger storage event for dynamic updates in other components
-        window.dispatchEvent(new Event("storage"));
+        window.dispatchEvent(new Event("storage")); // Ensure dynamic navbar update
 
-        // Navigate to the home page
         navigate("/");
       } else {
         setError("Invalid login credentials. Please try again.");
@@ -39,25 +41,11 @@ const Login = () => {
       <h2>Login</h2>
       {error && <p className="error">{error}</p>}
       <form onSubmit={handleLogin}>
-        <input
-          type="email"
-          placeholder="Email"
-          required
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
-        <input
-          type="password"
-          placeholder="Password"
-          required
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
+        <input type="email" placeholder="Email" required value={email} onChange={(e) => setEmail(e.target.value)} />
+        <input type="password" placeholder="Password" required value={password} onChange={(e) => setPassword(e.target.value)} />
         <button type="submit">Login</button>
       </form>
-      <p>
-        Don't have an account? <a href="/register">Register</a>
-      </p>
+      <p>Don't have an account? <a href="/register">Register</a></p>
     </div>
   );
 };

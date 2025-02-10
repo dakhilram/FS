@@ -7,31 +7,30 @@ from flask_migrate import Migrate
 
 # Initialize Flask app
 app = Flask(__name__)
-CORS(app, resources={r"/*": {"origins": "http://localhost:5173"}})
 
-# Enable CORS for the frontend origin
-CORS(app, supports_credentials=True, origins=["http://localhost:5173"])
+# ✅ Enable CORS for GitHub Pages & Localhost
+CORS(app, resources={r"/*": {"origins": ["https://dakhilram.github.io", "http://localhost:5173"]}}, supports_credentials=True)
 
-# PostgreSQL configuration (Uses Render DATABASE_URL)
-app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv("DATABASE_URL", "postgresql://postgres:1234@localhost/foresight")
+# ✅ PostgreSQL Configuration (Uses Render DATABASE_URL)
+app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv("DATABASE_URL", "YOUR_RENDER_POSTGRES_URL")  # Replace with Render PostgreSQL URL
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 # Initialize database
 db = SQLAlchemy(app)
-migrate = Migrate(app, db)  # ✅ Moved to correct place
+migrate = Migrate(app, db)
 
-# User Model
+# ✅ User Model
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(50), unique=True, nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
     password = db.Column(db.String(255), nullable=False)
 
-# Create tables (Only runs locally, not on Render)
+# ✅ Create tables (Only runs locally, not on Render)
 with app.app_context():
     db.create_all()
 
-# Signup route
+# ✅ Signup Route
 @app.route('/signup', methods=['POST'])
 def signup():
     data = request.json
@@ -53,7 +52,7 @@ def signup():
 
     return jsonify({'message': 'User registered successfully'}), 201
 
-# Login route
+# ✅ Login Route
 @app.route('/login', methods=['POST'])
 def login():
     data = request.json
@@ -66,7 +65,7 @@ def login():
 
     return jsonify({'message': 'Login successful', 'username': user.username}), 200
 
-# Health check
+# ✅ Health Check Route
 @app.route('/')
 def home():
     return "Flask Backend Running!"

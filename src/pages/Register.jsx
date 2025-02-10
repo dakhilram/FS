@@ -14,13 +14,12 @@ const Register = () => {
     e.preventDefault();
 
     try {
-      const response = await axios.post("https://fs-51ng.onrender.com/signup", {
-        username,
-        email,
-        password,
-      });
+      const response = await axios.post(
+        "https://fs-51ng.onrender.com/signup",
+        { username, email, password },
+        { withCredentials: true }
+      );
 
-      console.log("Signup Response:", response);
       if (response.status === 201) {
         alert(response.data.message);
         navigate("/login");
@@ -36,27 +35,9 @@ const Register = () => {
       <h2>Register</h2>
       {error && <p className="error">{error}</p>}
       <form onSubmit={handleRegister}>
-        <input
-          type="text"
-          placeholder="Username"
-          required
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-        />
-        <input
-          type="email"
-          placeholder="Email"
-          required
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
-        <input
-          type="password"
-          placeholder="Password"
-          required
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
+        <input type="text" placeholder="Username" required value={username} onChange={(e) => setUsername(e.target.value)} />
+        <input type="email" placeholder="Email" required value={email} onChange={(e) => setEmail(e.target.value)} />
+        <input type="password" placeholder="Password" required value={password} onChange={(e) => setPassword(e.target.value)} />
         <button type="submit">Signup</button>
       </form>
       <p>Already have an account? <a href="/login">Login</a></p>
