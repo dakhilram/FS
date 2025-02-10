@@ -9,7 +9,6 @@ const Navbar = () => {
   const dropdownRef = useRef(null);
   const navigate = useNavigate();
 
-  // ✅ Check if user is logged in on component mount and when localStorage changes
   useEffect(() => {
     const storedUser = localStorage.getItem("username");
     const isLoggedIn = localStorage.getItem("isLoggedIn");
@@ -17,39 +16,31 @@ const Navbar = () => {
     if (storedUser && isLoggedIn === "true") {
       setUsername(storedUser);
     }
-  }, []);
 
-  // ✅ Add an event listener to update username dynamically
-  useEffect(() => {
-    const updateUsername = () => {
-      const storedUser = localStorage.getItem("username");
-      const isLoggedIn = localStorage.getItem("isLoggedIn");
-
-      if (storedUser && isLoggedIn === "true") {
-        setUsername(storedUser);
+    // Listen for login changes dynamically
+    const handleStorageChange = () => {
+      const updatedUser = localStorage.getItem("username");
+      if (updatedUser) {
+        setUsername(updatedUser);
       } else {
         setUsername(null);
       }
     };
 
-    window.addEventListener("storage", updateUsername);
+    window.addEventListener("storage", handleStorageChange);
     return () => {
-      window.removeEventListener("storage", updateUsername);
+      window.removeEventListener("storage", handleStorageChange);
     };
   }, []);
 
   const handleLogout = () => {
-    // ✅ Clear user session
     localStorage.removeItem("username");
     localStorage.removeItem("isLoggedIn");
     setUsername(null);
     setShowDropdown(false);
-
-    // ✅ Redirect to login page
     navigate("/login");
   };
 
-  // ✅ Close dropdown when clicking outside
   useEffect(() => {
     function handleClickOutside(event) {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -91,6 +82,7 @@ const Navbar = () => {
               />
               {showDropdown && (
                 <div className="profile-dropdown">
+                  <Link to="/account" className="dropdown-link">Account</Link> {/* ✅ Account Page Link */}
                   <button onClick={handleLogout}>Logout</button>
                 </div>
               )}
@@ -103,12 +95,8 @@ const Navbar = () => {
               />
               {showDropdown && (
                 <div className="profile-dropdown">
-                  <Link to="/login" className="dropdown-link">
-                    Login
-                  </Link>
-                  <Link to="/register" className="dropdown-link">
-                    Signup
-                  </Link>
+                  <Link to="/login" className="dropdown-link">Login</Link>
+                  <Link to="/register" className="dropdown-link">Signup</Link>
                 </div>
               )}
             </>
