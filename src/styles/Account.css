@@ -1,0 +1,39 @@
+.account-container {
+    max-width: 800px;
+    margin: 50px auto;
+    text-align: center;
+  }
+  
+  .account-title {
+    font-size: 2rem;
+    font-style: italic;
+  }
+  
+  .account-box {
+    background-color: #e0e0e0;
+    padding: 30px;
+    border-radius: 15px;
+    text-align: left;
+    width: 60%;
+    margin: 20px auto;
+  }
+  
+  .account-box p {
+    font-size: 1.2rem;
+    margin: 15px 0;
+  }
+  
+  .reset-link {
+    color: #333;
+    cursor: pointer;
+    font-weight: bold;
+    margin-left: 10px;
+  }
+  
+  .delete-account {
+    color: red;
+    cursor: pointer;
+    font-weight: bold;
+    margin-top: 20px;
+  }
+  

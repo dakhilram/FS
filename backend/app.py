@@ -70,5 +70,38 @@ def login():
 def home():
     return "Flask Backend Running!"
 
+
+# Fetch user details
+@app.route('/user', methods=['GET'])
+def get_user():
+    username = request.args.get('username')
+    if not username:
+        return jsonify({'message': 'Username is required'}), 400
+
+    user = User.query.filter_by(username=username).first()
+    if not user:
+        return jsonify({'message': 'User not found'}), 404
+
+    return jsonify({
+        'username': user.username,
+        'email': user.email,
+        'verified': False  # Change this if you implement verification
+    }), 200
+
+# Delete user account
+@app.route('/delete-user', methods=['DELETE'])
+def delete_user():
+    data = request.json
+    email = data.get('email')
+
+    user = User.query.filter_by(email=email).first()
+    if not user:
+        return jsonify({'message': 'User not found'}), 404
+
+    db.session.delete(user)
+    db.session.commit()
+    return jsonify({'message': 'User account deleted successfully'}), 200
+
+
 if __name__ == '__main__':
     app.run(host="0.0.0.0", port=5000, debug=True)  # ✅ Updated for Render
