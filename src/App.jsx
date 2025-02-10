@@ -10,6 +10,7 @@ import Hurricane from "./pages/Hurricane";
 import Tornado from "./pages/Tornado";
 import Terrorism from "./pages/Terrorism";
 import Alerts from "./pages/Alerts";
+import Account from "./pages/Account"; // ✅ Import the Account component properly
 
 function App() {
   return (
@@ -25,7 +26,7 @@ function App() {
         <Route path="/nature/tornado" element={<Tornado />} />
         <Route path="/terrorism" element={<Terrorism />} />
         <Route path="/alerts" element={<Alerts />} />
-        <Route path="/account" element={<Account />} />
+        <Route path="/account" element={<Account />} />  {/* ✅ Account page now properly defined */}
       </Routes>
     </>
   );
