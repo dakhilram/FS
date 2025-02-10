@@ -49,17 +49,17 @@ const Account = () => {
     }
   };
 
-  if (loading) return <div>Loading...</div>;
+  if (loading) return <div className="loading-screen">Loading...</div>;
 
   return (
     <div className="account-container">
       <h1 className="account-title"><i>Account Summary</i></h1>
       <div className="account-box">
-        <p><strong>Email:</strong> {user?.email}</p>
+        <p><strong>Email:</strong> {user?.email || "Not Available"}</p>
         <p><strong>Email Verification:</strong> {user?.verified ? "Verified" : "Not Verified"}</p>
         <p>
           <strong>Password:</strong>
-          <span className="reset-link">Reset password</span>
+          <span className="reset-link"> Reset password </span>
         </p>
         <p className="delete-account" onClick={handleDeleteAccount}>
           Delete Account

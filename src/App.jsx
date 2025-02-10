@@ -25,6 +25,7 @@ function App() {
         <Route path="/nature/tornado" element={<Tornado />} />
         <Route path="/terrorism" element={<Terrorism />} />
         <Route path="/alerts" element={<Alerts />} />
+        <Route path="/account" element={<Account />} />
       </Routes>
     </>
   );
