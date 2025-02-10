@@ -4,27 +4,15 @@ import "../styles/Navbar.css";
 import { FaUserCircle } from "react-icons/fa";
 
 const Navbar = () => {
-  const [username, setUsername] = useState(null);
+  const [username, setUsername] = useState(localStorage.getItem("username") || null);
   const [showDropdown, setShowDropdown] = useState(false);
   const dropdownRef = useRef(null);
   const navigate = useNavigate();
 
+  // ✅ Update username when localStorage changes (for dynamic updates)
   useEffect(() => {
-    const storedUser = localStorage.getItem("username");
-    const isLoggedIn = localStorage.getItem("isLoggedIn");
-
-    if (storedUser && isLoggedIn === "true") {
-      setUsername(storedUser);
-    }
-
-    // Listen for login changes dynamically
     const handleStorageChange = () => {
-      const updatedUser = localStorage.getItem("username");
-      if (updatedUser) {
-        setUsername(updatedUser);
-      } else {
-        setUsername(null);
-      }
+      setUsername(localStorage.getItem("username") || null);
     };
 
     window.addEventListener("storage", handleStorageChange);
@@ -33,6 +21,7 @@ const Navbar = () => {
     };
   }, []);
 
+  // ✅ Handle Logout
   const handleLogout = () => {
     localStorage.removeItem("username");
     localStorage.removeItem("isLoggedIn");
@@ -41,6 +30,7 @@ const Navbar = () => {
     navigate("/login");
   };
 
+  // ✅ Close dropdown when clicking outside
   useEffect(() => {
     function handleClickOutside(event) {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -82,7 +72,7 @@ const Navbar = () => {
               />
               {showDropdown && (
                 <div className="profile-dropdown">
-                  <Link to="/account" className="dropdown-link">Account</Link> {/* ✅ Account Page Link */}
+                  <Link to="/account" className="dropdown-link">Account</Link> {/* ✅ Added Account Link */}
                   <button onClick={handleLogout}>Logout</button>
                 </div>
               )}
