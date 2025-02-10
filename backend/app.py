@@ -65,13 +65,7 @@ def login():
 
     return jsonify({'message': 'Login successful', 'username': user.username}), 200
 
-# ✅ Health Check Route
-@app.route('/')
-def home():
-    return "Flask Backend Running!"
-
-
-# Fetch user details
+# ✅ Fetch User Details Route
 @app.route('/user', methods=['GET'])
 def get_user():
     username = request.args.get('username')
@@ -85,10 +79,10 @@ def get_user():
     return jsonify({
         'username': user.username,
         'email': user.email,
-        'verified': False  # Change this if you implement verification
+        'verified': False  # Placeholder (Change this if you implement email verification)
     }), 200
 
-# Delete user account
+# ✅ Delete User Account Route
 @app.route('/delete-user', methods=['DELETE'])
 def delete_user():
     data = request.json
@@ -102,6 +96,28 @@ def delete_user():
     db.session.commit()
     return jsonify({'message': 'User account deleted successfully'}), 200
 
+# ✅ Password Reset Route (Placeholder, Implement Email-Based Reset Later)
+@app.route('/reset-password', methods=['POST'])
+def reset_password():
+    data = request.json
+    email = data.get('email')
+    new_password = data.get('new_password')
 
+    user = User.query.filter_by(email=email).first()
+    if not user:
+        return jsonify({'message': 'User not found'}), 404
+
+    hashed_password = generate_password_hash(new_password, method='pbkdf2:sha256')
+    user.password = hashed_password
+    db.session.commit()
+
+    return jsonify({'message': 'Password reset successfully'}), 200
+
+# ✅ Health Check Route
+@app.route('/')
+def home():
+    return "Flask Backend Running!"
+
+# ✅ Run the Flask app on Render
 if __name__ == '__main__':
-    app.run(host="0.0.0.0", port=5000, debug=True)  # ✅ Updated for Render
+    app.run(host="0.0.0.0", port=5000, debug=True)
