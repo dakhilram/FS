@@ -13,11 +13,12 @@ const Account = () => {
       try {
         const storedUsername = localStorage.getItem("username");
         if (!storedUsername) {
-          navigate("/login"); // Redirect if not logged in
+          navigate("/login");
           return;
         }
         const response = await axios.get(
-          `https://fs-51ng.onrender.com/user?username=${storedUsername}`
+          `https://fs-51ng.onrender.com/user?username=${storedUsername}`,
+          { withCredentials: true }
         );
         setUser(response.data);
       } catch (error) {
@@ -41,6 +42,7 @@ const Account = () => {
       try {
         await axios.delete(`https://fs-51ng.onrender.com/delete-user`, {
           data: { email: user.email },
+          withCredentials: true,
         });
         handleLogout();
       } catch (error) {
@@ -49,17 +51,17 @@ const Account = () => {
     }
   };
 
-  if (loading) return <div className="loading-screen">Loading...</div>;
+  if (loading) return <div className="account-container">Loading...</div>;
 
   return (
     <div className="account-container">
-      <h1 className="account-title"><i>Account Summary</i></h1>
+      <h1 className="account-title">Account Summary</h1>
       <div className="account-box">
-        <p><strong>Email:</strong> {user?.email || "Not Available"}</p>
+        <p><strong>Email:</strong> {user?.email}</p>
         <p><strong>Email Verification:</strong> {user?.verified ? "Verified" : "Not Verified"}</p>
         <p>
           <strong>Password:</strong>
-          <span className="reset-link"> Reset password </span>
+          <span className="reset-link">Reset password</span>
         </p>
         <p className="delete-account" onClick={handleDeleteAccount}>
           Delete Account

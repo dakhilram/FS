@@ -4,33 +4,26 @@ import "../styles/Navbar.css";
 import { FaUserCircle } from "react-icons/fa";
 
 const Navbar = () => {
-  const [username, setUsername] = useState(localStorage.getItem("username") || null);
+  const [username, setUsername] = useState(localStorage.getItem("username"));
   const [showDropdown, setShowDropdown] = useState(false);
   const dropdownRef = useRef(null);
   const navigate = useNavigate();
 
-  // ✅ Update username when localStorage changes (for dynamic updates)
   useEffect(() => {
     const handleStorageChange = () => {
-      setUsername(localStorage.getItem("username") || null);
+      setUsername(localStorage.getItem("username"));
     };
-
     window.addEventListener("storage", handleStorageChange);
-    return () => {
-      window.removeEventListener("storage", handleStorageChange);
-    };
+    return () => window.removeEventListener("storage", handleStorageChange);
   }, []);
 
-  // ✅ Handle Logout
   const handleLogout = () => {
     localStorage.removeItem("username");
     localStorage.removeItem("isLoggedIn");
     setUsername(null);
-    setShowDropdown(false);
     navigate("/login");
   };
 
-  // ✅ Close dropdown when clicking outside
   useEffect(() => {
     function handleClickOutside(event) {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -38,9 +31,7 @@ const Navbar = () => {
       }
     }
     document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   return (
@@ -72,7 +63,7 @@ const Navbar = () => {
               />
               {showDropdown && (
                 <div className="profile-dropdown">
-                  <Link to="/account" className="dropdown-link">Account</Link> {/* ✅ Added Account Link */}
+                  <Link to="/account" className="dropdown-link">Account</Link>
                   <button onClick={handleLogout}>Logout</button>
                 </div>
               )}
