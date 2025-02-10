@@ -12,7 +12,7 @@ const Login = () => {
   const handleLogin = async (e) => {
     e.preventDefault(); // Prevent form submission refresh
     try {
-      const response = await axios.post("http://127.0.0.1:5000/login", { email, password });
+      const response = await axios.post("https://fs-51ng.onrender.com/login", { email, password });
 
       const { username } = response.data; // Destructure username from the response
       if (username) {
