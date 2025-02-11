@@ -4,6 +4,10 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_migrate import Migrate
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 # Initialize Flask app
 app = Flask(__name__)
@@ -11,8 +15,8 @@ app = Flask(__name__)
 # ✅ Enable CORS for GitHub Pages & Localhost
 CORS(app, resources={r"/*": {"origins": ["https://dakhilram.github.io", "http://localhost:5173"]}}, supports_credentials=True)
 
-# ✅ PostgreSQL Configuration (Uses Render DATABASE_URL)
-app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv("DATABASE_URL", "YOUR_RENDER_POSTGRES_URL")  # Replace with Render PostgreSQL URL
+# ✅ PostgreSQL Configuration using Azure Database
+app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv("DATABASE_URL", "postgresql://akhil:Foresight%402025@fs-postgres-db.postgres.database.azure.com:5432/postgres") + "?sslmode=require"
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 # Initialize database

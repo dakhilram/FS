@@ -17,7 +17,7 @@ const Account = () => {
           return;
         }
         const response = await axios.get(
-          `https://fs-51ng.onrender.com/user?username=${storedUsername}`,
+          `fs-backend-hcgfephuf9fmfqdm.canadacentral-01.azurewebsites.net/user?username=${storedUsername}`,
           { withCredentials: true }
         );
         setUser(response.data);

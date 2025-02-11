@@ -15,7 +15,7 @@ const Register = () => {
 
     try {
       const response = await axios.post(
-        "https://fs-51ng.onrender.com/signup",
+        "fs-backend-hcgfephuf9fmfqdm.canadacentral-01.azurewebsites.net/signup",
         { username, email, password },
         { withCredentials: true }
       );

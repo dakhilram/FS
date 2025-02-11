@@ -14,7 +14,7 @@ const Login = () => {
 
     try {
       const response = await axios.post(
-        "https://fs-51ng.onrender.com/login",
+        "fs-backend-hcgfephuf9fmfqdm.canadacentral-01.azurewebsites.net/login",
         { email, password },
         { withCredentials: true }
       );
