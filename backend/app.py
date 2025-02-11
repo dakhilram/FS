@@ -12,6 +12,12 @@ load_dotenv()
 # Initialize Flask app
 app = Flask(__name__)
 
+allowed_origins = [
+    "https://dakhilram.github.io",  # GitHub Pages (if still needed)
+    "https://black-tree-0e663b110.4.azurestaticapps.net"  # Azure Static Web Apps
+]
+
+
 # ✅ Explicitly Allow GitHub Pages & Localhost with Correct Headers
 CORS(app, supports_credentials=True)
 
