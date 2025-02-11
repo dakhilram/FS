@@ -12,8 +12,16 @@ load_dotenv()
 # Initialize Flask app
 app = Flask(__name__)
 
-# ✅ Enable CORS for GitHub Pages & Localhost
-CORS(app, resources={r"/*": {"origins": ["https://dakhilram.github.io", "http://localhost:5173"]}}, supports_credentials=True)
+# ✅ Explicitly Allow GitHub Pages & Localhost with Correct Headers
+CORS(app)
+
+@app.after_request
+def add_cors_headers(response):
+    response.headers["Access-Control-Allow-Origin"] = "https://dakhilram.github.io"
+    response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS"
+    response.headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization"
+    response.headers["Access-Control-Allow-Credentials"] = "true"
+    return response
 
 # ✅ PostgreSQL Configuration using Azure Database
 app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv("DATABASE_URL", "postgresql://akhil:Foresight%402025@fs-postgres-db.postgres.database.azure.com:5432/postgres") + "?sslmode=require"
