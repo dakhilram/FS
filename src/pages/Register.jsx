@@ -12,15 +12,14 @@ const Register = () => {
 
   const handleRegister = async (e) => {
     e.preventDefault();
-
+  
     try {
       const response = await axios.post(
-        "fs-backend-hcgfephuf9fmfqdm.canadacentral-01.azurewebsites.net/signup",
+        "https://fs-backend-hcgfephuf9fmfqdm.canadacentral-01.azurewebsites.net/signup", // ✅ Fixed URL
         { username, email, password },
         { withCredentials: true }
       );
-      
-
+  
       if (response.status === 201) {
         alert(response.data.message);
         navigate("/login");
