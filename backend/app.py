@@ -13,7 +13,7 @@ load_dotenv()
 app = Flask(__name__)
 
 # ✅ Explicitly Allow GitHub Pages & Localhost with Correct Headers
-CORS(app)
+CORS(app, supports_credentials=True)
 
 @app.after_request
 def add_cors_headers(response):
