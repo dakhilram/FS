@@ -1,6 +1,6 @@
 import React from "react";
 import "../styles/Terrorism.css";
-import terrorismImage from "../assets/Te.jpg"; // Ensure the correct path
+import terrorismImage from "../assets/te.jpg"; // Ensure the correct path
 
 const Terrorism = () => {
   return (
