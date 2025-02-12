@@ -1,6 +1,6 @@
 import React from "react";
 import "../styles/Nature.css";
-import tornadoImage from "../assets/To.jpg";
+import tornadoImage from "../assets/to.jpg";
 
 const Tornado = () => {
   return (
