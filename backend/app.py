@@ -75,6 +75,18 @@ def signup():
 
     return jsonify({'message': 'User registered successfully'}), 201
 
+@app.route('/login', methods=['POST'])
+def login():
+    data = request.json
+    email = data.get('email')
+    password = data.get('password')
+
+    user = User.query.filter_by(email=email).first()
+    if user and check_password_hash(user.password, password):
+        return jsonify({"message": "Login successful", "username": user.username}), 200
+    else:
+        return jsonify({"message": "Invalid credentials"}), 401
+
 # ✅ Health Check Route
 @app.route('/')
 def home():

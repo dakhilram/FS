@@ -10,22 +10,26 @@ const Login = () => {
   const navigate = useNavigate();
 
   const handleLogin = async (e) => {
-    e.preventDefault(); // Prevent form refresh
+    e.preventDefault();
+    setError(""); // Clear previous errors
+
+    if (!email || !password) {
+      setError("Email and password are required.");
+      return;
+    }
 
     try {
       const response = await axios.post(
-        "fs-backend-hcgfephuf9fmfqdm.canadacentral-01.azurewebsites.net/login",
+        "http://localhost:5000/login", // ✅ Local Flask Backend
         { email, password },
-        { withCredentials: true }
+        { withCredentials: false }
       );
-      
 
-      const { username } = response.data;
-      if (username) {
-        localStorage.setItem("username", username);
+      if (response.status === 200 && response.data.username) {
+        localStorage.setItem("username", response.data.username);
         localStorage.setItem("isLoggedIn", "true");
 
-        window.dispatchEvent(new Event("storage")); // Ensure dynamic navbar update
+        window.dispatchEvent(new Event("storage")); // Ensure navbar updates dynamically
 
         navigate("/");
       } else {
@@ -33,7 +37,17 @@ const Login = () => {
       }
     } catch (err) {
       console.error("Login Error:", err);
-      setError("An error occurred while logging in. Please try again.");
+      if (err.response) {
+        if (err.response.status === 401) {
+          setError("Invalid email or password.");
+        } else if (err.response.status === 404) {
+          setError("Login endpoint not found. Ensure Flask is running.");
+        } else {
+          setError("An error occurred while logging in. Please try again.");
+        }
+      } else {
+        setError("Server is not responding. Check if Flask is running.");
+      }
     }
   };
 

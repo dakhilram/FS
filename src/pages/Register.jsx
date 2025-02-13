@@ -15,9 +15,9 @@ const Register = () => {
   
     try {
       const response = await axios.post(
-        "https://fs-backend-hcgfephuf9fmfqdm.canadacentral-01.azurewebsites.net/signup", // ✅ Fixed URL
+        "http://localhost:5000/signup", // ✅ Fixed URL
         { username, email, password },
-        { withCredentials: true }
+        { withCredentials: false }
       );
   
       if (response.status === 201) {
