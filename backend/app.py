@@ -12,10 +12,10 @@ load_dotenv()
 # Initialize Flask app
 app = Flask(__name__)
 
-# Allow CORS for GitHub Pages
+# Allow CORS for GitHub Pages & Local Development
 allowed_origins = [
     "https://dakhilram.github.io",  # Frontend hosted on GitHub Pages
-    "http://localhost:5173"  # For local testing (Vite default)
+    "http://localhost:5173"  # Local development (Vite)
 ]
 
 CORS(app, resources={r"/*": {"origins": allowed_origins}}, supports_credentials=True)
@@ -31,15 +31,29 @@ def handle_preflight():
         response.headers["Access-Control-Allow-Credentials"] = "true"
         return response, 200
 
-# PostgreSQL Configuration
-app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv("DATABASE_URL", "postgresql://akhil:Foresight%402025@fs-postgres-db.postgres.database.azure.com:5432/postgres") + "?sslmode=require"
+# ✅ Database Configuration (Local PostgreSQL - Update as Needed)
+app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv(
+    "DATABASE_URL",
+    "postgresql://postgres:1234@localhost:5432/foresight"  # Change this to match your local DB
+)
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-# Initialize database
+# ✅ Initialize database
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 
-# Routes (unchanged)
+# ✅ User Model (You need this for signup to work)
+class User(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(50), unique=True, nullable=False)
+    email = db.Column(db.String(120), unique=True, nullable=False)
+    password = db.Column(db.String(255), nullable=False)
+
+# ✅ Create tables (Only needed for local development)
+with app.app_context():
+    db.create_all()
+
+# ✅ Signup Route
 @app.route('/signup', methods=['POST'])
 def signup():
     data = request.json
@@ -61,11 +75,11 @@ def signup():
 
     return jsonify({'message': 'User registered successfully'}), 201
 
-# Health Check
+# ✅ Health Check Route
 @app.route('/')
 def home():
     return "Flask Backend Running!"
 
-# Run the Flask app
+# ✅ Run the Flask app
 if __name__ == '__main__':
     app.run(host="0.0.0.0", port=5000, debug=True)
