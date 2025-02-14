@@ -3,6 +3,10 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import "../styles/Auth.css";
 
+const API_BASE_URL = window.location.hostname === "localhost"
+  ? "http://localhost:5000"  // ✅ Local development backend
+  : "https://fs-51ng.onrender.com";  // ✅ Replace with your deployed backend URL
+
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -11,43 +15,25 @@ const Login = () => {
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    setError(""); // Clear previous errors
-
-    if (!email || !password) {
-      setError("Email and password are required.");
-      return;
-    }
 
     try {
       const response = await axios.post(
-        "http://localhost:5000/login", // ✅ Local Flask Backend
+        `${API_BASE_URL}/login`,  // ✅ Dynamic backend URL
         { email, password },
-        { withCredentials: false }
+        { withCredentials: true }  // ✅ Ensures authentication is handled correctly
       );
 
-      if (response.status === 200 && response.data.username) {
+      if (response.status === 200) {
         localStorage.setItem("username", response.data.username);
         localStorage.setItem("isLoggedIn", "true");
 
-        window.dispatchEvent(new Event("storage")); // Ensure navbar updates dynamically
+        window.dispatchEvent(new Event("storage")); // ✅ Forces Navbar to update
 
-        navigate("/");
-      } else {
-        setError("Invalid login credentials. Please try again.");
+        navigate("/");  // ✅ Redirects to Home
       }
     } catch (err) {
       console.error("Login Error:", err);
-      if (err.response) {
-        if (err.response.status === 401) {
-          setError("Invalid email or password.");
-        } else if (err.response.status === 404) {
-          setError("Login endpoint not found. Ensure Flask is running.");
-        } else {
-          setError("An error occurred while logging in. Please try again.");
-        }
-      } else {
-        setError("Server is not responding. Check if Flask is running.");
-      }
+      setError(err.response?.data?.message || "Invalid login credentials.");
     }
   };
 

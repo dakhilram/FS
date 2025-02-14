@@ -34,7 +34,7 @@ def handle_preflight():
 # ✅ Database Configuration (Local PostgreSQL - Update as Needed)
 app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv(
     "DATABASE_URL",
-    "postgresql://postgres:1234@localhost:5432/foresight"  # Change this to match your local DB
+    "postgresql://akhil:YvMTFxMVgulJjudfvZ6ovc5XJwZE9G0k@dpg-cukit5a3esus73asth4g-a.oregon-postgres.render.com/foresight_db_uyxi"  # Change this to Render
 )
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
@@ -70,6 +70,7 @@ def signup():
     hashed_password = generate_password_hash(password, method='pbkdf2:sha256')
     new_user = User(username=username, email=email, password=hashed_password)
 
+
     db.session.add(new_user)
     db.session.commit()
 
@@ -82,10 +83,17 @@ def login():
     password = data.get('password')
 
     user = User.query.filter_by(email=email).first()
-    if user and check_password_hash(user.password, password):
+
+    if not user:
+        return jsonify({"message": "User not found"}), 404
+
+    # ✅ Properly compare the stored hash with entered password
+    if check_password_hash(user.password, password):
         return jsonify({"message": "Login successful", "username": user.username}), 200
     else:
-        return jsonify({"message": "Invalid credentials"}), 401
+        return jsonify({"message": "Invalid password"}), 401
+
+
 
 # ✅ Health Check Route
 @app.route('/')

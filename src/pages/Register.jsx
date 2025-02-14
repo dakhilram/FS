@@ -3,6 +3,10 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import "../styles/Auth.css";
 
+const API_BASE_URL = window.location.hostname === "localhost"
+  ? "http://localhost:5000"  // ✅ Use localhost in development
+  : "https://fs-51ng.onrender.com";  // ✅ Replace with your deployed backend URL
+
 const Register = () => {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
@@ -12,14 +16,14 @@ const Register = () => {
 
   const handleRegister = async (e) => {
     e.preventDefault();
-  
+
     try {
       const response = await axios.post(
-        "http://localhost:5000/signup", // ✅ Fixed URL
+        `${API_BASE_URL}/signup`,  // ✅ Dynamic backend URL
         { username, email, password },
-        { withCredentials: false }
+        { withCredentials: true }
       );
-  
+
       if (response.status === 201) {
         alert(response.data.message);
         navigate("/login");

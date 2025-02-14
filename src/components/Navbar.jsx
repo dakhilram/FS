@@ -5,25 +5,35 @@ import { FaUserCircle } from "react-icons/fa";
 
 const Navbar = () => {
   const [username, setUsername] = useState(localStorage.getItem("username"));
+  const [isLoggedIn, setIsLoggedIn] = useState(localStorage.getItem("isLoggedIn") === "true");
   const [showDropdown, setShowDropdown] = useState(false);
   const dropdownRef = useRef(null);
   const navigate = useNavigate();
 
+  // ✅ Listen for login/logout changes
   useEffect(() => {
     const handleStorageChange = () => {
       setUsername(localStorage.getItem("username"));
+      setIsLoggedIn(localStorage.getItem("isLoggedIn") === "true");
     };
+
     window.addEventListener("storage", handleStorageChange);
     return () => window.removeEventListener("storage", handleStorageChange);
   }, []);
 
+  // ✅ Logout Function
   const handleLogout = () => {
     localStorage.removeItem("username");
     localStorage.removeItem("isLoggedIn");
     setUsername(null);
+    setIsLoggedIn(false);
+
+    window.dispatchEvent(new Event("storage")); // ✅ Force Navbar update
+
     navigate("/login");
   };
 
+  // ✅ Close dropdown when clicking outside
   useEffect(() => {
     function handleClickOutside(event) {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -54,7 +64,7 @@ const Navbar = () => {
 
       <div className="auth-links">
         <div className="profile-section" ref={dropdownRef}>
-          {username ? (
+          {isLoggedIn ? (
             <>
               <span className="username">{username}</span>
               <FaUserCircle
@@ -89,3 +99,4 @@ const Navbar = () => {
 };
 
 export default Navbar;
+// ✅ This code implements a responsive navigation bar with dropdown functionality for user authentication and nature-related links. It uses React hooks for state management and effects, and it handles user login/logout actions while ensuring the UI updates accordingly. The dropdown menu is designed to close when clicking outside of it, enhancing the user experience. The component is styled using CSS classes defined in an external stylesheet.
