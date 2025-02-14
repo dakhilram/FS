@@ -29,7 +29,6 @@ const Navbar = () => {
     setIsLoggedIn(false);
 
     window.dispatchEvent(new Event("storage")); // ✅ Force Navbar update
-
     navigate("/login");
   };
 
@@ -43,6 +42,12 @@ const Navbar = () => {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+
+  // ✅ Handles navigation and closes dropdown
+  const handleNavClick = (path) => {
+    setShowDropdown(false);
+    navigate(path);
+  };
 
   return (
     <nav className="navbar">
@@ -73,7 +78,7 @@ const Navbar = () => {
               />
               {showDropdown && (
                 <div className="profile-dropdown">
-                  <Link to="/account" className="dropdown-link">Account</Link>
+                  <button onClick={() => handleNavClick("/account")}>Account</button>
                   <button onClick={handleLogout}>Logout</button>
                 </div>
               )}
@@ -86,8 +91,8 @@ const Navbar = () => {
               />
               {showDropdown && (
                 <div className="profile-dropdown">
-                  <Link to="/login" className="dropdown-link">Login</Link>
-                  <Link to="/register" className="dropdown-link">Signup</Link>
+                  <button onClick={() => handleNavClick("/login")}>Login</button>
+                  <button onClick={() => handleNavClick("/register")}>Signup</button>
                 </div>
               )}
             </>
@@ -99,4 +104,3 @@ const Navbar = () => {
 };
 
 export default Navbar;
-// ✅ This code implements a responsive navigation bar with dropdown functionality for user authentication and nature-related links. It uses React hooks for state management and effects, and it handles user login/logout actions while ensuring the UI updates accordingly. The dropdown menu is designed to close when clicking outside of it, enhancing the user experience. The component is styled using CSS classes defined in an external stylesheet.

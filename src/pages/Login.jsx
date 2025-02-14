@@ -4,8 +4,8 @@ import axios from "axios";
 import "../styles/Auth.css";
 
 const API_BASE_URL = window.location.hostname === "localhost"
-  ? "http://localhost:5000"  // ✅ Local development backend
-  : "https://fs-51ng.onrender.com";  // ✅ Replace with your deployed backend URL
+  ? "http://localhost:5000"
+  : "https://fs-51ng.onrender.com"; 
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -18,18 +18,18 @@ const Login = () => {
 
     try {
       const response = await axios.post(
-        `${API_BASE_URL}/login`,  // ✅ Dynamic backend URL
+        `${API_BASE_URL}/login`,
         { email, password },
-        { withCredentials: true }  // ✅ Ensures authentication is handled correctly
+        { withCredentials: true }
       );
 
       if (response.status === 200) {
         localStorage.setItem("username", response.data.username);
         localStorage.setItem("isLoggedIn", "true");
+        
+        window.dispatchEvent(new Event("storage")); // ✅ Ensures Navbar updates
 
-        window.dispatchEvent(new Event("storage")); // ✅ Forces Navbar to update
-
-        navigate("/");  // ✅ Redirects to Home
+        navigate("/");
       }
     } catch (err) {
       console.error("Login Error:", err);
