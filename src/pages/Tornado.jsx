@@ -3,6 +3,7 @@ import "../styles/Tornado.css";
 import tornadoImage from "../assets/to.jpg";
 import totrend from "../assets/Tornados/Trend.png";
 import toinjuries from "../assets/Tornados/Injuries.png";
+import tobubble from "../assets/Tornados/tobubble.jpg";
 
 const Tornado = () => {
   return (
@@ -51,6 +52,15 @@ const Tornado = () => {
         <img src={toinjuries} alt="Tornado Injuries" className="chart-image" />
       </div>
 
+      <h2> Tornado Occurrence by States</h2>
+      <div className="chart-container">
+        <img src={tobubble} alt="Tornado Trend" className="chart-imagebubble" />
+        <p className="chart-description">The image represents a bubble map of tornado occurrences across the United States. The size of each bubble corresponds to the number of tornadoes reported in that state, with larger bubbles indicating a higher occurrence. The color intensity also varies, with darker shades of red representing states with more tornadoes.
+Texas has the highest number of tornadoes, as indicated by the largest and darkest bubble.
+Other states in the Midwest and Southeastern regions, such as Oklahoma, Kansas, and Florida, also show significant tornado activity.
+States in the Western and Northeastern U.S. have relatively smaller bubbles, indicating fewer tornado occurrences.
+        </p>
+      </div>
       
     </div>
   );
