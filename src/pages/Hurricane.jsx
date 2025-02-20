@@ -2,14 +2,17 @@ import React from "react";
 import "../styles/Hurricane.css";
 import hurricaneImage from "../assets/Hu.jpg";
 import hutrend from "../assets/hurricane/hutrend.png";
+import hudamage from "../assets/hurricane/hudamage.png";
+import hudeath from "../assets/hurricane/hudeath.png";
 
 const Hurricane = () => {
   return (
     <div className="nature-page">
       <h1>🌀 Hurricane Information 🌀</h1>
-      
+
       {/* Main Hurricane Image */}
       <img src={hurricaneImage} alt="Hurricane" className="nature-image" />
+
       {/* Introduction */}
       <h2>🌊 What are Hurricanes?</h2>
       <p className="intro-text">
@@ -21,15 +24,40 @@ const Hurricane = () => {
         make landfall in coastal regions.
       </p>
 
-      
       {/* Hurricane Trend Chart */}
       <h2>📈 Hurricane Trends Over the Years 📉</h2>
       <div className="chart-container">
         <img src={hutrend} alt="Hurricane Trend" className="chart-image" />
         <p className="chart-description">
-          The trend of hurricanes over the years shows fluctuations in hurricane occurrences, 
-          with some years experiencing significantly higher storm activity. This variation is influenced 
-          by factors such as ocean temperatures, atmospheric conditions, and climate change.
+          The line graph illustrates the trend of hurricanes per year from 1921 to the present. 
+          It shows fluctuations in hurricane occurrences, with some years experiencing significantly more hurricanes than others. 
+          There are periods of increased hurricane activity, possibly due to climate patterns like El Niño and La Niña. 
+          The dynamically spaced x-axis provides a clear visualization of hurricane frequency over time.
+          The graph suggests a fluctuating but persistent occurrence of hurricanes over the years, with some years witnessing extreme hurricane activity. This trend highlights the need for continuous monitoring, preparedness, and climate analysis to mitigate future hurricane risks. 🚀
+        </p>
+      </div>
+
+      {/* Hurricane Damage Chart */}
+      <h2>💰 Economic Damage Caused by Hurricanes 💰</h2>
+      <div className="chart-container">
+        <p className="chart-description">
+          The bar chart illustrates the total economic damage caused by hurricanes across different categories. 
+          Higher-category hurricanes generally result in greater financial losses, with Category 5 storms 
+          causing the most damage. This trend highlights the destructive potential of intense hurricanes, emphasizing 
+          the need for disaster preparedness and mitigation efforts. 
+        </p>
+        <img src={hudamage} alt="Hurricane Damage" className="chart-image" />
+      </div>
+
+      {/* Hurricane Deaths Chart */}
+      <h2>⚠️ Fatalities Caused by Hurricanes ⚠️</h2>
+      <div className="chart-container right-align">
+        <img src={hudeath} alt="Hurricane Deaths" className="chart-image" />
+        <p className="chart-description">
+          The bar chart displays the total number of deaths caused by hurricanes across different categories. 
+          While higher-category hurricanes tend to cause more fatalities, some lower-category storms have 
+          also resulted in significant death tolls, likely due to flooding, infrastructure damage, and population density. 
+          This emphasizes the importance of early warnings and emergency response systems to minimize loss of life. 
         </p>
       </div>
     </div>

@@ -4,6 +4,7 @@ import earthquakeImage from "../assets/eq.jpg";
 import eqmagnitude from "../assets/Earthquake/eqmagnitude.png";
 import eqscatter from "../assets/Earthquake/eqscatter.png";
 import eqtrend from "../assets/Earthquake/eqtrend.png";
+import eqscattergeo from "../assets/Earthquake/eqscattergeo.png";
 
 const Earthquake = () => {
   return (
@@ -67,6 +68,20 @@ const Earthquake = () => {
         Most high-magnitude earthquakes occur at shallow depths, which is why earthquake-prone regions like California, Japan, and Indonesia focus on building earthquake-resistant infrastructure.
         </p>
       </div>
+
+            {/* Section: Magnitude Distribution */}
+            <h2>🌡️ Magnitude Distribution of Earthquakes 🌡️</h2>
+      <div className="chart-container right-align">
+        <p className="chart-description">
+        This scatter plot represents the locations of recorded earthquakes based on latitude and longitude. 
+        The size and color of each point indicate the magnitude of the earthquake. 
+        As expected, most earthquakes occur along tectonic plate boundaries, such as the Pacific Ring of Fire,
+         where intense seismic activity is common. This visualization highlights key earthquake-prone regions, 
+         including parts of the Americas, Asia, and the Pacific.
+        </p>
+        <img src={eqscattergeo} alt="Earthquake Magnitude Distribution" className="chart-image" />
+      </div>
+
     </div>
   );
 };
