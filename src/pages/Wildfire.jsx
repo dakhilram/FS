@@ -35,7 +35,7 @@ const Wildfire = () => {
 
 
       {/* Wildfire Trend Over the Years */}
-      <h2>📈 Wildfire Trends Over the Years</h2>
+      <h2>📈 Wildfire Trends Over the Years 📉</h2>
       <div className="chart-container">
         <img src={wildfireTrend} alt="Wildfire Trend" className="chart-image" />
         <p className="chart-description">
@@ -46,7 +46,7 @@ const Wildfire = () => {
       </div>
 
       {/* Wildfire Occurrence - Day vs Night */}
-      <h2>🌙 Day vs. Night Wildfire Occurrence</h2>
+      <h2>☀️ Day vs. Night Wildfire Occurrence 🌙</h2>
       <div className="chart-container right-align">
         <p className="chart-description">
         Wildfires are far more common during the daytime than at night. 
@@ -58,7 +58,7 @@ const Wildfire = () => {
       </div>
       
       {/* Wildfire Occurrence by Hour */}
-      <h2>🔥 When do Wildfires Occur Most?</h2>
+      <h2>🕛 When do Wildfires Occur Most? 🕛</h2>
       <div className="chart-container">
         <img src={wildhour} alt="Wildfire by Hour" className="chart-image" />
         <p className="chart-description">
