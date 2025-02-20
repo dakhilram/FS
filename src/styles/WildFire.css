@@ -78,6 +78,25 @@
     border-radius: 8px;
     box-shadow: 0px 2px 5px rgba(41, 43, 48, 0.544);
 }
+/* 🔥 Wildfire Map Container */
+.map-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 20px auto;
+    width: 90%;
+}
+
+/* 🌍 Wildfire Map (Iframe) */
+.wildfire-map {
+    width: 100%;
+    max-width: 900px;
+    height: 500px;
+    border-radius: 10px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+    border: none;
+}
+
 
 /* Responsive Design */
 @media screen and (max-width: 768px) {
@@ -98,5 +117,10 @@
 
     .chart-container.right-align {
         justify-content: center;
+    }
+
+    .wildfire-map {
+        height: 400px;
+        width: 95%;
     }
 }

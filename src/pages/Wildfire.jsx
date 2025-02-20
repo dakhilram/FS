@@ -67,8 +67,18 @@ const Wildfire = () => {
         </p>
       </div>
 
-      
-
+      <h2>🌍 Wildfire Prediction Map 🌍</h2>
+      <p className="map-description">
+        This interactive map provides a visual representation of wildfire predictions across the United States. 
+        It helps in understanding the potential risk areas and planning for wildfire management and prevention.</p>  
+      <div className="map-container">
+      <iframe 
+        src=  {`${import.meta.env.BASE_URL}USA_Wildfire_Map.html`} 
+        title="Wildfire Prediction Map"
+        className="wildfire-map"
+        >
+        </iframe>
+      </div>
       
     </div>
   );
