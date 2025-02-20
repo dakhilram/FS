@@ -35,19 +35,20 @@ const Tornado = () => {
       <h2>🌍 Tornado Trends Over Time</h2>
       <div className="chart-container">
         <img src={totrend} alt="Tornado Trend" className="chart-image" />
-        <p className="chart-description">
-          Tornado occurrences have increased over the years due to improved detection 
-          technologies and changing climate patterns. The highest peaks indicate years 
-          with extreme tornado activity, often influenced by El Niño and La Niña cycles.
+        <p className="chart-description">This graph depicts the number of tornadoes occurring annually over time.
+In the Early Years (1950s) the number of recorded tornadoes starts at around 200 and rises steadily.
+During the 1960s–1980s, the number of tornadoes fluctuates significantly, with multiple peaks and drops. The highest peak appeared around 1974 and another significant peak around 2011, both exceeding 800 tornadoes in a year.
+Climate patterns, such as El Niño/La Niña cycles, may contribute to periodic increases or decreases in tornado activity.
+The sharp spike around 2011 aligns with a well-known period of increased tornado activity in the U.S., particularly the 2011 Super Outbreak.
         </p>
       </div>
 
       <h2>🚑 Tornado Injuries Per Year</h2>
       <div className="chart-container right-align">
-        <p className="chart-description">
-          Tornadoes can cause thousands of injuries annually, with major spikes occurring 
-          in years with severe outbreaks. Strong tornadoes, categorized as EF4 and EF5, 
-          are responsible for the most destruction, leading to fatalities and infrastructure loss.
+        <p className="chart-description">The bar chart illustrates the number of injuries caused by tornadoes over the years.
+Certain years stand out with extremely high injury counts, notably around 1953, 1974, 2011, where injuries exceeded 5000–7000 in a single year.
+The spike in 1974 corresponds to the Super Outbreak of 1974, one of the deadliest tornado outbreaks in U.S. history.
+The peak around 2011 aligns with the 2011 Super Outbreak, which caused over 5,000 injuries.
         </p>
         <img src={toinjuries} alt="Tornado Injuries" className="chart-image" />
       </div>
