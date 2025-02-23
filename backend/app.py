@@ -4,24 +4,25 @@ from flask_cors import CORS
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_migrate import Migrate
 from dotenv import load_dotenv
-import resend  # ✅ Import Resend
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
 import os
 
-# Load environment variables
+# ✅ Load environment variables
 load_dotenv()
 
-# Initialize Flask app
+# ✅ Initialize Flask app
 app = Flask(__name__)
 
-# Allow CORS for GitHub Pages & Local Development
+# ✅ Allow CORS for GitHub Pages & Local Development
 allowed_origins = [
     "https://dakhilram.github.io",  # Frontend hosted on GitHub Pages
     "http://localhost:5173"  # Local development (Vite)
 ]
-
 CORS(app, resources={r"/*": {"origins": allowed_origins}}, supports_credentials=True)
 
-# Handle CORS for preflight requests
+# ✅ Handle CORS for preflight requests
 @app.before_request
 def handle_preflight():
     if request.method == "OPTIONS":
@@ -43,9 +44,11 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 
-# ✅ Initialize Resend API
-RESEND_API_KEY = "re_6iMG3f2t_JnMHQ4LJhv3XjzTdvnnHSFJ1"
-resend.api_key = RESEND_API_KEY
+# ✅ Gmail SMTP Configuration
+SMTP_SERVER = "smtp.gmail.com"
+SMTP_PORT = 587
+SMTP_USERNAME = os.getenv("SMTP_USERNAME")  # Your Gmail address
+SMTP_PASSWORD = os.getenv("SMTP_PASSWORD")  # Your App Password
 
 # ✅ User Model with `is_verified` field
 class User(db.Model):
@@ -59,20 +62,32 @@ class User(db.Model):
 with app.app_context():
     db.create_all()
 
-# ✅ Function to Send Email Verification
+# ✅ Function to Send Email Verification via Gmail SMTP
 def send_verification_email(email):
     verification_link = f"https://dakhilram.github.io/FS/#/verify-email?email={email}"
 
-    resend.Emails.send({
-        "from": "onboarding@resend.dev",
-        "to": email,
-        "subject": "Verify Your Email - Foresight",
-        "html": f"""
-        <h2>Verify Your Email</h2>
-        <p>Click the link below to verify your email:</p>
-        <a href="{verification_link}" style="display: inline-block; padding: 10px 15px; color: white; background-color: blue; text-decoration: none; border-radius: 5px;">Verify Email</a>
-        """
-    })
+    msg = MIMEMultipart()
+    msg["From"] = SMTP_USERNAME
+    msg["To"] = email
+    msg["Subject"] = "Verify Your Email - Foresight"
+
+    body = f"""
+    <h2>Verify Your Email</h2>
+    <p>Click the link below to verify your email:</p>
+    <a href="{verification_link}" style="display: inline-block; padding: 10px 15px; color: white; background-color: blue; text-decoration: none; border-radius: 5px;">Verify Email</a>
+    """
+    msg.attach(MIMEText(body, "html"))
+
+    try:
+        with smtplib.SMTP(SMTP_SERVER, SMTP_PORT) as server:
+            server.starttls()  # Secure connection
+            server.login(SMTP_USERNAME, SMTP_PASSWORD)
+            server.sendmail(SMTP_USERNAME, email, msg.as_string())
+
+        print(f"✅ Verification email sent to {email}")
+
+    except Exception as e:
+        print(f"❌ Failed to send email: {e}")
 
 # ✅ Signup Route (Now sends verification email)
 @app.route('/signup', methods=['POST'])
