@@ -8,24 +8,14 @@
   padding: 15px 30px;
   position: fixed;
   top: 0;
-  left: 0;
-  right: 0;
+  width: 100%;
   z-index: 1000;
-  transition: all 0.3s ease-in-out;
-}
-
-/* ✅ Navbar Shadow When Scrolled */
-.navbar.scrolled {
-  background: rgba(0, 0, 0, 0.9);
   box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
 }
 
-/* ✅ Logo Styling */
-.logo {
-  font-size: 24px;
-  color: lightblue;
-  font-weight: bold;
-  margin-right: auto;
+/* ✅ Fix for Page Content Being Hidden */
+body {
+  padding-top: 70px;
 }
 
 /* ✅ Navbar Links */
@@ -33,7 +23,6 @@
   display: flex;
   gap: 20px;
   align-items: center;
-  margin: 0 auto;
   justify-content: center;
   flex: 1;
 }
@@ -173,3 +162,10 @@
   color: white;
 }
 
+/* ✅ Responsive Navbar */
+@media screen and (max-width: 768px) {
+  .nav-links {
+    flex-direction: column;
+    gap: 10px;
+  }
+}

@@ -1,38 +1,49 @@
-/* ✅ Fullscreen Container with Background Gradient */
+/* ✅ Background Gradient */
 .account-container {
   display: flex;
   justify-content: center;
   align-items: center;
-  flex-direction: column;
+  flex-wrap: wrap;
   min-height: 100vh;
-  background: linear-gradient(to right, #cfe2ff, #e0f7fa); /* Light Blue Gradient */
-  padding: 40px 20px;
+  background: linear-gradient(to right, #d7eafd, #e3f2fd);
+  padding-top: 80px;
+}
+
+/* ✅ Arrange Cards Side by Side */
+.account-card-container {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  flex-wrap: wrap;
+  width: 90%;
+  max-width: 1000px;
 }
 
 /* ✅ Flash Card Design */
 .account-card {
-  background: rgba(255, 255, 255, 0.9); /* White cards for contrast */
-  box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.2);
+  background: rgba(255, 255, 255, 0.3); /* Glass effect */
+  backdrop-filter: blur(15px);
+  box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
   border-radius: 15px;
-  padding: 25px;
-  width: 50%;
-  max-width: 500px;
+  padding: 30px;
+  width: 30%;
+  min-width: 280px;
   text-align: center;
-  margin-bottom: 25px;
+  margin: 10px;
   transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
 }
 
 /* ✅ Hover Effect */
 .account-card:hover {
   transform: translateY(-5px);
-  box-shadow: 0px 12px 25px rgba(0, 0, 0, 0.3);
+  box-shadow: 0px 12px 20px rgba(0, 0, 0, 0.3);
 }
 
-/* ✅ Header */
+/* ✅ Account Header */
 .account-header {
-  font-size: 24px;
+  font-size: 26px;
   font-weight: bold;
-  color: #0056b3;
+  color: #333;
   margin-bottom: 15px;
 }
 
@@ -41,7 +52,6 @@
   font-size: 18px;
   color: #222;
   margin-bottom: 10px;
-  font-weight: 500;
 }
 
 /* ✅ Email Verification */
@@ -57,9 +67,10 @@ input {
   width: 100%;
   padding: 12px;
   margin-top: 10px;
-  border: 1px solid #ddd;
+  border: none;
   border-radius: 8px;
-  background: rgba(255, 255, 255, 0.7);
+  background: rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(5px);
   font-size: 16px;
   color: #333;
   transition: 0.3s ease-in-out;
@@ -68,8 +79,7 @@ input {
 /* ✅ Input Focus */
 input:focus {
   outline: none;
-  background: rgba(255, 255, 255, 0.9);
-  border-color: #007bff;
+  background: rgba(255, 255, 255, 0.5);
 }
 
 /* ✅ Update Password & Delete Account Buttons */
@@ -107,6 +117,6 @@ input:focus {
 /* ✅ Responsive Design */
 @media (max-width: 768px) {
   .account-card {
-      width: 90%;
+    width: 90%;
   }
 }
