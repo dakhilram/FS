@@ -3,7 +3,9 @@ import axios from "axios";
 import "../styles/Alerts.css";
 import { FaCloudSun, FaWind, FaTint, FaTemperatureHigh, FaSun, FaMoon } from "react-icons/fa";
 
-const API_BASE_URL = "http://localhost:5000"; // Adjust based on deployment
+const API_BASE_URL = window.location.hostname === "localhost"
+  ? "http://localhost:5000"
+  : "https://fs-51ng.onrender.com";
 
 const Alerts = () => {
   const [city, setCity] = useState("Houston");

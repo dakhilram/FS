@@ -270,11 +270,11 @@ def delete_account():
 
     return jsonify({"message": "Account deleted successfully"}), 200
 
-API_KEY = os.getenv("OPENWEATHER_API_KEY")
+OPENWEATHER_API_KEY = os.getenv("OPENWEATHER_API_KEY")
 @app.route('/weather-alerts', methods=['GET'])
 def get_weather_alerts():
     city = request.args.get("city", "Houston")  # Default to Houston
-    url = f"https://api.openweathermap.org/data/2.5/weather?q={city}&appid={API_KEY}&units=metric"
+    url = f"https://api.openweathermap.org/data/2.5/weather?q={city}&appid={OPENWEATHER_API_KEY}&units=metric"
 
     try:
         response = requests.get(url)
@@ -289,7 +289,7 @@ def get_weather_alerts():
             "humidity": data["main"]["humidity"],
             "weather": data["weather"][0]["description"],
             "wind_speed": data["wind"]["speed"],
-            "icon": data["weather"][0]["icon"]
+            "icon": f"http://openweathermap.org/img/wn/{data['weather'][0]['icon']}.png"
         }
         return jsonify(weather_info), 200
     except Exception as e:
