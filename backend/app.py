@@ -146,6 +146,73 @@ def login():
     else:
         return jsonify({"message": "Invalid password"}), 401
 
+# ✅ Fetch User Details API
+@app.route('/user-details', methods=['GET'])
+def user_details():
+    username = request.args.get("username")
+    user = User.query.filter_by(username=username).first()
+
+    if not user:
+        return jsonify({"message": "User not found"}), 404
+
+    return jsonify({
+        "username": user.username,
+        "email": user.email,
+        "isVerified": user.is_verified
+    }), 200
+
+# ✅ Resend Email Verification API
+@app.route('/resend-verification', methods=['POST'])
+def resend_verification():
+    data = request.json
+    email = data.get("email")
+
+    user = User.query.filter_by(email=email).first()
+    if not user:
+        return jsonify({"message": "User not found"}), 404
+
+    send_verification_email(email)
+    return jsonify({"message": "Verification email resent!"}), 200
+
+# ✅ Change Password API
+@app.route('/change-password', methods=['POST'])
+def change_password():
+    data = request.json
+    email = data.get("email")
+    current_password = data.get("currentPassword")
+    new_password = data.get("newPassword")
+
+    user = User.query.filter_by(email=email).first()
+    if not user:
+        return jsonify({"message": "User not found"}), 404
+
+    if not check_password_hash(user.password, current_password):
+        return jsonify({"message": "Current password is incorrect"}), 401
+
+    user.password = generate_password_hash(new_password, method='pbkdf2:sha256')
+    db.session.commit()
+
+    return jsonify({"message": "Password updated successfully"}), 200
+
+# ✅ Delete Account API
+@app.route('/delete-account', methods=['POST'])
+def delete_account():
+    data = request.json
+    email = data.get("email")
+    password = data.get("password")
+
+    user = User.query.filter_by(email=email).first()
+    if not user:
+        return jsonify({"message": "User not found"}), 404
+
+    if not check_password_hash(user.password, password):
+        return jsonify({"message": "Incorrect password"}), 401
+
+    db.session.delete(user)
+    db.session.commit()
+
+    return jsonify({"message": "Account deleted successfully"}), 200
+
 # ✅ Health Check Route
 @app.route('/')
 def home():
