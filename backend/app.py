@@ -8,6 +8,7 @@ import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 import os
+import requests
 
 # ✅ Load environment variables
 load_dotenv()
@@ -268,6 +269,31 @@ def delete_account():
     db.session.commit()
 
     return jsonify({"message": "Account deleted successfully"}), 200
+
+API_KEY = os.getenv("OPENWEATHER_API_KEY")
+@app.route('/weather-alerts', methods=['GET'])
+def get_weather_alerts():
+    city = request.args.get("city", "Houston")  # Default to Houston
+    url = f"https://api.openweathermap.org/data/2.5/weather?q={city}&appid={API_KEY}&units=metric"
+
+    try:
+        response = requests.get(url)
+        data = response.json()
+        
+        if response.status_code != 200:
+            return jsonify({"error": data.get("message", "Failed to fetch data")}), response.status_code
+
+        weather_info = {
+            "city": data["name"],
+            "temperature": data["main"]["temp"],
+            "humidity": data["main"]["humidity"],
+            "weather": data["weather"][0]["description"],
+            "wind_speed": data["wind"]["speed"],
+            "icon": data["weather"][0]["icon"]
+        }
+        return jsonify(weather_info), 200
+    except Exception as e:
+        return jsonify({"error": "Failed to fetch weather data", "details": str(e)}), 500
 
 # ✅ Health Check Route
 @app.route('/')
