@@ -6,13 +6,21 @@
   justify-content: space-between;
   align-items: center;
   padding: 15px 30px;
-  position: relative;
+  position: fixed;
   top: 0;
-  width: 100%;
+  width: 100vw; /* Ensures full width */
   left: 0;
   right: 0;
   z-index: 1000;
+  box-sizing: border-box;
   transition: all 0.3s ease-in-out;
+}
+
+/* ✅ Fix for Gap Between Navbar and Content */
+body {
+  margin: 0;
+  padding-top: 70px; /* Adjusted so content does not get hidden */
+  overflow-x: hidden; /* Prevent horizontal scroll */
 }
 
 /* ✅ Navbar Shadow When Scrolled */
@@ -34,7 +42,6 @@
   display: flex;
   gap: 20px;
   align-items: center;
-  margin: 0 auto;
   justify-content: center;
   flex: 1;
 }
@@ -103,9 +110,8 @@
 
 /* ✅ Profile Section */
 .profile-section {
-  position: relative;
   display: flex;
-  align-items: center; /* Centers icon and username vertically */
+  align-items: center;
   cursor: pointer;
   gap: 8px;
 }
@@ -122,13 +128,13 @@
   font-weight: bold;
   font-family: "Poppins", sans-serif;
   font-size: 14px;
-  line-height: 1; /* Ensures proper vertical centering */
+  line-height: 1;
 }
 
 /* ✅ Dropdown Menu for Profile */
 .profile-dropdown {
   position: absolute;
-  top: calc(100% + 5px); /* Adjusted positioning to align dropdown below the profile icon */
+  top: calc(100% + 5px);
   right: 0;
   background: white;
   color: black;
@@ -174,3 +180,13 @@
   color: white;
 }
 
+/* ✅ Responsive Fix */
+@media screen and (max-width: 768px) {
+  .navbar {
+    padding: 10px 20px;
+  }
+  .nav-links {
+    flex-direction: column;
+    gap: 10px;
+  }
+}
