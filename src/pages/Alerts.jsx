@@ -18,32 +18,33 @@ const Alerts = () => {
   // ✅ Fetch Weather Data
   const fetchWeather = async () => {
     try {
-      let params;
-      if (!isNaN(location)) {
-        params = { zip: `${location},US` };
+      let params = {};
+  
+      // Check if input is a number (ZIP code)
+      if (!isNaN(city)) {
+        params.zip = `${city},US`;  // Use ZIP code
       } else {
-        params = { q: location };
+        params.q = city;  // Use city name
       }
   
-      console.log("Fetching weather for:", params); // ✅ Debugging Log
+      console.log("Fetching weather for:", params); // Debugging log
   
       const response = await axios.get(`${API_BASE_URL}/weather`, { params });
   
-      console.log("API Response:", response.data); // ✅ Log Response
+      console.log("API Response:", response.data); // Log response
   
-      if (response.data.cod !== 200) {
-        setError(`API Error: ${response.data.message}`);
+      if (response.data.error) {
+        setError(`API Error: ${response.data.error}`);
         return;
       }
   
       setWeather(response.data);
-      setCoords({ lat: response.data.coord.lat, lon: response.data.coord.lon });
       setError("");
     } catch (err) {
       console.error("Error fetching weather:", err);
-      setError("Failed to fetch weather alerts. Check the console.");
+      setError("Failed to fetch weather alerts.");
     }
-  };
+  };  
   
 
   return (
