@@ -1,52 +1,66 @@
 import React, { useState } from "react";
 import axios from "axios";
 import "../styles/Alerts.css";
+import { FaCloudSun, FaWind, FaTint, FaTemperatureHigh, FaSun, FaMoon } from "react-icons/fa";
 
-const API_BASE_URL = window.location.hostname === "localhost"
-  ? "http://localhost:5000"
-  : "https://fs-51ng.onrender.com";
+const API_BASE_URL = "http://localhost:5000"; // Adjust based on deployment
 
 const Alerts = () => {
   const [city, setCity] = useState("Houston");
-  const [weatherData, setWeatherData] = useState(null);
+  const [weather, setWeather] = useState(null);
   const [error, setError] = useState("");
 
-  const fetchWeatherAlerts = async () => {
+  // ✅ Fetch Weather Data
+  const fetchWeather = async () => {
     try {
-      const response = await axios.get(`${API_BASE_URL}/weather-alerts`, {
-        params: { city }
+      const response = await axios.get(`${API_BASE_URL}/weather`, {
+        params: { city },
       });
-      setWeatherData(response.data);
+
+      if (response.data.cod !== 200) {
+        setError("Failed to fetch weather data.");
+        return;
+      }
+
+      setWeather(response.data);
       setError("");
     } catch (err) {
+      console.error("Error fetching weather:", err);
       setError("Failed to fetch weather alerts.");
-      setWeatherData(null);
     }
   };
 
   return (
-    <div className="alerts-page">
-      <h1>🌍 Weather Alerts</h1>
-      <div className="zip-search">
+    <div className="alerts-container">
+      <h2 className="alerts-header">
+        <FaCloudSun /> Weather Alerts
+      </h2>
+
+      <div className="search-box">
         <input
           type="text"
-          placeholder="Enter City"
           value={city}
           onChange={(e) => setCity(e.target.value)}
+          placeholder="Enter city name"
         />
-        <button onClick={fetchWeatherAlerts}>Get Alerts</button>
+        <button className="get-alerts" onClick={fetchWeather}>
+          Get Alerts
+        </button>
       </div>
 
-      {error && <p className="error">{error}</p>}
+      {error && <p className="error-text">{error}</p>}
 
-      {weatherData && (
-        <div className="location-info">
-          <h2>{weatherData.city}</h2>
-          <p>🌡 Temperature: {weatherData.temperature}°C</p>
-          <p>💧 Humidity: {weatherData.humidity}%</p>
-          <p>🌬 Wind Speed: {weatherData.wind_speed} m/s</p>
-          <p>☁ Condition: {weatherData.weather}</p>
-          <img src={`http://openweathermap.org/img/wn/${weatherData.icon}@2x.png`} alt="Weather icon"/>
+      {weather && (
+        <div className="weather-card">
+          <h3>{weather.name}</h3>
+          <div className="weather-details">
+            <p><FaTemperatureHigh /> Temperature: {weather.main.temp.toFixed(2)}°C</p>
+            <p><FaTint /> Humidity: {weather.main.humidity}%</p>
+            <p><FaWind /> Wind Speed: {weather.wind.speed} m/s</p>
+            <p><FaCloudSun /> Condition: {weather.weather[0].description}</p>
+            <p><FaSun /> Sunrise: {new Date(weather.sys.sunrise * 1000).toLocaleTimeString()}</p>
+            <p><FaMoon /> Sunset: {new Date(weather.sys.sunset * 1000).toLocaleTimeString()}</p>
+          </div>
         </div>
       )}
     </div>

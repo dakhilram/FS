@@ -1,60 +1,96 @@
-.alerts-page {
-    text-align: center;
-    padding: 40px;
-    background: linear-gradient(to right, #2193b0, #6dd5ed);
+/* 🔥 Background & Layout */
+.alerts-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     min-height: 100vh;
-    color: white;
-}
-
-/* Title Styling */
-h1 {
-    color: #fff;
+    background: linear-gradient(to right, #56ccf2, #2f80ed);
+    padding-top: 80px;
+    text-align: center;
+  }
+  
+  /* 🌍 Header Styling */
+  .alerts-header {
     font-size: 32px;
     font-weight: bold;
-}
-
-/* Search Box */
-.zip-search {
-    margin-top: 20px;
+    color: #fff;
     display: flex;
-    justify-content: center;
+    align-items: center;
     gap: 10px;
-}
-
-.zip-search input {
-    padding: 12px;
-    font-size: 18px;
-    border: none;
-    border-radius: 8px;
-    width: 250px;
-}
-
-.zip-search button {
-    background: #ff7e5f;
-    color: white;
-    padding: 12px 15px;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 18px;
-}
-
-.zip-search button:hover {
-    background: #e06348;
-}
-
-/* Weather Information Box */
-.location-info {
+  }
+  
+  /* 🔍 Search Box */
+  .search-box {
+    display: flex;
+    gap: 10px;
     margin-top: 20px;
-    background: rgba(255, 255, 255, 0.2);
-    padding: 20px;
-    border-radius: 12px;
-    box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.3);
-    display: inline-block;
+  }
+  
+  .search-box input {
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    width: 250px;
+  }
+  
+  .get-alerts {
+    background: #ff7b54;
     color: white;
-}
-
-.error {
+    border: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: 0.3s;
+  }
+  
+  .get-alerts:hover {
+    background: #e63946;
+  }
+  
+  /* 🌤 Weather Card */
+  .weather-card {
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    padding: 20px;
+    margin-top: 20px;
+    border-radius: 15px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+    width: 50%;
+    text-align: center;
+    color: white;
+  }
+  
+  /* 📌 Weather Details */
+  .weather-details {
+    margin-top: 10px;
+    font-size: 18px;
+  }
+  
+  .weather-details p {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin: 5px 0;
+  }
+  
+  /* ⚠️ Error Message */
+  .error-text {
     color: yellow;
     font-weight: bold;
-}
+    margin-top: 10px;
+  }
+  
+  /* 📱 Responsive */
+  @media (max-width: 768px) {
+    .weather-card {
+      width: 80%;
+    }
+  
+    .search-box input {
+      width: 200px;
+    }
+  }
+  
