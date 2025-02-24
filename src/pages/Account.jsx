@@ -3,69 +3,174 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import "../styles/Account.css";
 
+const API_BASE_URL = window.location.hostname === "localhost"
+  ? "http://localhost:5000"
+  : "https://fs-51ng.onrender.com";
+
 const Account = () => {
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState({ username: "", email: "", isVerified: false });
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [passwordValid, setPasswordValid] = useState(false);
+  const [deletePassword, setDeletePassword] = useState("");
+  const [error, setError] = useState("");
   const navigate = useNavigate();
 
+  // ✅ Fetch User Details on Page Load
   useEffect(() => {
-    const fetchUserData = async () => {
+    const fetchUserDetails = async () => {
       try {
         const storedUsername = localStorage.getItem("username");
         if (!storedUsername) {
           navigate("/login");
           return;
         }
-        const response = await axios.get(
-          `fs-backend-hcgfephuf9fmfqdm.canadacentral-01.azurewebsites.net/user?username=${storedUsername}`,
-          { withCredentials: true }
-        );
+
+        const response = await axios.get(`${API_BASE_URL}/user-details`, {
+          params: { username: storedUsername },
+        });
+
         setUser(response.data);
-      } catch (error) {
-        console.error("Error fetching user data:", error);
-      } finally {
-        setLoading(false);
+      } catch (err) {
+        console.error("Error fetching user details:", err);
+        setError("Failed to fetch user details.");
       }
     };
-
-    fetchUserData();
+    fetchUserDetails();
   }, [navigate]);
 
-  const handleLogout = () => {
-    localStorage.removeItem("username");
-    localStorage.removeItem("isLoggedIn");
-    navigate("/login");
-  };
-
-  const handleDeleteAccount = async () => {
-    if (window.confirm("Are you sure you want to delete your account?")) {
-      try {
-        await axios.delete(`https://fs-51ng.onrender.com/delete-user`, {
-          data: { email: user.email },
-          withCredentials: true,
-        });
-        handleLogout();
-      } catch (error) {
-        console.error("Error deleting account:", error);
-      }
+  // ✅ Handle Resend Verification Email
+  const handleResendVerification = async () => {
+    try {
+      await axios.post(`${API_BASE_URL}/resend-verification`, { email: user.email });
+      alert("Verification email sent successfully!");
+    } catch (err) {
+      console.error("Error resending verification email:", err);
+      setError("Failed to resend verification email.");
     }
   };
 
-  if (loading) return <div className="account-container">Loading...</div>;
+  // ✅ Handle Password Validation
+  const validateNewPassword = (pass) => {
+    const isValid =
+      pass.length >= 8 &&
+      /[A-Z]/.test(pass) &&
+      /[a-z]/.test(pass) &&
+      /\d/.test(pass) &&
+      /[@#$%^&*!]/.test(pass);
+    setPasswordValid(isValid);
+  };
+
+  // ✅ Handle Password Update
+  const handleChangePassword = async (e) => {
+    e.preventDefault();
+    if (!passwordValid) {
+      setError("New password does not meet the security criteria.");
+      return;
+    }
+
+    try {
+      await axios.post(`${API_BASE_URL}/change-password`, {
+        email: user.email,
+        currentPassword,
+        newPassword,
+      });
+
+      alert("Password updated successfully!");
+      setCurrentPassword("");
+      setNewPassword("");
+    } catch (err) {
+      console.error("Error changing password:", err);
+      setError("Failed to update password.");
+    }
+  };
+
+  // ✅ Handle Account Deletion
+  const handleDeleteAccount = async (e) => {
+    e.preventDefault();
+    const confirmDelete = window.confirm("Are you sure you want to delete your account?");
+    if (!confirmDelete) return;
+
+    try {
+      await axios.post(`${API_BASE_URL}/delete-account`, {
+        email: user.email,
+        password: deletePassword,
+      });
+
+      localStorage.removeItem("username");
+      localStorage.removeItem("isLoggedIn");
+      alert("Account deleted successfully!");
+      navigate("/");
+    } catch (err) {
+      console.error("Error deleting account:", err);
+      setError("Failed to delete account.");
+    }
+  };
 
   return (
     <div className="account-container">
-      <h1 className="account-title">Account Summary</h1>
-      <div className="account-box">
-        <p><strong>Email:</strong> {user?.email}</p>
-        <p><strong>Email Verification:</strong> {user?.verified ? "Verified" : "Not Verified"}</p>
+      <h2>Account Settings</h2>
+      {error && <p className="error">{error}</p>}
+
+      {/* ✅ Display User Details */}
+      <div className="user-info">
+        <p><strong>Username:</strong> {user.username}</p>
+        <p><strong>Email:</strong> {user.email}</p>
         <p>
-          <strong>Password:</strong>
-          <span className="reset-link">Reset password</span>
+          <strong>Verification Status:</strong>{" "}
+          <span className={user.isVerified ? "verified" : "not-verified"}>
+            {user.isVerified ? "✔️ Verified" : "❌ Not Verified"}
+          </span>
         </p>
-        <p className="delete-account" onClick={handleDeleteAccount}>
-          Delete Account
-        </p>
+        {!user.isVerified && (
+          <button onClick={handleResendVerification} className="btn resend-btn">
+            Resend Verification Email
+          </button>
+        )}
+      </div>
+
+      {/* ✅ Change Password Section */}
+      <div className="form-section">
+        <h3>Change Password</h3>
+        <form onSubmit={handleChangePassword}>
+          <input
+            type="password"
+            placeholder="Current Password"
+            value={currentPassword}
+            onChange={(e) => setCurrentPassword(e.target.value)}
+            required
+          />
+          <input
+            type="password"
+            placeholder="New Password"
+            value={newPassword}
+            onChange={(e) => {
+              setNewPassword(e.target.value);
+              validateNewPassword(e.target.value);
+            }}
+            required
+          />
+          <button type="submit" disabled={!passwordValid}>
+            Update Password
+          </button>
+        </form>
+      </div>
+
+      {/* ✅ Delete Account Section */}
+      <div className="form-section delete-section">
+        <h3>Delete Account</h3>
+        <form onSubmit={handleDeleteAccount}>
+          <input
+            type="password"
+            placeholder="Enter Password to Confirm"
+            value={deletePassword}
+            onChange={(e) => setDeletePassword(e.target.value)}
+            required
+          />
+          <button type="submit" className="delete-btn">
+            Delete Account
+          </button>
+        </form>
       </div>
     </div>
   );

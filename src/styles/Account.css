@@ -1,44 +1,76 @@
 .account-container {
-    max-width: 600px;
-    margin: 50px auto;
-    padding: 20px;
-    text-align: center;
-  }
-  
-  .account-title {
-    font-size: 28px;
-    font-weight: bold;
-  }
-  
-  .account-box {
-    background: #e6e6e6;
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
-  }
-  
-  .account-box p {
-    font-size: 16px;
-    font-style: italic;
-    margin: 15px 0;
-  }
-  
-  .reset-link {
-    color: #007bff;
-    text-decoration: underline;
-    cursor: pointer;
-  }
-  
-  .delete-account {
-    color: red;
-    font-weight: bold;
-    cursor: pointer;
-    margin-top: 20px;
-  }
-  
-  .loading-screen {
-    text-align: center;
-    font-size: 18px;
-    margin-top: 50px;
-  }
-  
+  max-width: 600px;
+  margin: 50px auto;
+  padding: 20px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+  text-align: center;
+}
+
+h2, h3 {
+  color: #007fae;
+  margin-bottom: 15px;
+}
+
+/* ✅ User Info */
+.user-info {
+  background: #f8f8f8;
+  padding: 15px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+/* ✅ Verification Status */
+.verified {
+  color: green;
+  font-weight: bold;
+}
+
+.not-verified {
+  color: red;
+  font-weight: bold;
+}
+
+/* ✅ Form Sections */
+.form-section {
+  margin-bottom: 20px;
+}
+
+input {
+  width: 100%;
+  padding: 10px;
+  margin: 8px 0;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+button {
+  background: #007fae;
+  color: white;
+  padding: 10px 15px;
+  border: none;
+  cursor: pointer;
+  border-radius: 5px;
+  width: 100%;
+  margin-top: 10px;
+}
+
+button:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+
+/* ✅ Delete Section */
+.delete-section {
+  border-top: 2px solid red;
+  padding-top: 15px;
+}
+
+.delete-btn {
+  background: red;
+}
+
+.delete-btn:hover {
+  background: darkred;
+}
