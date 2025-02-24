@@ -1,15 +1,13 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import "../styles/Alerts.css";
-import { MapContainer, TileLayer } from "react-leaflet";
+import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
-import { FaCloudSun, FaWind, FaTint, FaTemperatureHigh, FaSun, FaMoon, FaGlobe } from "react-icons/fa";
+import { FaCloudSun, FaWind, FaTint, FaTemperatureHigh, FaSun, FaMoon } from "react-icons/fa";
 
 const API_BASE_URL = window.location.hostname === "localhost"
   ? "http://localhost:5000"
   : "https://fs-51ng.onrender.com";
-
-const API_KEY = "YOUR_OPENWEATHER_API_KEY"; // Replace with your API Key
 
 const Alerts = () => {
   const [location, setLocation] = useState("Houston");
@@ -20,31 +18,38 @@ const Alerts = () => {
   // ✅ Fetch Weather Data
   const fetchWeather = async () => {
     try {
-      const response = await axios.get(`${API_BASE_URL}/weather`, {
-        params: { city: location },
-      });
-
+      let params;
+      if (!isNaN(location)) {
+        params = { zip: `${location},US` };
+      } else {
+        params = { q: location };
+      }
+  
+      console.log("Fetching weather for:", params); // ✅ Debugging Log
+  
+      const response = await axios.get(`${API_BASE_URL}/weather`, { params });
+  
+      console.log("API Response:", response.data); // ✅ Log Response
+  
       if (response.data.cod !== 200) {
-        setError("Failed to fetch weather data.");
+        setError(`API Error: ${response.data.message}`);
         return;
       }
-
+  
       setWeather(response.data);
-      setCoords({
-        lat: response.data.coord.lat,
-        lon: response.data.coord.lon,
-      });
+      setCoords({ lat: response.data.coord.lat, lon: response.data.coord.lon });
       setError("");
     } catch (err) {
       console.error("Error fetching weather:", err);
-      setError("Failed to fetch weather alerts.");
+      setError("Failed to fetch weather alerts. Check the console.");
     }
   };
+  
 
   return (
     <div className="alerts-container">
       <h2 className="alerts-header">
-        <FaGlobe /> Weather Alerts
+        🌍 Weather Alerts
       </h2>
 
       <div className="search-box">
@@ -52,7 +57,7 @@ const Alerts = () => {
           type="text"
           value={location}
           onChange={(e) => setLocation(e.target.value)}
-          placeholder="Enter city or ZIP code"
+          placeholder="Enter city name or ZIP"
         />
         <button className="get-alerts" onClick={fetchWeather}>
           Search
@@ -75,16 +80,18 @@ const Alerts = () => {
         </div>
       )}
 
-      {/* ✅ Weather Map */}
-      <div className="weather-map">
-        <h3>Live Weather Map</h3>
-        <MapContainer center={[coords.lat, coords.lon]} zoom={10} style={{ height: "400px", width: "100%" }}>
-          <TileLayer
-            url={`https://tile.openweathermap.org/map/temp_new/{z}/{x}/{y}.png?appid=${API_KEY}`}
-            attribution="© OpenWeather"
-          />
-        </MapContainer>
-      </div>
+      {/* ✅ Live Weather Map */}
+      <h3 className="map-header">Live Weather Map</h3>
+      <MapContainer center={[coords.lat, coords.lon]} zoom={10} className="weather-map">
+        <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+        {weather && (
+          <Marker position={[coords.lat, coords.lon]}>
+            <Popup>
+              {weather.name} <br /> {weather.weather[0].description}
+            </Popup>
+          </Marker>
+        )}
+      </MapContainer>
     </div>
   );
 };
