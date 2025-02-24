@@ -50,6 +50,51 @@ SMTP_PORT = 587
 SMTP_USERNAME = os.getenv("SMTP_USERNAME")  # Your Gmail address
 SMTP_PASSWORD = os.getenv("SMTP_PASSWORD")  # Your App Password
 
+def send_contact_email(subject, message, sender_email):
+    msg = MIMEMultipart()
+    msg["From"] = SMTP_USERNAME
+    msg["To"] = SMTP_USERNAME  # Send the message to your own admin email
+    msg["Subject"] = f"New Contact Form Submission: {subject}"
+
+    body = f"""
+    <h3>New Contact Form Message</h3>
+    <p><strong>From:</strong> {sender_email}</p>
+    <p><strong>Subject:</strong> {subject}</p>
+    <p>{message}</p>
+    """
+
+    msg.attach(MIMEText(body, "html"))
+
+    try:
+        with smtplib.SMTP(SMTP_SERVER, SMTP_PORT) as server:
+            server.starttls()  # Secure connection
+            server.login(SMTP_USERNAME, SMTP_PASSWORD)
+            server.sendmail(SMTP_USERNAME, SMTP_USERNAME, msg.as_string())
+
+        print(f"✅ Contact message sent successfully!")
+        return True
+    except Exception as e:
+        print(f"❌ Failed to send contact message: {e}")
+        return False
+
+# ✅ Route to Handle Contact Form Submission
+@app.route('/contact-us', methods=['POST'])
+def contact_us():
+    data = request.json
+    subject = data.get("subject")
+    message = data.get("message")
+    sender_email = data.get("email")
+
+    if not subject or not message or not sender_email:
+        return jsonify({"message": "All fields are required"}), 400
+
+    success = send_contact_email(subject, message, sender_email)
+
+    if success:
+        return jsonify({"message": "Your message has been sent successfully!"}), 200
+    else:
+        return jsonify({"message": "Failed to send your message. Try again later."}), 500
+
 # ✅ User Model with `is_verified` field
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
