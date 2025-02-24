@@ -10,61 +10,47 @@ const API_BASE_URL = window.location.hostname === "localhost"
   : "https://fs-51ng.onrender.com";
 
 const Alerts = () => {
-  const [location, setLocation] = useState("Houston");
+  const [location, setLocation] = useState("");
   const [weather, setWeather] = useState(null);
   const [error, setError] = useState("");
-  const [coords, setCoords] = useState({ lat: 29.7604, lon: -95.3698 }); // Default to Houston
+  const [coords, setCoords] = useState({ lat: 29.7604, lon: -95.3698 }); // Default: Houston
 
   // ✅ Fetch Weather Data
   const fetchWeather = async () => {
+    if (!location.trim()) {
+      setError("Please enter a valid city name or ZIP code.");
+      return;
+    }
+
     try {
-      if (!city || city.trim() === "") {
-        setError("Please enter a valid city name or ZIP code.");
-        return;
-      }
-  
-      let params = {};
-  
-      // Check if input is a number (ZIP code) or a city name
-      if (!isNaN(city)) {
-        params = { zip: `${city},US` };  // Assume US ZIP codes
-      } else {
-        params = { q: city };  // Assume it's a city name
-      }
-  
-      console.log("Fetching weather with params:", params); // Debugging log
-  
+      let params = isNaN(location) ? { q: location } : { zip: `${location},US` }; // Detect ZIP or city
+
       const response = await axios.get(`${API_BASE_URL}/weather`, { params });
-  
-      console.log("API Response:", response.data); // Log response
-  
-      if (response.data.error) {
-        setError(`API Error: ${response.data.error}`);
+
+      if (response.data.cod !== 200) {
+        setError("Invalid location. Try again.");
         return;
       }
-  
+
       setWeather(response.data);
+      setCoords({ lat: response.data.coord.lat, lon: response.data.coord.lon });
       setError("");
     } catch (err) {
       console.error("Error fetching weather:", err);
       setError("Failed to fetch weather alerts. Please check your input.");
     }
   };
-  
-  
 
   return (
     <div className="alerts-container">
-      <h2 className="alerts-header">
-        🌍 Weather Alerts
-      </h2>
+      <h2 className="alerts-header">🌍 Weather Alerts</h2>
 
       <div className="search-box">
         <input
           type="text"
           value={location}
           onChange={(e) => setLocation(e.target.value)}
-          placeholder="Enter city name or ZIP"
+          placeholder="Enter city name or ZIP code"
         />
         <button className="get-alerts" onClick={fetchWeather}>
           Search
