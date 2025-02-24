@@ -274,15 +274,20 @@ OPENWEATHER_API_KEY = os.getenv("OPENWEATHER_API_KEY")
 @app.route("/weather", methods=["GET"])
 def get_weather():
     city = request.args.get("city")
-    if not city:
-        return jsonify({"error": "City parameter is required"}), 400
-    
-    # OpenWeather API request
-    url = f"http://api.openweathermap.org/data/2.5/weather?q={city}&appid={OPENWEATHER_API_KEY}&units=metric"
+    zip_code = request.args.get("zip")
+
+    if not city and not zip_code:
+        return jsonify({"error": "City or ZIP code is required"}), 400
+
+    if zip_code:
+        url = f"http://api.openweathermap.org/data/2.5/weather?zip={zip_code},US&appid={OPENWEATHER_API_KEY}&units=metric"
+    else:
+        url = f"http://api.openweathermap.org/data/2.5/weather?q={city}&appid={OPENWEATHER_API_KEY}&units=metric"
+
     response = requests.get(url)
 
     if response.status_code == 200:
-        return jsonify(response.json())  # Return weather data
+        return jsonify(response.json())  
     else:
         return jsonify({"error": "Failed to fetch weather data"}), response.status_code
 
