@@ -1,5 +1,6 @@
 /* ✅ Flash Card Style for Account Page */
 .account-container {
+  background-color: #007bff;
   display: flex;
   justify-content: center;
   align-items: center;
