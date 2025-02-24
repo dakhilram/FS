@@ -18,18 +18,18 @@ const Alerts = () => {
   // ✅ Fetch Weather Data
   const fetchWeather = async () => {
     try {
-      if (!city || city.trim() === "") {
+      if (!city) {
         setError("Please enter a city name or ZIP code.");
         return;
       }
   
       let params = {};
-      
+  
       // Check if input is a number (ZIP code)
       if (!isNaN(city)) {
-        params.zip = `${city},US`;  // Use ZIP code format
+        params.zip = `${city},US`;  // Use ZIP code
       } else {
-        params.q = city;  // Use city name format
+        params.q = city;  // Use city name
       }
   
       console.log("Fetching weather for:", params); // Debugging log
@@ -50,7 +50,6 @@ const Alerts = () => {
       setError("Failed to fetch weather alerts.");
     }
   };
-  
   
 
   return (
