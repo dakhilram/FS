@@ -1,19 +1,23 @@
+/* ✅ Account Page Container */
 .account-container {
   max-width: 600px;
-  margin: 50px auto;
-  padding: 20px;
+  margin: 80px auto 50px auto;
+  padding: 25px;
   background: white;
-  border-radius: 8px;
-  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+  border-radius: 10px;
+  box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.1);
   text-align: center;
 }
 
-h2, h3 {
-  color: #007fae;
+/* ✅ Account Heading */
+.account-container h2 {
+  font-size: 24px;
+  font-weight: bold;
+  color: #2c3e50;
   margin-bottom: 15px;
 }
 
-/* ✅ User Info */
+/* ✅ User Information */
 .user-info {
   background: #f8f8f8;
   padding: 15px;
@@ -21,56 +25,102 @@ h2, h3 {
   margin-bottom: 20px;
 }
 
+.user-info p {
+  font-size: 18px;
+  font-weight: 500;
+  color: #333;
+  margin-bottom: 8px;
+}
+
 /* ✅ Verification Status */
-.verified {
-  color: green;
+.verification-status {
+  font-size: 16px;
   font-weight: bold;
+  color: #27ae60;
 }
 
-.not-verified {
+/* If not verified, change color */
+.verification-status.not-verified {
   color: red;
-  font-weight: bold;
 }
 
-/* ✅ Form Sections */
-.form-section {
+/* ✅ Change Password Section */
+.password-change {
+  background: #f8f8f8;
+  padding: 20px;
+  border-radius: 8px;
   margin-bottom: 20px;
 }
 
-input {
+.password-change h3 {
+  font-size: 18px;
+  color: #2c3e50;
+  margin-bottom: 10px;
+}
+
+/* ✅ Input Fields */
+input[type="password"] {
   width: 100%;
   padding: 10px;
-  margin: 8px 0;
+  margin-bottom: 12px;
   border: 1px solid #ccc;
   border-radius: 5px;
 }
 
-button {
-  background: #007fae;
+/* ✅ Update Password Button */
+.update-password-btn {
+  background: #3498db;
   color: white;
-  padding: 10px 15px;
+  padding: 12px;
   border: none;
-  cursor: pointer;
-  border-radius: 5px;
   width: 100%;
-  margin-top: 10px;
+  border-radius: 5px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background 0.3s;
 }
 
-button:disabled {
-  background: #ccc;
-  cursor: not-allowed;
+.update-password-btn:hover {
+  background: #2980b9;
 }
 
-/* ✅ Delete Section */
-.delete-section {
-  border-top: 2px solid red;
-  padding-top: 15px;
+/* ✅ Delete Account Section */
+.delete-account {
+  background: #fff3f3;
+  padding: 20px;
+  border-radius: 8px;
 }
 
-.delete-btn {
+.delete-account h3 {
+  font-size: 18px;
+  color: #c0392b;
+  margin-bottom: 10px;
+}
+
+input[type="password"].confirm-delete {
+  border: 1px solid red;
+}
+
+/* ✅ Delete Account Button */
+.delete-account-btn {
   background: red;
+  color: white;
+  padding: 12px;
+  border: none;
+  width: 100%;
+  border-radius: 5px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background 0.3s;
 }
 
-.delete-btn:hover {
+.delete-account-btn:hover {
   background: darkred;
+}
+
+/* ✅ Responsive */
+@media (max-width: 768px) {
+  .account-container {
+      max-width: 90%;
+  }
 }
