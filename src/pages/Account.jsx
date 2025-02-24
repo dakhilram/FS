@@ -109,28 +109,28 @@ const Account = () => {
 
   return (
     <div className="account-container">
-      <h2>Account Settings</h2>
-      {error && <p className="error">{error}</p>}
-
-      {/* ✅ Display User Details */}
-      <div className="user-info">
-        <p><strong>Username:</strong> {user.username}</p>
-        <p><strong>Email:</strong> {user.email}</p>
-        <p>
+      
+      {/* ✅ User Info Card */}
+      <div className="account-card">
+        <h2 className="account-header">Account Settings</h2>
+        {error && <p className="error">{error}</p>}
+        <p className="account-info"><strong>Username:</strong> {user.username}</p>
+        <p className="account-info"><strong>Email:</strong> {user.email}</p>
+        <p className="verification-status">
           <strong>Verification Status:</strong>{" "}
           <span className={user.isVerified ? "verified" : "not-verified"}>
             {user.isVerified ? "✔️ Verified" : "❌ Not Verified"}
           </span>
         </p>
         {!user.isVerified && (
-          <button onClick={handleResendVerification} className="btn resend-btn">
+          <button onClick={handleResendVerification} className="button resend-btn">
             Resend Verification Email
           </button>
         )}
       </div>
 
-      {/* ✅ Change Password Section */}
-      <div className="form-section">
+      {/* ✅ Change Password Card */}
+      <div className="account-card">
         <h3>Change Password</h3>
         <form onSubmit={handleChangePassword}>
           <input
@@ -150,14 +150,14 @@ const Account = () => {
             }}
             required
           />
-          <button type="submit" disabled={!passwordValid}>
+          <button type="submit" className="button update-password" disabled={!passwordValid}>
             Update Password
           </button>
         </form>
       </div>
 
-      {/* ✅ Delete Account Section */}
-      <div className="form-section delete-section">
+      {/* ✅ Delete Account Card */}
+      <div className="account-card">
         <h3>Delete Account</h3>
         <form onSubmit={handleDeleteAccount}>
           <input
@@ -167,11 +167,12 @@ const Account = () => {
             onChange={(e) => setDeletePassword(e.target.value)}
             required
           />
-          <button type="submit" className="delete-btn">
+          <button type="submit" className="button delete-account">
             Delete Account
           </button>
         </form>
       </div>
+
     </div>
   );
 };
