@@ -271,29 +271,23 @@ def delete_account():
     return jsonify({"message": "Account deleted successfully"}), 200
 
 OPENWEATHER_API_KEY = os.getenv("OPENWEATHER_API_KEY")
-@app.route('/weather-alerts', methods=['GET'])
-def get_weather_alerts():
-    city = request.args.get("city", "Houston")  # Default to Houston
-    url = f"https://api.openweathermap.org/data/2.5/weather?q={city}&appid={OPENWEATHER_API_KEY}&units=metric"
+@app.route("/weather", methods=["GET"])
+def get_weather():
+    city = request.args.get("city")
+    if not city:
+        return jsonify({"error": "City parameter is required"}), 400
+    
+    # OpenWeather API request
+    url = f"http://api.openweathermap.org/data/2.5/weather?q={city}&appid={OPENWEATHER_API_KEY}&units=metric"
+    response = requests.get(url)
 
-    try:
-        response = requests.get(url)
-        data = response.json()
-        
-        if response.status_code != 200:
-            return jsonify({"error": data.get("message", "Failed to fetch data")}), response.status_code
+    if response.status_code == 200:
+        return jsonify(response.json())  # Return weather data
+    else:
+        return jsonify({"error": "Failed to fetch weather data"}), response.status_code
 
-        weather_info = {
-            "city": data["name"],
-            "temperature": data["main"]["temp"],
-            "humidity": data["main"]["humidity"],
-            "weather": data["weather"][0]["description"],
-            "wind_speed": data["wind"]["speed"],
-            "icon": f"http://openweathermap.org/img/wn/{data['weather'][0]['icon']}.png"
-        }
-        return jsonify(weather_info), 200
-    except Exception as e:
-        return jsonify({"error": "Failed to fetch weather data", "details": str(e)}), 500
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=5000, debug=True)
 
 # ✅ Health Check Route
 @app.route('/')

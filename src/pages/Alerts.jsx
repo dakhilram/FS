@@ -46,7 +46,7 @@ const Alerts = () => {
           placeholder="Enter city name"
         />
         <button className="get-alerts" onClick={fetchWeather}>
-          Get Alerts
+          Search
         </button>
       </div>
 
