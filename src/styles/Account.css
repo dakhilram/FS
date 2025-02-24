@@ -1,126 +1,111 @@
-/* ✅ Account Page Container */
+/* ✅ Flash Card Style for Account Page */
 .account-container {
-  max-width: 600px;
-  margin: 80px auto 50px auto;
-  padding: 25px;
-  background: white;
-  border-radius: 10px;
-  box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.1);
-  text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  min-height: 100vh;
+  background: url('your-background-image.jpg') no-repeat center center/cover;
 }
 
-/* ✅ Account Heading */
-.account-container h2 {
-  font-size: 24px;
+/* ✅ Flash Card Design */
+.account-card {
+  background: rgba(255, 255, 255, 0.15); /* Glass effect */
+  backdrop-filter: blur(10px);
+  box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
+  border-radius: 15px;
+  padding: 30px;
+  width: 50%;
+  max-width: 600px;
+  text-align: center;
+  margin-bottom: 20px;
+  transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+}
+
+/* ✅ Hover Effect */
+.account-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0px 12px 20px rgba(0, 0, 0, 0.3);
+}
+
+/* ✅ Header */
+.account-header {
+  font-size: 26px;
   font-weight: bold;
-  color: #2c3e50;
+  color: #333;
   margin-bottom: 15px;
 }
 
-/* ✅ User Information */
-.user-info {
-  background: #f8f8f8;
-  padding: 15px;
-  border-radius: 8px;
-  margin-bottom: 20px;
-}
-
-.user-info p {
+/* ✅ User Info */
+.account-info {
   font-size: 18px;
-  font-weight: 500;
-  color: #333;
-  margin-bottom: 8px;
-}
-
-/* ✅ Verification Status */
-.verification-status {
-  font-size: 16px;
-  font-weight: bold;
-  color: #27ae60;
-}
-
-/* If not verified, change color */
-.verification-status.not-verified {
-  color: red;
-}
-
-/* ✅ Change Password Section */
-.password-change {
-  background: #f8f8f8;
-  padding: 20px;
-  border-radius: 8px;
-  margin-bottom: 20px;
-}
-
-.password-change h3 {
-  font-size: 18px;
-  color: #2c3e50;
+  color: #222;
   margin-bottom: 10px;
+}
+
+/* ✅ Email Verification */
+.verification-status {
+  font-size: 18px;
+  color: #28a745;
+  font-weight: bold;
+  margin-top: 10px;
 }
 
 /* ✅ Input Fields */
-input[type="password"] {
+input {
   width: 100%;
-  padding: 10px;
-  margin-bottom: 12px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
+  padding: 12px;
+  margin-top: 10px;
+  border: none;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(5px);
+  font-size: 16px;
+  color: #333;
+  transition: 0.3s ease-in-out;
+}
+
+/* ✅ Input Focus */
+input:focus {
+  outline: none;
+  background: rgba(255, 255, 255, 0.5);
+}
+
+/* ✅ Update Password & Delete Account Buttons */
+.button {
+  width: 100%;
+  padding: 12px;
+  margin-top: 15px;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
 }
 
 /* ✅ Update Password Button */
-.update-password-btn {
-  background: #3498db;
+.update-password {
+  background: linear-gradient(135deg, #007bff, #0056b3);
   color: white;
-  padding: 12px;
-  border: none;
-  width: 100%;
-  border-radius: 5px;
-  font-size: 16px;
-  cursor: pointer;
-  transition: background 0.3s;
 }
 
-.update-password-btn:hover {
-  background: #2980b9;
-}
-
-/* ✅ Delete Account Section */
-.delete-account {
-  background: #fff3f3;
-  padding: 20px;
-  border-radius: 8px;
-}
-
-.delete-account h3 {
-  font-size: 18px;
-  color: #c0392b;
-  margin-bottom: 10px;
-}
-
-input[type="password"].confirm-delete {
-  border: 1px solid red;
+.update-password:hover {
+  background: linear-gradient(135deg, #0056b3, #003d82);
 }
 
 /* ✅ Delete Account Button */
-.delete-account-btn {
-  background: red;
+.delete-account {
+  background: linear-gradient(135deg, #ff4d4d, #b30000);
   color: white;
-  padding: 12px;
-  border: none;
-  width: 100%;
-  border-radius: 5px;
-  font-size: 16px;
-  cursor: pointer;
-  transition: background 0.3s;
 }
 
-.delete-account-btn:hover {
-  background: darkred;
+.delete-account:hover {
+  background: linear-gradient(135deg, #b30000, #800000);
 }
 
-/* ✅ Responsive */
+/* ✅ Responsive Design */
 @media (max-width: 768px) {
-  .account-container {
-      max-width: 90%;
+  .account-card {
+      width: 90%;
   }
 }
