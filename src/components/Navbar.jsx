@@ -52,6 +52,8 @@ const Navbar = () => {
   return (
     <nav className="navbar">
       <div className="logo">FS</div>
+
+      {/* ✅ Fixed Navbar Centered Navigation */}
       <div className="nav-links">
         <Link to="/">Home</Link>
         <div className="dropdown">
@@ -67,7 +69,8 @@ const Navbar = () => {
         <Link to="/alerts">Alerts</Link>
       </div>
 
-      <div className="auth-links">
+      {/* ✅ Profile Section with Fixed Width */}
+      <div className="profile-container">
         <div className="profile-section" ref={dropdownRef}>
           {isLoggedIn ? (
             <>
