@@ -271,25 +271,26 @@ def delete_account():
     return jsonify({"message": "Account deleted successfully"}), 200
 
 OPENWEATHER_API_KEY = os.getenv("OPENWEATHER_API_KEY")
-@app.route("/weather", methods=["GET"])
+@app.route('/weather', methods=['GET'])
 def get_weather():
-    city = request.args.get("city")
-    zip_code = request.args.get("zip")
-
-    if not city and not zip_code:
+    city = request.args.get('q')  # Get city name
+    zipcode = request.args.get('zip')  # Get ZIP code
+    
+    if not city and not zipcode:
         return jsonify({"error": "City or ZIP code is required"}), 400
 
-    if zip_code:
-        url = f"http://api.openweathermap.org/data/2.5/weather?zip={zip_code},US&appid={OPENWEATHER_API_KEY}&units=metric"
+    if zipcode:
+        url = f"http://api.openweathermap.org/data/2.5/weather?zip={zipcode},US&appid={OPENWEATHER_API_KEY}&units=metric"
     else:
         url = f"http://api.openweathermap.org/data/2.5/weather?q={city}&appid={OPENWEATHER_API_KEY}&units=metric"
 
     response = requests.get(url)
+    data = response.json()
 
-    if response.status_code == 200:
-        return jsonify(response.json())  
-    else:
-        return jsonify({"error": "Failed to fetch weather data"}), response.status_code
+    if response.status_code != 200:
+        return jsonify({"error": data.get("message", "Failed to fetch weather data")}), response.status_code
+
+    return jsonify(data)
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
