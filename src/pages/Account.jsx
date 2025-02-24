@@ -141,44 +141,30 @@ const Account = () => {
   // ✅ Handle Contact Us Form Submission
   const handleContactSubmit = async (e) => {
     e.preventDefault();
-    try {
-      await axios.post(`${API_BASE_URL}/contact`, {
-        email: user.email,
-        subject,
-        message,
-      }, {
-        withCredentials: true,
-      });
-      setContactStatus("Message sent successfully!");
-      setSubject("");
-      setMessage("");
-    } catch (err) {
-      console.error("Error sending message:", err);
-      setContactStatus("Failed to send message.");
-    }
-  };
-
-  const handleSendMessage = async () => {
-    if (!contactSubject || !contactMessage) {
+  
+    if (!subject || !message) {
       alert("Please enter both subject and message.");
       return;
     }
   
     try {
-      const response = await axios.post(`${API_BASE_URL}/contact-us`, {
+      const response = await axios.post(`${API_BASE_URL}/contact`, {
         email: user.email,
-        subject: contactSubject,
-        message: contactMessage
+        subject,
+        message,
+      }, {
+        withCredentials: true, // Ensures authentication is sent
       });
   
       alert(response.data.message);
-      setContactSubject("");
-      setContactMessage("");
+      setSubject("");
+      setMessage("");
     } catch (err) {
       console.error("Error sending message:", err);
       alert("Failed to send message. Please try again.");
     }
   };
+  
 
   return (
     <div className="account-container">

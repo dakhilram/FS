@@ -77,23 +77,34 @@ def send_contact_email(subject, message, sender_email):
         print(f"❌ Failed to send contact message: {e}")
         return False
 
-# ✅ Route to Handle Contact Form Submission
-@app.route('/contact-us', methods=['POST'])
-def contact_us():
+@app.route('/contact', methods=['POST'])
+def contact():
     data = request.json
-    subject = data.get("subject")
-    message = data.get("message")
-    sender_email = data.get("email")
+    user_email = data.get('email')
+    subject = data.get('subject')
+    message_body = data.get('message')
 
-    if not subject or not message or not sender_email:
-        return jsonify({"message": "All fields are required"}), 400
+    if not user_email or not subject or not message_body:
+        return jsonify({"error": "All fields are required"}), 400
 
-    success = send_contact_email(subject, message, sender_email)
+    try:
+        msg = MIMEMultipart()
+        msg["From"] = SMTP_USERNAME
+        msg["To"] = "your-email@example.com"  # Replace with the receiver's email
+        msg["Subject"] = f"Contact Form: {subject}"
+        
+        msg.attach(MIMEText(f"From: {user_email}\n\n{message_body}", "plain"))
 
-    if success:
-        return jsonify({"message": "Your message has been sent successfully!"}), 200
-    else:
-        return jsonify({"message": "Failed to send your message. Try again later."}), 500
+        with smtplib.SMTP(SMTP_SERVER, SMTP_PORT) as server:
+            server.starttls()
+            server.login(SMTP_USERNAME, SMTP_PASSWORD)
+            server.sendmail(SMTP_USERNAME, "your-email@example.com", msg.as_string())
+
+        return jsonify({"message": "Message sent successfully!"}), 200
+
+    except Exception as e:
+        print("Email send error:", str(e))
+        return jsonify({"error": "Failed to send message"}), 500
 
 # ✅ User Model with `is_verified` field
 class User(db.Model):
