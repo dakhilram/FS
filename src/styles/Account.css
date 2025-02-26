@@ -140,7 +140,68 @@ input:focus, textarea:focus {
   background: linear-gradient(135deg, #868383, #800000);
 }
 
-/* ✅ Preferences Toggle */
+/* ✅ Toggle Container */
+.toggle-container {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 15px;
+  margin-top: 10px;
+}
+
+/* ✅ Label Styling */
+.toggle-label {
+  font-size: 16px;
+  color: #2c3e50;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  position: relative;
+  cursor: pointer;
+}
+
+/* ✅ Hide the Default Checkbox */
+.toggle-label input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+  position: absolute;
+}
+
+/* ✅ Toggle Switch Styling */
+.toggle-slider {
+  position: relative;
+  width: 50px;
+  height: 25px;
+  background: #ccc;
+  border-radius: 25px;
+  transition: 0.3s ease-in-out;
+}
+
+/* ✅ The Circle Inside the Toggle */
+.toggle-slider::before {
+  content: "";
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  background: white;
+  border-radius: 50%;
+  top: 2.5px;
+  left: 3px;
+  transition: 0.3s;
+}
+
+/* ✅ Toggle Active State */
+.toggle-label input:checked + .toggle-slider {
+  background: #27ae60;
+}
+
+.toggle-label input:checked + .toggle-slider::before {
+  transform: translateX(25px);
+}
+
+
+/* ✅ Preferences Toggle 
 .toggle-container {
   display: flex;
   flex-direction: column;
@@ -155,9 +216,9 @@ input:focus, textarea:focus {
   display: flex;
   align-items: center;
   gap: 10px;
-}
+}*/
 
-/* ✅ Preferences Save Button */
+/* ✅ Preferences Save Button 
 .update-preferences {
   background: linear-gradient(135deg, #27ae60, #219150);
   color: white;
@@ -165,7 +226,7 @@ input:focus, textarea:focus {
 
 .update-preferences:hover {
   background: linear-gradient(135deg, #219150, #1b7d43);
-}
+}*/
 
 /* ✅ Enlarged Contact Us Section */
 .contact-card {
@@ -174,6 +235,7 @@ input:focus, textarea:focus {
 }
 
 .contact-card {
+  margin-top: 30px;;
   background: rgba(255, 255, 255, 0.2);
   backdrop-filter: blur(15px);
   box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);

@@ -148,8 +148,8 @@ const Account = () => {
 
       {/* ✅ User Info Card - Centered & Bigger */}
       <div className="account-info-card">
-        <h3>Username    : {user.username}</h3> 
-        <h3>Email       : {user.email}</h3> 
+        <h3>Username: {user.username}</h3> 
+        <h3>Email: {user.email}</h3> 
         <h3 className={`verification-status ${user.isVerified ? "" : "not-verified"}`}>Verification: {user.isVerified ? "✔️ Verified" : "❌ Not Verified"} </h3>
         
         {!user.isVerified && (
@@ -173,23 +173,31 @@ const Account = () => {
 
         {/* ✅ Notification Preferences */}
         <div className="account-card">
-          <h3>Notification Preferences</h3>
-          <div className="toggle-container">
-            <label>
-              <input type="checkbox" checked={securityAlerts} onChange={() => setSecurityAlerts(!securityAlerts)} />
-              Security Alerts
-            </label>
-            <label>
-              <input type="checkbox" checked={newsUpdates} onChange={() => setNewsUpdates(!newsUpdates)} />
-              News Updates
-            </label>
-          </div>
-          <button className="button update-preferences" onClick={handleSavePreferences}>Save Preferences</button>
-        </div>
+  <h3>Notification Preferences</h3>
+  <div className="toggle-container">
+    <label className="toggle-label">
+      Security Alerts
+      <input type="checkbox" checked={securityAlerts} onChange={() => setSecurityAlerts(!securityAlerts)} />
+      <span className="toggle-slider"></span>
+    </label>
+
+    <label className="toggle-label">
+      News Updates
+      <input type="checkbox" checked={newsUpdates} onChange={() => setNewsUpdates(!newsUpdates)} />
+      <span className="toggle-slider"></span>
+    </label>
+  </div>
+
+  <button className="button update-preferences" onClick={handleSavePreferences}>
+    Save Preferences
+  </button>
+</div>
+
 
         {/* ✅ Delete Account */}
         <div className="account-card">
           <h3>Delete Account</h3>
+          <p> You cannot recover your account once deleted.</p>
           <form onSubmit={handleDeleteAccount}>
             <input type="password" placeholder="Confirm Password" value={deletePassword} onChange={(e) => setDeletePassword(e.target.value)} required />
             <button type="submit" className="button delete-account">Delete</button>
