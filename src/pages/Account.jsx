@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import LoadingScreen from "./LoadingScreen";  // Import Loading Screen
 import "../styles/Account.css";
 
 const API_BASE_URL = window.location.hostname === "localhost"
@@ -18,11 +19,13 @@ const Account = () => {
   const [message, setMessage] = useState("");
   const [contactStatus, setContactStatus] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false); // ✅ Loading state
   const navigate = useNavigate();
 
   // ✅ Fetch User Details
   useEffect(() => {
     const fetchUserDetails = async () => {
+      setLoading(true); // Show loading
       try {
         const storedUsername = localStorage.getItem("username");
         if (!storedUsername) {
@@ -42,12 +45,14 @@ const Account = () => {
         console.error("Error fetching user details:", err);
         setError("Failed to fetch user details.");
       }
+      setLoading(false); // Hide loading
     };
     fetchUserDetails();
   }, [navigate]);
 
   // ✅ Handle Resend Verification Email
   const handleResendVerification = async () => {
+    setLoading(true);
     try {
       await axios.post(`${API_BASE_URL}/resend-verification`, { email: user.email }, {
         withCredentials: true,
@@ -57,11 +62,13 @@ const Account = () => {
       console.error("Error resending verification email:", err);
       setError("Failed to resend verification email.");
     }
+    setLoading(false);
   };
 
   // ✅ Handle Password Change
   const handleChangePassword = async (e) => {
     e.preventDefault();
+    setLoading(true);
     try {
       await axios.post(`${API_BASE_URL}/change-password`, {
         email: user.email,
@@ -78,6 +85,7 @@ const Account = () => {
       console.error("Error changing password:", err);
       setError("Failed to update password.");
     }
+    setLoading(false);
   };
 
   // ✅ Handle Account Deletion
@@ -86,6 +94,7 @@ const Account = () => {
     const confirmDelete = window.confirm("Are you sure you want to delete your account?");
     if (!confirmDelete) return;
 
+    setLoading(true);
     try {
       await axios.post(`${API_BASE_URL}/delete-account`, {
         email: user.email,
@@ -102,10 +111,12 @@ const Account = () => {
       console.error("Error deleting account:", err);
       setError("Failed to delete account.");
     }
+    setLoading(false);
   };
 
   // ✅ Handle Notification Preferences Update
   const handleSavePreferences = async () => {
+    setLoading(true);
     try {
       await axios.post(`${API_BASE_URL}/update-preferences`, {
         email: user.email,
@@ -119,11 +130,13 @@ const Account = () => {
       console.error("Error updating preferences:", err);
       setError("Failed to update preferences.");
     }
+    setLoading(false);
   };
 
   // ✅ Handle Contact Us Form Submission
   const handleContactSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
     try {
       await axios.post(`${API_BASE_URL}/contact`, {
         email: user.email,
@@ -139,10 +152,13 @@ const Account = () => {
       console.error("Error sending message:", err);
       setContactStatus("Failed to send message.");
     }
+    setLoading(false);
   };
 
   return (
     <div className="account-container">
+      {loading && <LoadingScreen />} {/* ✅ Display loading animation when an action is in progress */}
+      
       <h2 className="account-header">Account Settings</h2>
       {error && <p className="error">{error}</p>}
 
@@ -150,7 +166,9 @@ const Account = () => {
       <div className="account-info-card">
         <h3>Username: {user.username}</h3> 
         <h3>Email: {user.email}</h3> 
-        <h3 className={`verification-status ${user.isVerified ? "" : "not-verified"}`}>Verification: {user.isVerified ? "✔️ Verified" : "❌ Not Verified"} </h3>
+        <h3 className={`verification-status ${user.isVerified ? "" : "not-verified"}`}>
+          Verification: {user.isVerified ? "✔️ Verified" : "❌ Not Verified"}
+        </h3>
         
         {!user.isVerified && (
           <button onClick={handleResendVerification} className="button update-preferences">
@@ -171,28 +189,24 @@ const Account = () => {
           </form>
         </div>
 
-        {/* ✅ Notification Preferences */}
+        {/* ✅ Notification Preferences with Toggle Effect */}
         <div className="account-card">
-  <h3>Notification Preferences</h3>
-  <div className="toggle-container">
-    <label className="toggle-label">
-      Security Alerts
-      <input type="checkbox" checked={securityAlerts} onChange={() => setSecurityAlerts(!securityAlerts)} />
-      <span className="toggle-slider"></span>
-    </label>
+          <h3>Notification Preferences</h3>
+          <div className="toggle-container">
+            <label className="toggle-label">
+              Security Alerts
+              <input type="checkbox" checked={securityAlerts} onChange={() => setSecurityAlerts(!securityAlerts)} />
+              <span className="toggle-slider"></span>
+            </label>
 
-    <label className="toggle-label">
-      News Updates
-      <input type="checkbox" checked={newsUpdates} onChange={() => setNewsUpdates(!newsUpdates)} />
-      <span className="toggle-slider"></span>
-    </label>
-  </div>
-
-  <button className="button update-preferences" onClick={handleSavePreferences}>
-    Save Preferences
-  </button>
-</div>
-
+            <label className="toggle-label">
+              News Updates
+              <input type="checkbox" checked={newsUpdates} onChange={() => setNewsUpdates(!newsUpdates)} />
+              <span className="toggle-slider"></span>
+            </label>
+          </div>
+          <button className="button update-preferences" onClick={handleSavePreferences}>Save Preferences</button>
+        </div>
 
         {/* ✅ Delete Account */}
         <div className="account-card">
