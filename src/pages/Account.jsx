@@ -11,7 +11,6 @@ const Account = () => {
   const [user, setUser] = useState({ username: "", email: "", isVerified: false });
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
-  const [passwordValid, setPasswordValid] = useState(false);
   const [deletePassword, setDeletePassword] = useState("");
   const [securityAlerts, setSecurityAlerts] = useState(true);
   const [newsUpdates, setNewsUpdates] = useState(true);
@@ -21,7 +20,7 @@ const Account = () => {
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
-  // ✅ Fetch User Details on Page Load
+  // ✅ Fetch User Details
   useEffect(() => {
     const fetchUserDetails = async () => {
       try {
@@ -60,25 +59,9 @@ const Account = () => {
     }
   };
 
-  // ✅ Handle Password Validation
-  const validateNewPassword = (pass) => {
-    const isValid =
-      pass.length >= 8 &&
-      /[A-Z]/.test(pass) &&
-      /[a-z]/.test(pass) &&
-      /\d/.test(pass) &&
-      /[@#$%^&*!]/.test(pass);
-    setPasswordValid(isValid);
-  };
-
-  // ✅ Handle Password Update
+  // ✅ Handle Password Change
   const handleChangePassword = async (e) => {
     e.preventDefault();
-    if (!passwordValid) {
-      setError("New password does not meet the security criteria.");
-      return;
-    }
-
     try {
       await axios.post(`${API_BASE_URL}/change-password`, {
         email: user.email,
@@ -141,96 +124,86 @@ const Account = () => {
   // ✅ Handle Contact Us Form Submission
   const handleContactSubmit = async (e) => {
     e.preventDefault();
-  
-    if (!subject || !message) {
-      alert("Please enter both subject and message.");
-      return;
-    }
-  
     try {
-      const response = await axios.post(`${API_BASE_URL}/contact`, {
+      await axios.post(`${API_BASE_URL}/contact`, {
         email: user.email,
         subject,
         message,
       }, {
-        withCredentials: true, // Ensures authentication is sent
+        withCredentials: true,
       });
-  
-      alert(response.data.message);
+      setContactStatus("Message sent successfully!");
       setSubject("");
       setMessage("");
     } catch (err) {
       console.error("Error sending message:", err);
-      alert("Failed to send message. Please try again.");
+      setContactStatus("Failed to send message.");
     }
   };
-  
 
   return (
     <div className="account-container">
-      {/* ✅ User Info Card */}
-      <div className="account-card">
-        <h2 className="account-header">Account Settings</h2>
-        {error && <p className="error">{error}</p>}
-        <p className="account-info"><strong>Username:</strong> {user.username}</p>
-        <p className="account-info"><strong>Email:</strong> {user.email}</p>
-        <p className="verification-status">
-          <strong>Verification Status:</strong>{" "}
-          <span className={user.isVerified ? "verified" : "not-verified"}>
-            {user.isVerified ? "✔️ Verified" : "❌ Not Verified"}
-          </span>
-        </p>
+      <h2 className="account-header">Account Settings</h2>
+      {error && <p className="error">{error}</p>}
+
+      {/* ✅ User Info Card - Centered & Bigger */}
+      <div className="account-info-card">
+        <h3>Username    : {user.username}</h3> 
+        <h3>Email       : {user.email}</h3> 
+        <h3 className={`verification-status ${user.isVerified ? "" : "not-verified"}`}>Verification: {user.isVerified ? "✔️ Verified" : "❌ Not Verified"} </h3>
+        
         {!user.isVerified && (
-          <button onClick={handleResendVerification} className="button resend-btn">
+          <button onClick={handleResendVerification} className="button update-preferences">
             Resend Verification Email
           </button>
         )}
       </div>
 
+      {/* ✅ 3 Sections in a Row */}
       <div className="account-flex-container">
-        {/* ✅ Change Password Card */}
+        {/* ✅ Change Password */}
         <div className="account-card">
           <h3>Change Password</h3>
           <form onSubmit={handleChangePassword}>
             <input type="password" placeholder="Current Password" value={currentPassword} onChange={(e) => setCurrentPassword(e.target.value)} required />
-            <input type="password" placeholder="New Password" value={newPassword} onChange={(e) => { setNewPassword(e.target.value); validateNewPassword(e.target.value); }} required />
-            <button type="submit" className="button update-password" disabled={!passwordValid}>Update Password</button>
+            <input type="password" placeholder="New Password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} required />
+            <button type="submit" className="button update-password">Reset Password</button>
           </form>
         </div>
 
-        {/* ✅ Delete Account Card */}
+        {/* ✅ Notification Preferences */}
+        <div className="account-card">
+          <h3>Notification Preferences</h3>
+          <div className="toggle-container">
+            <label>
+              <input type="checkbox" checked={securityAlerts} onChange={() => setSecurityAlerts(!securityAlerts)} />
+              Security Alerts
+            </label>
+            <label>
+              <input type="checkbox" checked={newsUpdates} onChange={() => setNewsUpdates(!newsUpdates)} />
+              News Updates
+            </label>
+          </div>
+          <button className="button update-preferences" onClick={handleSavePreferences}>Save Preferences</button>
+        </div>
+
+        {/* ✅ Delete Account */}
         <div className="account-card">
           <h3>Delete Account</h3>
           <form onSubmit={handleDeleteAccount}>
-            <input type="password" placeholder="Enter Password to Confirm" value={deletePassword} onChange={(e) => setDeletePassword(e.target.value)} required />
-            <button type="submit" className="button delete-account">Delete Account</button>
+            <input type="password" placeholder="Confirm Password" value={deletePassword} onChange={(e) => setDeletePassword(e.target.value)} required />
+            <button type="submit" className="button delete-account">Delete</button>
           </form>
         </div>
       </div>
 
-      {/* ✅ Notification Preferences Card */}
-      <div className="account-card">
-        <h3>Notification Preferences</h3>
-        <div className="toggle-container">
-          <label>
-            <input type="checkbox" checked={securityAlerts} onChange={() => setSecurityAlerts(!securityAlerts)} />
-            <span className="toggle"></span> Security Alerts
-          </label>
-          <label>
-            <input type="checkbox" checked={newsUpdates} onChange={() => setNewsUpdates(!newsUpdates)} />
-            <span className="toggle"></span> News Updates
-          </label>
-        </div>
-        <button className="button update-preferences" onClick={handleSavePreferences}>Save Preferences</button>
-      </div>
-
-      {/* ✅ Contact Us Section */}
-      <div className="account-card">
+      {/* ✅ Enlarged Contact Us Section */}
+      <div className="account-card contact-card">
         <h3>Contact Us</h3>
         <form onSubmit={handleContactSubmit}>
           <input type="text" placeholder="Subject" value={subject} onChange={(e) => setSubject(e.target.value)} required />
-          <textarea placeholder="Your message..." value={message} onChange={(e) => setMessage(e.target.value)} required></textarea>
-          <button type="submit" className="button contact-btn">Send Message</button>
+          <textarea placeholder="Message..." value={message} onChange={(e) => setMessage(e.target.value)} required></textarea>
+          <button type="submit" className="button contact-btn">Send</button>
           {contactStatus && <p className="contact-status">{contactStatus}</p>}
         </form>
       </div>

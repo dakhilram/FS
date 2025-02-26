@@ -1,89 +1,101 @@
-/* ✅ Background Gradient */
+/* ✅ General Page Styling */
 .account-container {
   display: flex;
   flex-direction: column;
   align-items: center;
-  min-height: 100vh;
-  background: linear-gradient(to bottom right, #dad4ec, #f3e7e9);
-  padding: 50px 20px;
-}
-
-/* ✅ Account Cards Layout */
-.account-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-  gap: 20px;
-  width: 90%;
-  max-width: 1200px;
   justify-content: center;
+  min-height: 100vh;
+  background: linear-gradient(to right, #e3edf7, #6786b4);
+  padding-top: 20px;
 }
 
-/* ✅ Flash Card Design */
-.account-card {
-  background: rgba(255, 255, 255, 0.25);
-  backdrop-filter: blur(20px);
-  box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.2);
+/* ✅ Header Styling */
+.account-header {
+  font-size: 32px;
+  font-weight: bold;
+  color: #2c3e50;
+  margin-bottom: 10px; /* Reduced spacing */
+}
+
+/* ✅ Username Section - Centered & Bigger */
+.account-info-card {
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(15px);
+  box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
   border-radius: 15px;
   padding: 25px;
-  text-align: center;
-  transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
-  min-width: 350px;
+  text-align: justify;
+  width: 50%;
+  max-width: 500px;
+  transition: all 0.3s ease-in-out;
 }
 
-/* ✅ Hover Effect */
-.account-card:hover {
+.account-info-card:hover {
   transform: translateY(-5px);
-  box-shadow: 0px 15px 25px rgba(0, 0, 0, 0.3);
 }
 
-/* ✅ Header */
-.account-header {
-  font-size: 22px;
-  font-weight: bold;
-  color: #333;
-  margin-bottom: 10px;
-}
-
-/* ✅ User Info */
+/* ✅ User Info Text */
 .account-info {
   font-size: 18px;
-  color: #222;
-  margin-bottom: 10px;
-}
-
-/* ✅ Email Verification */
-.verification-status {
-  font-size: 18px;
+  color: #2c3e50;
   font-weight: bold;
-  margin-top: 10px;
+  margin-bottom: 5px;
 }
 
-.verified {
+/* ✅ Verification Status */
+.verification-status {
+  font-size: 16px;
   color: #28a745;
+  font-weight: bold;
 }
 
-.not-verified {
-  color: #dc3545;
+.verification-status.not-verified {
+  color: #e74c3c;
+}
+
+/* ✅ Row Layout for Three Sections */
+.account-flex-container {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  width: 80%;
+  margin-top: 20px;
+  bottom: 0;
+}
+
+/* ✅ Glassmorphic Cards */
+.account-card {
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(15px);
+  box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
+  border-radius: 15px;
+  padding: 20px;
+  text-align: center;
+  width: 30%;
+  transition: all 0.3s ease-in-out;
+}
+
+.account-card:hover {
+  transform: translateY(-5px);
 }
 
 /* ✅ Input Fields */
 input, textarea {
-  width: 100%;
+  width: 90%;
   padding: 10px;
   margin-top: 10px;
   border: none;
   border-radius: 8px;
-  background: rgba(255, 255, 255, 0.3);
-  backdrop-filter: blur(5px);
+  background: rgba(255, 255, 255, 0.4);
+  backdrop-filter: blur(10px);
   font-size: 16px;
-  color: #333;
+  color: #2c3e50;
   transition: 0.3s ease-in-out;
 }
 
-/* ✅ Input Focus */
 input:focus, textarea:focus {
   outline: none;
-  background: rgba(255, 255, 255, 0.5);
+  background: rgba(255, 255, 255, 0.6);
 }
 
 /* ✅ Buttons */
@@ -118,23 +130,73 @@ input:focus, textarea:focus {
   background: linear-gradient(135deg, #b30000, #800000);
 }
 
+/* ✅ Delete Account Button */
+.contact-btn {
+  background: linear-gradient(135deg, #807272, #2e1c1c);
+  color: white;
+}
+
+.contact-btn:hover {
+  background: linear-gradient(135deg, #868383, #800000);
+}
+
 /* ✅ Preferences Toggle */
 .toggle-container {
   display: flex;
-  align-items: center;
+  flex-direction: column;
+  align-items: flex-start;
   gap: 10px;
   margin-top: 10px;
 }
 
-.toggle-label {
+.toggle-container label {
   font-size: 16px;
-  font-weight: bold;
-  color: #333;
+  color: #2c3e50;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* ✅ Preferences Save Button */
+.update-preferences {
+  background: linear-gradient(135deg, #27ae60, #219150);
+  color: white;
+}
+
+.update-preferences:hover {
+  background: linear-gradient(135deg, #219150, #1b7d43);
+}
+
+/* ✅ Enlarged Contact Us Section */
+.contact-card {
+  width: 50%;
+  max-width: 600px;
+}
+
+.contact-card {
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(15px);
+  box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
+  border-radius: 15px;
+  padding: 25px;
+  text-align: center;
+  width: 50%;
+  max-width: 500px;
+  transition: all 0.3s ease-in-out;
 }
 
 /* ✅ Responsive Design */
 @media (max-width: 768px) {
-  .account-grid {
-    grid-template-columns: 1fr;
+  .account-flex-container {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .account-card {
+    width: 90%;
+  }
+
+  .contact-card {
+    width: 90%;
   }
 }
