@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import LoadingScreen from "./LoadingScreen";
 import "../styles/Auth.css";
+import backgroundVideo from "../assets/1.mp4";
 
 const API_BASE_URL = window.location.hostname === "localhost"
   ? "http://localhost:5000"
@@ -41,7 +42,11 @@ const Login = () => {
   };
 
   return (
-    <div>
+    <div className="login-container">
+    {/* Background Video */}
+    <video autoPlay loop muted className="background-video">
+      <source src={backgroundVideo} type="video/mp4" />    </video>
+    
       {loading && <LoadingScreen />}
     <div className="auth-container">
       

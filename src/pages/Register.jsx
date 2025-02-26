@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import LoadingScreen from "./LoadingScreen";
+import backgroundVideo from "../assets/2.mp4";
 import "../styles/Register.css";
 
 const API_BASE_URL = window.location.hostname === "localhost"
@@ -61,7 +62,10 @@ const Register = () => {
   };
 
   return (
-    <div>
+   <div className="login-container">
+        {/* Background Video */}
+        <video autoPlay loop muted className="background-video">
+          <source src={backgroundVideo} type="video/mp4" />    </video>
       {loading && <LoadingScreen />}
     <div className="auth-container">
       

@@ -1,7 +1,27 @@
+.login-container {
+  position: relative;
+  width: 100%;
+  height: 91vh; /* Full viewport height */
+  overflow: hidden; /* Prevents scrollbars */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.background-video {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw; /* Full viewport width */
+  height: 100vh; /* Full viewport height */
+  object-fit: cover; /* Ensures the video fully covers the screen without distortion */
+  z-index: -1;
+}
+
 /* ✅ Center Login Form */
 .auth-container {
   width: 350px; /* Slightly wider */
-  background: #f0f0f0;
+  background: #ffffff8e;
   padding: 25px;
   border-radius: 10px;
   text-align: center;
