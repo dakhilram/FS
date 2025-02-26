@@ -84,7 +84,6 @@ def contact():
     user_email = data.get('email')
     subject = data.get('subject')
     message_body = data.get('message')
-    email = db.Column(db.String(120), unique=True, nullable=False)##########################
 
     if not user_email or not subject or not message_body:
         return jsonify({"error": "All fields are required"}), 400
@@ -92,7 +91,7 @@ def contact():
     try:
         msg = MIMEMultipart()
         msg["From"] = SMTP_USERNAME
-        msg["To"] = email  # Replace with the receiver's email########################################
+        msg["To"] = "foresight.usa.noreply@gmail.com" 
         msg["Subject"] = f"Contact Form: {subject}"
         
         msg.attach(MIMEText(f"From: {user_email}\n\n{message_body}", "plain"))
