@@ -122,6 +122,7 @@ input:focus, textarea:focus {
 
 /* ✅ Delete Account Button */
 .delete-account {
+  margin-top: 40px;
   background: linear-gradient(135deg, #ff4d4d, #b30000);
   color: white;
 }
@@ -200,6 +201,10 @@ input:focus, textarea:focus {
   transform: translateX(25px);
 }
 
+.update-preferences{
+  margin-top: 48px;
+}
+
 
 /* ✅ Preferences Toggle 
 .toggle-container {
@@ -220,12 +225,12 @@ input:focus, textarea:focus {
 
 /* ✅ Preferences Save Button */
 .update-preferences {
-  background: linear-gradient(135deg, #bde6ce, #219150);
+  background: linear-gradient(135deg, #618a72, #219150);
   color: white;
 }
 
 .update-preferences:hover {
-  background: linear-gradient(135deg, #219150, #bde6ce);
+  background: linear-gradient(135deg, #219150, #618a72);
 }
 
 /* ✅ Enlarged Contact Us Section */
