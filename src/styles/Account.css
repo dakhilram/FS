@@ -218,15 +218,15 @@ input:focus, textarea:focus {
   gap: 10px;
 }*/
 
-/* ✅ Preferences Save Button 
+/* ✅ Preferences Save Button */
 .update-preferences {
-  background: linear-gradient(135deg, #27ae60, #219150);
+  background: linear-gradient(135deg, #bde6ce, #219150);
   color: white;
 }
 
 .update-preferences:hover {
-  background: linear-gradient(135deg, #219150, #1b7d43);
-}*/
+  background: linear-gradient(135deg, #219150, #bde6ce);
+}
 
 /* ✅ Enlarged Contact Us Section */
 .contact-card {
