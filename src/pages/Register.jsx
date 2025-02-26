@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import LoadingScreen from "./LoadingScreen";
 import "../styles/Register.css";
 
 const API_BASE_URL = window.location.hostname === "localhost"
@@ -14,6 +15,7 @@ const Register = () => {
   const [showPasswordRules, setShowPasswordRules] = useState(false);
   const [error, setError] = useState("");
   const [emailSent, setEmailSent] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const navigate = useNavigate();
 
@@ -39,6 +41,7 @@ const Register = () => {
 
   const handleRegister = async (e) => {
     e.preventDefault();
+    setLoading(true);
 
     try {
       const response = await axios.post(
@@ -54,10 +57,14 @@ const Register = () => {
       console.error("Signup Error:", err);
       setError(err.response?.data?.message || "An error occurred. Please try again.");
     }
+    setLoading(false);
   };
 
   return (
+    <div>
+      {loading && <LoadingScreen />}
     <div className="auth-container">
+      
       <h2>Register</h2>
       {error && <p className="error">{error}</p>}
       {emailSent ? (
@@ -122,7 +129,8 @@ const Register = () => {
           </button>
         </form>
       )}
-      <p>Already have an account? <a href="/login">Login</a></p>
+      <p>Already have an account? <a className="login-link" onClick={() => navigate("/login")}>Login</a></p>
+    </div>
     </div>
   );
 };
