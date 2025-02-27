@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import LoadingScreen from "./LoadingScreen";
-import backgroundVideo from "../assets/2.mp4";
+import backgroundVideo from "../assets/3.mp4";
 import "../styles/Register.css";
 
 const API_BASE_URL = window.location.hostname === "localhost"
