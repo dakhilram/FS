@@ -53,7 +53,7 @@ SMTP_PASSWORD = os.getenv("SMTP_PASSWORD")  # Your App Password
 
 def send_contact_email(subject, message, sender_email):
     msg = MIMEMultipart()
-    msg["From"] = SMTP_USERNAME
+    msg["From"] = sender_email
     msg["To"] = SMTP_USERNAME  # Send the message to your own admin email
     msg["Subject"] = f"New Contact Form Submission: {subject}"
 
@@ -99,7 +99,7 @@ def contact():
         with smtplib.SMTP(SMTP_SERVER, SMTP_PORT) as server:
             server.starttls()
             server.login(SMTP_USERNAME, SMTP_PASSWORD)
-            server.sendmail(SMTP_USERNAME, "your-email@example.com", msg.as_string())
+            server.sendmail(SMTP_USERNAME, "foresight.usa.noreply@gmail.com", msg.as_string())
 
         return jsonify({"message": "Message sent successfully!"}), 200
 
