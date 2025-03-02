@@ -60,6 +60,20 @@ const Hurricane = () => {
           This emphasizes the importance of early warnings and emergency response systems to minimize loss of life. 
         </p>
       </div>
+      <h2>🌍 Hurricane Prediction Map 🌍</h2>
+      <p className="map-description">
+      The heatmap visually represents the predicted hurricane occurrences across the entire United States, including both major and minor states. 
+      Darker red regions indicate higher hurricane activity, with coastal states like Florida, Texas, and Louisiana showing the highest risk. 
+      This visualization helps in identifying hurricane-prone areas, aiding in disaster preparedness and risk management.
+      </p>  
+      <div className="map-container">
+      <iframe 
+        src=  {`${import.meta.env.BASE_URL}hurricane_map.html`} 
+        title="Hurricane Prediction Map"
+        className="hurricane-map"
+        >
+        </iframe>
+      </div>
     </div>
   );
 };

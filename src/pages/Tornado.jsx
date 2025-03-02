@@ -56,11 +56,29 @@ The peak around 2011 aligns with the 2011 Super Outbreak, which caused over 5,0
       <h2> Tornado Occurrence by States</h2>
       <div className="chart-container">
         <img src={tobubble} alt="Tornado Trend" className="chart-imagebubble" />
-        <p className="chart-description">The image represents a bubble map of tornado occurrences across the United States. The size of each bubble corresponds to the number of tornadoes reported in that state, with larger bubbles indicating a higher occurrence. The color intensity also varies, with darker shades of red representing states with more tornadoes.
+        <p className="chart-description">The image represents a bubble map of tornado occurrences across the United States. 
+          The size of each bubble corresponds to the number of tornadoes reported in that state, with larger bubbles indicating a higher occurrence. 
+          The color intensity also varies, with darker shades of red representing states with more tornadoes.
 Texas has the highest number of tornadoes, as indicated by the largest and darkest bubble.
 Other states in the Midwest and Southeastern regions, such as Oklahoma, Kansas, and Florida, also show significant tornado activity.
 States in the Western and Northeastern U.S. have relatively smaller bubbles, indicating fewer tornado occurrences.
         </p>
+      </div>
+
+      <h2>🌍 Tornado Prediction Map 🌍</h2>
+      <p className="map-description">
+      The Tornado Heatmap is an interactive visualization that highlights the geographical distribution and intensity of tornado occurrences across the United States. 
+      The map utilizes heatmap layers to represent high-risk tornado zones based on historical data. 
+      The heatmap visually represents tornado occurrences, with brighter and denser areas indicating higher tornado frequency. 
+      The heatmap spans across major tornado-prone states in the U.S., particularly in the Tornado Alley region, including Texas, Oklahoma, Kansas, Nebraska, and surrounding states.
+      </p>  
+      <div className="map-container">
+      <iframe 
+        src=  {`${import.meta.env.BASE_URL}tornado_heatmap.html`} 
+        title="Hurricane Prediction Map"
+        className="hurricane-map"
+        >
+        </iframe>
       </div>
       
     </div>

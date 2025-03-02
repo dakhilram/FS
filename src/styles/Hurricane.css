@@ -84,6 +84,35 @@
     box-shadow: 0px 2px 5px rgba(41, 43, 48, 0.544);
 }
 
+/*hurricane map-description*/
+.map-description {
+    font-size: 18px;
+    color: #444;
+    max-width: 800px;
+    margin: 0 auto 20px auto;
+    padding: 12px;
+    text-align: justify;
+    line-height: 1.6;
+}
+
+/* 🌊 Hurricane Map Container */
+.map-container.hurricane {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 20px auto;
+    width: 90%;
+}
+/* 🌊 Hurricane Map (Iframe) */
+.hurricane-map {
+    width: 100%;
+    max-width: 900px;
+    height: 500px;
+    border-radius: 10px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+    border: none;
+}
+
 /* Responsive Design */
 @media screen and (max-width: 768px) {
     .chart-container {
