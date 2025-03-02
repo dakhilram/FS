@@ -1,29 +1,125 @@
-.info-page {
+.nature-page {
     text-align: center;
     padding: 40px;
-    background-color: #fff5f5;
+    background-color: #f8f8f8;
     min-height: 100vh;
 }
 
-.info-page h1 {
-    color: #d9534f;
+/* Title Styling */
+.nature-page h1 {
+    color: #8B0000; /* Dark Red - Matches Terrorism Theme */
     font-size: 32px;
     font-weight: bold;
     margin-bottom: 20px;
 }
 
-.info-image {
-    width: 70%;
-    max-width: 600px;
+/* Introduction Text */
+.intro-text {
+    font-size: 18px;
+    color: #444;
+    max-width: 800px;
+    margin: 0 auto 20px auto;
+    padding: 12px;
+    text-align: justify;
+    text-justify: inter-word;
+    border-radius: 8px;
+    line-height: 1.6;
+}
+
+/* Centered Main Image */
+.nature-image {
+    width: 85%;
+    max-width: 800px;
     border-radius: 10px;
     box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
     margin-bottom: 20px;
 }
 
-.info-page p {
+/* Chart Layout */
+.chart-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    max-width: 80%;
+    margin: 40px auto;
+}
+
+/* Right-Aligned Chart */
+.chart-container.right-align {
+    justify-content: flex-end;
+}
+
+/* Chart Image Styling */
+.chart-image {
+    width: 45%;
+    max-width: 650px;
+    border-radius: 10px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+    transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+}
+
+/* Hover Effect */
+.chart-image:hover {
+    transform: scale(1.05);
+    box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.3);
+}
+
+/* Chart Text */
+.chart-description {
     font-size: 18px;
     color: #333;
-    max-width: 800px;
-    margin: 0 auto;
+    max-width: 50%;
+    text-align: justify;
+    text-justify: inter-word;
     line-height: 1.6;
+    background: rgba(255, 255, 255, 0.9);
+    padding: 12px;
+    border-radius: 8px;
+    box-shadow: 0px 2px 5px rgba(41, 43, 48, 0.544);
+}
+
+/* 📍 Terrorism Incident Map */
+.map-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 20px auto;
+    width: 90%;
+}
+
+.terrorism-map {
+    width: 100%;
+    max-width: 900px;
+    height: 500px;
+    border-radius: 10px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+    border: none;
+}
+
+/* Responsive Design */
+@media screen and (max-width: 768px) {
+    .chart-container {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .chart-image {
+        width: 80%;
+        max-width: 100%;
+    }
+
+    .chart-description {
+        max-width: 90%;
+        text-align: justify;
+    }
+
+    .chart-container.right-align {
+        justify-content: center;
+    }
+
+    .terrorism-map {
+        height: 400px;
+        width: 95%;
+    }
 }
