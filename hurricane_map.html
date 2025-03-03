@@ -25,7 +25,7 @@
             <meta name="viewport" content="width=device-width,
                 initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
             <style>
-                #map_9d421dfaef284e53c67cb8abfca43619 {
+                #map_81d745909fb72bfac376ad1b693ef496 {
                     position: relative;
                     width: 100.0%;
                     height: 100.0%;
@@ -35,24 +35,23 @@
                 .leaflet-container { font-size: 1rem; }
             </style>
         
-    <script src="https://cdn.jsdelivr.net/gh/python-visualization/folium@main/folium/templates/leaflet_heat.min.js"></script>
 </head>
 <body>
     
     
-            <div class="folium-map" id="map_9d421dfaef284e53c67cb8abfca43619" ></div>
+            <div class="folium-map" id="map_81d745909fb72bfac376ad1b693ef496" ></div>
         
 </body>
 <script>
     
     
-            var map_9d421dfaef284e53c67cb8abfca43619 = L.map(
-                "map_9d421dfaef284e53c67cb8abfca43619",
+            var map_81d745909fb72bfac376ad1b693ef496 = L.map(
+                "map_81d745909fb72bfac376ad1b693ef496",
                 {
                     center: [37.0902, -95.7129],
                     crs: L.CRS.EPSG3857,
                     ...{
-  "zoom": 5,
+  "zoom": 4,
   "zoomControl": true,
   "preferCanvas": false,
 }
@@ -64,7 +63,7 @@
 
         
     
-            var tile_layer_fd7b2f06dc056d9bb4101fa59a51de92 = L.tileLayer(
+            var tile_layer_c33b04edc81a61c958231f3b6bf7291e = L.tileLayer(
                 "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
                 {
   "minZoom": 0,
@@ -81,27 +80,306 @@
             );
         
     
-            tile_layer_fd7b2f06dc056d9bb4101fa59a51de92.addTo(map_9d421dfaef284e53c67cb8abfca43619);
+            tile_layer_c33b04edc81a61c958231f3b6bf7291e.addTo(map_81d745909fb72bfac376ad1b693ef496);
         
     
-            var heat_map_b990bb2e33dad9c95c7732e79de5bf91 = L.heatLayer(
-                [[26.0, -90.0], [31.0, -100.0], [31.0, -100.0], [35.7596, -79.0193], [27.9944024, -81.7602544], [27.9944024, -81.7602544], [35.7596, -79.0193], [35.7596, -79.0193], [35.7596, -79.0193], [18.2208, -66.5901], [30.9843, -91.9623], [31.0, -100.0], [31.0, -100.0], [35.7596, -79.0193], [35.7596, -79.0193]],
-                {
-  "minOpacity": 0.5,
-  "maxZoom": 1,
-  "radius": 15,
-  "blur": 10,
-}
-            );
+            var circle_marker_e28883912e7b9d91a537ddd76a1de804 = L.circleMarker(
+                [31.0, -99.0],
+                {"bubblingMouseEvents": true, "color": "red", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "red", "fillOpacity": 0.6, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 48, "stroke": true, "weight": 3}
+            ).addTo(map_81d745909fb72bfac376ad1b693ef496);
         
     
-            heat_map_b990bb2e33dad9c95c7732e79de5bf91.addTo(map_9d421dfaef284e53c67cb8abfca43619);
+        var popup_dd5abce23588826503d8fb62817053f3 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_1c3eb56a0186d029ef05edfc2da8930c = $(`<div id="html_1c3eb56a0186d029ef05edfc2da8930c" style="width: 100.0%; height: 100.0%;">Texas: 24 hurricanes</div>`)[0];
+                popup_dd5abce23588826503d8fb62817053f3.setContent(html_1c3eb56a0186d029ef05edfc2da8930c);
+            
+        
+
+        circle_marker_e28883912e7b9d91a537ddd76a1de804.bindPopup(popup_dd5abce23588826503d8fb62817053f3)
+        ;
+
         
     
-            tile_layer_fd7b2f06dc056d9bb4101fa59a51de92.addTo(map_9d421dfaef284e53c67cb8abfca43619);
+    
+            var circle_marker_0e68024612bc6ce6f5fa0d8560677d0a = L.circleMarker(
+                [18.2, -66.5],
+                {"bubblingMouseEvents": true, "color": "red", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "red", "fillOpacity": 0.6, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 54, "stroke": true, "weight": 3}
+            ).addTo(map_81d745909fb72bfac376ad1b693ef496);
         
     
-            heat_map_b990bb2e33dad9c95c7732e79de5bf91.addTo(map_9d421dfaef284e53c67cb8abfca43619);
+        var popup_5d0e95bac8a68d008a2e5f411ff4af8f = L.popup({
+  "maxWidth": "100%",
+});
+
         
+            
+                var html_f76e57a66ddcf67919b66087f6612a07 = $(`<div id="html_f76e57a66ddcf67919b66087f6612a07" style="width: 100.0%; height: 100.0%;">Puerto Rico: 27 hurricanes</div>`)[0];
+                popup_5d0e95bac8a68d008a2e5f411ff4af8f.setContent(html_f76e57a66ddcf67919b66087f6612a07);
+            
+        
+
+        circle_marker_0e68024612bc6ce6f5fa0d8560677d0a.bindPopup(popup_5d0e95bac8a68d008a2e5f411ff4af8f)
+        ;
+
+        
+    
+    
+            var circle_marker_4c1c8f7c0f2fef2fa8f0647d51001903 = L.circleMarker(
+                [35.5, -79.4],
+                {"bubblingMouseEvents": true, "color": "red", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "red", "fillOpacity": 0.6, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 44, "stroke": true, "weight": 3}
+            ).addTo(map_81d745909fb72bfac376ad1b693ef496);
+        
+    
+        var popup_eec755b901f009e9fd7a3067c5dc964e = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_2317b6b1df0c14387b4e17c6c1e032a0 = $(`<div id="html_2317b6b1df0c14387b4e17c6c1e032a0" style="width: 100.0%; height: 100.0%;">North Carolina: 22 hurricanes</div>`)[0];
+                popup_eec755b901f009e9fd7a3067c5dc964e.setContent(html_2317b6b1df0c14387b4e17c6c1e032a0);
+            
+        
+
+        circle_marker_4c1c8f7c0f2fef2fa8f0647d51001903.bindPopup(popup_eec755b901f009e9fd7a3067c5dc964e)
+        ;
+
+        
+    
+    
+            var circle_marker_e98d0d9f55a12334c29ba7a48a601e24 = L.circleMarker(
+                [30.9, -91.7],
+                {"bubblingMouseEvents": true, "color": "red", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "red", "fillOpacity": 0.6, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 38, "stroke": true, "weight": 3}
+            ).addTo(map_81d745909fb72bfac376ad1b693ef496);
+        
+    
+        var popup_6c23e09661af649c05dfbf7c0d75e4fa = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_f09aa902def7302cdde94522b4920897 = $(`<div id="html_f09aa902def7302cdde94522b4920897" style="width: 100.0%; height: 100.0%;">Louisiana: 19 hurricanes</div>`)[0];
+                popup_6c23e09661af649c05dfbf7c0d75e4fa.setContent(html_f09aa902def7302cdde94522b4920897);
+            
+        
+
+        circle_marker_e98d0d9f55a12334c29ba7a48a601e24.bindPopup(popup_6c23e09661af649c05dfbf7c0d75e4fa)
+        ;
+
+        
+    
+    
+            var circle_marker_bd52f6db3f0b6e4421be575ff0b71501 = L.circleMarker(
+                [32.4, -89.4],
+                {"bubblingMouseEvents": true, "color": "red", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "red", "fillOpacity": 0.6, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 18, "stroke": true, "weight": 3}
+            ).addTo(map_81d745909fb72bfac376ad1b693ef496);
+        
+    
+        var popup_9fe197de20c8f9e4a96e576e48547153 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_c48a3a03f56909a13cde58e21f2ed794 = $(`<div id="html_c48a3a03f56909a13cde58e21f2ed794" style="width: 100.0%; height: 100.0%;">Mississippi: 9 hurricanes</div>`)[0];
+                popup_9fe197de20c8f9e4a96e576e48547153.setContent(html_c48a3a03f56909a13cde58e21f2ed794);
+            
+        
+
+        circle_marker_bd52f6db3f0b6e4421be575ff0b71501.bindPopup(popup_9fe197de20c8f9e4a96e576e48547153)
+        ;
+
+        
+    
+    
+            var circle_marker_d62f1f8c61081ebfa7e1c845ccbc163d = L.circleMarker(
+                [32.9, -83.4],
+                {"bubblingMouseEvents": true, "color": "red", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "red", "fillOpacity": 0.6, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 22, "stroke": true, "weight": 3}
+            ).addTo(map_81d745909fb72bfac376ad1b693ef496);
+        
+    
+        var popup_448a2126334677d554f295e0c0c8daeb = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_231841328183770afaa6c7adee416cdd = $(`<div id="html_231841328183770afaa6c7adee416cdd" style="width: 100.0%; height: 100.0%;">Georgia: 11 hurricanes</div>`)[0];
+                popup_448a2126334677d554f295e0c0c8daeb.setContent(html_231841328183770afaa6c7adee416cdd);
+            
+        
+
+        circle_marker_d62f1f8c61081ebfa7e1c845ccbc163d.bindPopup(popup_448a2126334677d554f295e0c0c8daeb)
+        ;
+
+        
+    
+    
+            var circle_marker_cde0d22725df7c621a2f6f493e2787c9 = L.circleMarker(
+                [27.8, -81.5],
+                {"bubblingMouseEvents": true, "color": "red", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "red", "fillOpacity": 0.6, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 102, "stroke": true, "weight": 3}
+            ).addTo(map_81d745909fb72bfac376ad1b693ef496);
+        
+    
+        var popup_068d25117ac61d3c883ac461a2877ad4 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_f7171ace41331e064b44b326319a9df1 = $(`<div id="html_f7171ace41331e064b44b326319a9df1" style="width: 100.0%; height: 100.0%;">Florida: 51 hurricanes</div>`)[0];
+                popup_068d25117ac61d3c883ac461a2877ad4.setContent(html_f7171ace41331e064b44b326319a9df1);
+            
+        
+
+        circle_marker_cde0d22725df7c621a2f6f493e2787c9.bindPopup(popup_068d25117ac61d3c883ac461a2877ad4)
+        ;
+
+        
+    
+    
+            var circle_marker_b9038c1451bb81025bff1a29151675c4 = L.circleMarker(
+                [33.8, -81.2],
+                {"bubblingMouseEvents": true, "color": "red", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "red", "fillOpacity": 0.6, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 16, "stroke": true, "weight": 3}
+            ).addTo(map_81d745909fb72bfac376ad1b693ef496);
+        
+    
+        var popup_a6a227e3bbabb9447172a4d5a7bb5f9f = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_3551cde1568c181bf2ce3adbeb6e76df = $(`<div id="html_3551cde1568c181bf2ce3adbeb6e76df" style="width: 100.0%; height: 100.0%;">South Carolina: 8 hurricanes</div>`)[0];
+                popup_a6a227e3bbabb9447172a4d5a7bb5f9f.setContent(html_3551cde1568c181bf2ce3adbeb6e76df);
+            
+        
+
+        circle_marker_b9038c1451bb81025bff1a29151675c4.bindPopup(popup_a6a227e3bbabb9447172a4d5a7bb5f9f)
+        ;
+
+        
+    
+    
+            var circle_marker_bebb4ff61095d28ef6726fd9604875b5 = L.circleMarker(
+                [37.5, -78.5],
+                {"bubblingMouseEvents": true, "color": "red", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "red", "fillOpacity": 0.6, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 22, "stroke": true, "weight": 3}
+            ).addTo(map_81d745909fb72bfac376ad1b693ef496);
+        
+    
+        var popup_1a9c8b06c2ef712ad7e92a2092ed6ad8 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_1edc4fd25abb3d65c129e504b663bd64 = $(`<div id="html_1edc4fd25abb3d65c129e504b663bd64" style="width: 100.0%; height: 100.0%;">Virginia: 11 hurricanes</div>`)[0];
+                popup_1a9c8b06c2ef712ad7e92a2092ed6ad8.setContent(html_1edc4fd25abb3d65c129e504b663bd64);
+            
+        
+
+        circle_marker_bebb4ff61095d28ef6726fd9604875b5.bindPopup(popup_1a9c8b06c2ef712ad7e92a2092ed6ad8)
+        ;
+
+        
+    
+    
+            var circle_marker_3affe11cccf154cc88185beee82a5a8e = L.circleMarker(
+                [32.8, -86.8],
+                {"bubblingMouseEvents": true, "color": "red", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "red", "fillOpacity": 0.6, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 16, "stroke": true, "weight": 3}
+            ).addTo(map_81d745909fb72bfac376ad1b693ef496);
+        
+    
+        var popup_0425091468ea91a46d6d697ea92edcc9 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_493faf377d8510c5500681a54a85ac28 = $(`<div id="html_493faf377d8510c5500681a54a85ac28" style="width: 100.0%; height: 100.0%;">Alabama: 8 hurricanes</div>`)[0];
+                popup_0425091468ea91a46d6d697ea92edcc9.setContent(html_493faf377d8510c5500681a54a85ac28);
+            
+        
+
+        circle_marker_3affe11cccf154cc88185beee82a5a8e.bindPopup(popup_0425091468ea91a46d6d697ea92edcc9)
+        ;
+
+        
+    
+    
+            var circle_marker_0d1c8c5497864116d7e107f616df5b2b = L.circleMarker(
+                [42.9, -75.5],
+                {"bubblingMouseEvents": true, "color": "red", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "red", "fillOpacity": 0.6, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 6, "stroke": true, "weight": 3}
+            ).addTo(map_81d745909fb72bfac376ad1b693ef496);
+        
+    
+        var popup_aa4784d5f47a801857d6e6c087f88b38 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_3f79dff833b34a5789dea6f9a01eb720 = $(`<div id="html_3f79dff833b34a5789dea6f9a01eb720" style="width: 100.0%; height: 100.0%;">New York: 3 hurricanes</div>`)[0];
+                popup_aa4784d5f47a801857d6e6c087f88b38.setContent(html_3f79dff833b34a5789dea6f9a01eb720);
+            
+        
+
+        circle_marker_0d1c8c5497864116d7e107f616df5b2b.bindPopup(popup_aa4784d5f47a801857d6e6c087f88b38)
+        ;
+
+        
+    
+    
+            var circle_marker_8c76d225bbb145140518b2229979c17f = L.circleMarker(
+                [42.3, -71.8],
+                {"bubblingMouseEvents": true, "color": "red", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "red", "fillOpacity": 0.6, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 2, "stroke": true, "weight": 3}
+            ).addTo(map_81d745909fb72bfac376ad1b693ef496);
+        
+    
+        var popup_b3e1d520f1dcc5078c095471ec163557 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_9fe3e4526eab62d72b3481b00e8939bd = $(`<div id="html_9fe3e4526eab62d72b3481b00e8939bd" style="width: 100.0%; height: 100.0%;">Massachusetts: 1 hurricanes</div>`)[0];
+                popup_b3e1d520f1dcc5078c095471ec163557.setContent(html_9fe3e4526eab62d72b3481b00e8939bd);
+            
+        
+
+        circle_marker_8c76d225bbb145140518b2229979c17f.bindPopup(popup_b3e1d520f1dcc5078c095471ec163557)
+        ;
+
+        
+    
+    
+            var circle_marker_7ad0d60255149db0c8db0630f91b9fb2 = L.circleMarker(
+                [40.1, -74.7],
+                {"bubblingMouseEvents": true, "color": "red", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "red", "fillOpacity": 0.6, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 6, "stroke": true, "weight": 3}
+            ).addTo(map_81d745909fb72bfac376ad1b693ef496);
+        
+    
+        var popup_af14e40c4bef0fead9cb89fd03b06181 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_b785058b99604bcaed5758104e1f3fa2 = $(`<div id="html_b785058b99604bcaed5758104e1f3fa2" style="width: 100.0%; height: 100.0%;">New Jersey: 3 hurricanes</div>`)[0];
+                popup_af14e40c4bef0fead9cb89fd03b06181.setContent(html_b785058b99604bcaed5758104e1f3fa2);
+            
+        
+
+        circle_marker_7ad0d60255149db0c8db0630f91b9fb2.bindPopup(popup_af14e40c4bef0fead9cb89fd03b06181)
+        ;
+
+        
+    
 </script>
 </html>
