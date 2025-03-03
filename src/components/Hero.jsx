@@ -10,7 +10,7 @@ import hurricaneTrend from "../assets/hurricane/hutrend.png";
 const Hero = () => {
   const navigate = useNavigate();
   const [currentSlide, setCurrentSlide] = useState(0);
-  const serviceRef = useRef(null);
+  const serviceRef = useRef(null);  // Reference for service section
   const [selectedModel, setSelectedModel] = useState(null); // No selection at start
   const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem("username")); // Check login status
 
@@ -32,6 +32,14 @@ const Hero = () => {
 
   // Scroll to Service Overview when "Learn More" is clicked
   const handleLearnMore = () => {
+    setTimeout(() => {
+      serviceRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 200);
+  };
+
+  // Scroll to Service Details when a service is selected
+  const handleServiceClick = (model) => {
+    setSelectedModel(model);
     setTimeout(() => {
       serviceRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
     }, 200);
@@ -91,15 +99,12 @@ const Hero = () => {
               <button 
                 key={model} 
                 className={`service-btn ${selectedModel === model ? "active" : ""}`}
-                onClick={() => setSelectedModel(model)}
+                onClick={() => handleServiceClick(model)}
               >
                 {model}
               </button>
             ))}
           </div>
-
-          {/* Curved Line */}
-          {selectedModel && <div className="curved-line"></div>}
 
           {/* Service Details */}
           <div className="service-details">
