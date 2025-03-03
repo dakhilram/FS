@@ -1,73 +1,124 @@
-import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import React, { useState, useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import "../styles/Hero.css";
+import videoBg from "../assets/4.mp4"; // Background video
+import earthquakeTrend from "../assets/Earthquake/eqtrend.png";
+import wildfireTrend from "../assets/wildfire/WildFiretrend.png";
+import tornadoTrend from "../assets/Tornados/trend.png";
+import hurricaneTrend from "../assets/hurricane/hutrend.png";
 
 const Hero = () => {
-  const [username, setUsername] = useState(localStorage.getItem("username") || null);
-  const [file, setFile] = useState(null);
-  const [fileContent, setFileContent] = useState("");
+  const navigate = useNavigate();
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const serviceRef = useRef(null);
+  const [selectedModel, setSelectedModel] = useState(null); // No selection at start
+  const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem("username")); // Check login status
 
-  const handleFileChange = (event) => {
-    const uploadedFile = event.target.files[0];
+  // Disaster Trends Data
+  const slides = [
+    { img: earthquakeTrend, title: "📊 Earthquake Magnitude Trends", desc: "Observe the historical shifts in earthquake magnitudes.", link: "/nature/earthquake" },
+    { img: wildfireTrend, title: "🔥 Wildfire Occurrences Over Time", desc: "Track how climate change influences wildfire intensity.", link: "/nature/wildfire" },
+    { img: tornadoTrend, title: "🌪️ Tornado Frequency Per Year", desc: "Analyze tornado patterns across different regions.", link: "/nature/tornado" },
+    { img: hurricaneTrend, title: "🌀 Hurricane Intensity Analysis", desc: "Understand hurricane strength variations over decades.", link: "/nature/hurricane" },
+  ];
 
-    if (uploadedFile) {
-      setFile(uploadedFile);
+  // Auto-slide every 5 seconds
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % slides.length);
+    }, 5000);
+    return () => clearInterval(interval);
+  }, []);
 
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const text = e.target.result;
-        if (uploadedFile.type === "application/json") {
-          try {
-            const jsonPreview = JSON.parse(text);
-            setFileContent(JSON.stringify(jsonPreview, null, 2)); // Beautify JSON for preview
-          } catch (error) {
-            setFileContent("Invalid JSON file.");
-          }
-        } else if (uploadedFile.type === "text/csv") {
-          setFileContent(text.split("\n").slice(0, 5).join("\n")); // Preview first 5 lines
-        } else {
-          setFileContent("Unsupported file format.");
-        }
-      };
-      reader.readAsText(uploadedFile);
-    }
+  // Scroll to Service Overview when "Learn More" is clicked
+  const handleLearnMore = () => {
+    setTimeout(() => {
+      serviceRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 200);
   };
 
   return (
-    <div className="hero">
-      <div className="hero-content">
-        <h1>ForeSight</h1>
-        <p>Predicting disasters ahead</p>
+    <div className="page-container">
+      {/* Background Video */}
+      <video autoPlay loop muted className="hero-video">
+        <source src={videoBg} type="video/mp4" />
+      </video>
+      <div className="overlay"></div>
 
-        {username ? (
-          <>
-            {/* Display Welcome Message */}
-            <h2>Welcome, {username}.</h2>
-
-            <div className="file-upload">
-              <label htmlFor="file-input">Upload JSON or CSV:</label>
-              <input
-                id="file-input"
-                type="file"
-                accept=".json, .csv"
-                onChange={handleFileChange}
-              />
-
-              {file && (
-                <div className="file-preview">
-                  <p><strong>File Name:</strong> {file.name}</p>
-                  <pre>{fileContent}</pre>
-                </div>
-              )}
-              <button className="btn">Generate Report</button>
-            </div>
-          </>
-        ) : (
-          <div className="buttons">
-            <Link to="/login" className="btn">Login</Link>
-            <Link to="/register" className="btn">Signup</Link>
+      {/* Hero Section */}
+      <div className="hero-container">
+        <h1 className="hero-heading">ForeSight</h1>
+        <p className="hero-tagline">Predicting disasters ahead.</p>
+        <div className="hero-content">
+          <h1 className="hero-title">Empowering Disaster Predictions with AI</h1>
+          <p className="hero-description">
+            Gain insights into natural disasters using machine learning models.
+            Upload datasets, analyze trends, and generate reports.
+          </p>
+          <div className="hero-buttons">
+            <button className="btn primary-btn" onClick={() => navigate("/register")}>
+              Get Started
+            </button>
+            <button className="btn secondary-btn" onClick={handleLearnMore}>
+              Learn More
+            </button>
           </div>
-        )}
+        </div>
+      </div>
+
+      {/* Carousel for Disaster Trends */}
+      <div className="carousel-container">
+        <h2 className="carousel-title">Latest Trends & Insights</h2>
+        <div className="carousel-slide">
+          <img src={slides[currentSlide].img} alt={slides[currentSlide].title} className="carousel-image" />
+          <div className="slide-text">
+            <h3>{slides[currentSlide].title}</h3>
+            <p>{slides[currentSlide].desc}</p>
+            <button className="btn explore-btn" onClick={() => navigate(slides[currentSlide].link)}>
+              Explore
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Service Overview Section */}
+      <div className="service-overview" ref={serviceRef}>
+        <h2 className="service-title">Select a Service for Prediction</h2>
+        <div className={`service-container ${selectedModel ? "expanded" : ""}`}>
+          {/* Service List */}
+          <div className="service-list">
+            {["Earthquake", "Wildfire", "Tornado", "Hurricane"].map((model) => (
+              <button 
+                key={model} 
+                className={`service-btn ${selectedModel === model ? "active" : ""}`}
+                onClick={() => setSelectedModel(model)}
+              >
+                {model}
+              </button>
+            ))}
+          </div>
+
+          {/* Curved Line */}
+          {selectedModel && <div className="curved-line"></div>}
+
+          {/* Service Details */}
+          <div className="service-details">
+            {selectedModel && (
+              <>
+                <h3>{selectedModel} Prediction Model</h3>
+                <p>Details about {selectedModel} prediction.</p>
+                {isLoggedIn ? (
+                  <>
+                    <label>Upload {selectedModel} Data (CSV/JSON):</label>
+                    <input type="file" accept=".csv, .json" />
+                  </>
+                ) : (
+                  <p className="login-prompt">🔒 Please log in to upload files.</p>
+                )}
+              </>
+            )}
+          </div>
+        </div>
       </div>
     </div>
   );
