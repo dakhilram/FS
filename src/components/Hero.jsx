@@ -10,9 +10,10 @@ import hurricaneTrend from "../assets/hurricane/hutrend.png";
 const Hero = () => {
   const navigate = useNavigate();
   const [currentSlide, setCurrentSlide] = useState(0);
-  const serviceRef = useRef(null);  // Reference for service section
-  const [selectedModel, setSelectedModel] = useState(null); // No selection at start
-  const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem("username")); // Check login status
+  const serviceRef = useRef(null);
+  const [selectedModel, setSelectedModel] = useState(null);
+  const [username, setUsername] = useState(localStorage.getItem("username"));
+  const [uploadedFileContent, setUploadedFileContent] = useState(null); // Store file content
 
   // Disaster Trends Data
   const slides = [
@@ -40,9 +41,42 @@ const Hero = () => {
   // Scroll to Service Details when a service is selected
   const handleServiceClick = (model) => {
     setSelectedModel(model);
+    setUploadedFileContent(null); // Reset file content when switching services
     setTimeout(() => {
       serviceRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
     }, 200);
+  };
+
+  // Handle File Upload and Read Content
+  const handleFileUpload = (event) => {
+    const file = event.target.files[0];
+
+    if (!file) return;
+
+    if (file.type === "application/json") {
+      // Read JSON file
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try {
+          const jsonData = JSON.parse(e.target.result);
+          setUploadedFileContent(JSON.stringify(jsonData, null, 2)); // Pretty print JSON
+        } catch (error) {
+          alert("Invalid JSON format");
+        }
+      };
+      reader.readAsText(file);
+    } else if (file.type === "text/csv") {
+      // Read CSV file
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const lines = e.target.result.split("\n").slice(0, 5); // Show first 5 lines
+        setUploadedFileContent(lines.join("\n"));
+      };
+      reader.readAsText(file);
+    } else {
+      alert("Please upload a valid CSV or JSON file.");
+      event.target.value = null; // Clear invalid file
+    }
   };
 
   return (
@@ -64,12 +98,23 @@ const Hero = () => {
             Upload datasets, analyze trends, and generate reports.
           </p>
           <div className="hero-buttons">
-            <button className="btn primary-btn" onClick={() => navigate("/register")}>
-              Get Started
-            </button>
-            <button className="btn secondary-btn" onClick={handleLearnMore}>
-              Learn More
-            </button>
+            {username ? (
+              <>
+                <p className="welcome-message">👋 Hello, {username}!</p>
+                <button className="btn secondary-btn" onClick={handleLearnMore}>
+                  Learn More
+                </button>
+              </>
+            ) : (
+              <>
+                <button className="btn primary-btn" onClick={() => navigate("/register")}>
+                  Get Started
+                </button>
+                <button className="btn secondary-btn" onClick={handleLearnMore}>
+                  Learn More
+                </button>
+              </>
+            )}
           </div>
         </div>
       </div>
@@ -112,10 +157,22 @@ const Hero = () => {
               <>
                 <h3>{selectedModel} Prediction Model</h3>
                 <p>Details about {selectedModel} prediction.</p>
-                {isLoggedIn ? (
+                {username ? (
                   <>
                     <label>Upload {selectedModel} Data (CSV/JSON):</label>
-                    <input type="file" accept=".csv, .json" />
+                    <input type="file" accept=".csv, .json" onChange={handleFileUpload} />
+                    
+                    {/* File Content Preview */}
+                    {uploadedFileContent && (
+                      <pre className="file-preview">{uploadedFileContent}</pre>
+                    )}
+
+                    {/* Generate Report Button */}
+                    {uploadedFileContent && (
+                      <button className="btn generate-btn">
+                        Generate Report
+                      </button>
+                    )}
                   </>
                 ) : (
                   <p className="login-prompt">🔒 Please log in to upload files.</p>

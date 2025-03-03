@@ -42,6 +42,14 @@
   background: rgba(0, 0, 0, 0.6);
   z-index: -1;
 }
+.welcome-message {
+  font-size: 20px;
+  color: white;
+  margin-bottom: 10px;
+  font-weight: bold;
+  text-align: center;
+}
+
 
 html {
   scroll-behavior: smooth;
@@ -276,6 +284,16 @@ html {
   font-style: italic;
 }
 
+.file-preview {
+  color: white;
+  background: rgba(0, 0, 0, 0.6);
+  padding: 10px;
+  border-radius: 5px;
+  max-height: 150px;
+  overflow-y: auto;
+  white-space: pre-wrap;
+  font-size: 14px;
+}
 /* ✅ Generate Report Button */
 .generate-btn {
   margin-top: 15px;
