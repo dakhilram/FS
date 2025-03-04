@@ -6,6 +6,7 @@ import earthquakeTrend from "../assets/Earthquake/eqtrend.png";
 import wildfireTrend from "../assets/wildfire/WildFiretrend.png";
 import tornadoTrend from "../assets/Tornados/trend.png";
 import hurricaneTrend from "../assets/hurricane/hutrend.png";
+import LoadingScreen from "./LoadingScreen";
 
 const Hero = () => {
   const navigate = useNavigate();
@@ -14,6 +15,7 @@ const Hero = () => {
   const [selectedModel, setSelectedModel] = useState(null);
   const [file, setFile] = useState(null);
   const [downloadLinks, setDownloadLinks] = useState(null);
+  const [loading, setLoading] = useState(false);
   const username = localStorage.getItem("username");
 
   // Disaster Trends Data
@@ -61,6 +63,8 @@ const Hero = () => {
       return;
     }
 
+    setLoading(true);
+
     const formData = new FormData();
     formData.append("file", file);
 
@@ -79,6 +83,7 @@ const Hero = () => {
     } catch (error) {
       alert("Network error. Check your connection.");
     }
+    setLoading(false);
   };
 
   // Handle Predictions for Different Models
@@ -99,6 +104,7 @@ const Hero = () => {
 
   return (
     <div className="page-container">
+      {loading && <LoadingScreen />}
       {/* Background Video */}
       <video autoPlay loop muted className="hero-video">
         <source src={videoBg} type="video/mp4" />
@@ -179,7 +185,7 @@ const Hero = () => {
                   <>
                     <input type="file" accept=".csv" onChange={handleFileUpload} />
                     {file && (
-                      <button className="btn generate-btn" onClick={handleGenerateReport}>
+                      <button className="btn generate-btn" onClick={handleGenerateReport} disabled={loading}>
                         Generate Report
                       </button>
                     )}
