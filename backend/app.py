@@ -556,9 +556,12 @@ def predict_earthquake():
     forecast_df = pd.DataFrame({"Date": forecast_dates, "Predicted Magnitude": predictions})
     forecast_df.to_csv(forecast_filename, index=False)
 
+    # ✅ Step 13: Return the Download Links
+    BASE_URL = "https://fs-51ng.onrender.com"  # Update with your Render backend URL
+
     return jsonify({
-        "csv_file": f"/download/earthquake_forecast.csv",
-        "pdf_file": f"/download/earthquake_report.pdf"
+        "csv_file": f"{BASE_URL}/download/future_wildfire_predictions.csv",
+        "pdf_file": f"{BASE_URL}/download/wildfire_future_predictions_report.pdf"
     }), 200
 
 @app.route("/predict-tornado", methods=["POST"])
