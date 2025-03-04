@@ -15,4 +15,4 @@ fpdf
 scikit-learn
 xgboost
 folium
-tensorflow
+tensorflow-cpu
