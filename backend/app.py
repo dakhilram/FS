@@ -560,9 +560,10 @@ def predict_earthquake():
     BASE_URL = "https://fs-51ng.onrender.com"  # Update with your Render backend URL
 
     return jsonify({
-        "csv_file": f"{BASE_URL}/download/future_wildfire_predictions.csv",
-        "pdf_file": f"{BASE_URL}/download/wildfire_future_predictions_report.pdf"
-    }), 200
+    "csv_file": f"{BASE_URL}/download/earthquake_forecast.csv",
+    "pdf_file": f"{BASE_URL}/download/earthquake_report.pdf"
+}), 200
+
 
 @app.route("/predict-tornado", methods=["POST"])
 def predict_tornado():
