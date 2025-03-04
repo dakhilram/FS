@@ -10,6 +10,6 @@ resend
 pandas
 numpy
 matplotlib
-saeborn
+seaborn
 fpdf
 scikit-learn

@@ -1,7 +1,8 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, send_file, render_template
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
 from werkzeug.security import generate_password_hash, check_password_hash
+from werkzeug.utils import secure_filename
 from flask_migrate import Migrate
 from dotenv import load_dotenv
 import smtplib
@@ -9,6 +10,14 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 import os
 import requests
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+from fpdf import FPDF
+from sklearn.cluster import KMeans
+from sklearn.ensemble import RandomForestClassifier
+
 
 # ✅ Load environment variables
 load_dotenv()
@@ -292,8 +301,102 @@ def get_weather():
 
     return jsonify(data)
 
-if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000, debug=True)
+# ✅ Fetch WIldFire Data
+UPLOAD_FOLDER = "uploads"
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
+
+ALLOWED_EXTENSIONS = {"csv"}
+
+def allowed_file(filename):
+    return "." in filename and filename.rsplit(".", 1)[1].lower() in ALLOWED_EXTENSIONS
+
+@app.route("/predict-wildfire", methods=["POST"])
+def predict_wildfire():
+    """Handles wildfire file uploads and runs the prediction model."""
+    if "file" not in request.files:
+        print("❌ No file uploaded")
+        return jsonify({"error": "No file uploaded"}), 400
+
+    file = request.files["file"]
+    if file.filename == "" or not allowed_file(file.filename):
+        print("❌ Invalid file format")
+        return jsonify({"error": "Invalid file format"}), 400
+
+    filename = secure_filename(file.filename)
+    file_path = os.path.join(app.config["UPLOAD_FOLDER"], filename)
+    file.save(file_path)
+    print(f"✅ File saved: {file_path}")
+
+    # Load dataset
+    try:
+        data = pd.read_csv(file_path)
+    except Exception as e:
+        print(f"❌ Error loading CSV: {e}")
+        return jsonify({"error": "Invalid CSV format"}), 400
+
+    # Encode categorical features
+    categorical_cols = ["satellite", "instrument", "confidence", "version", "daynight"]
+    for col in categorical_cols:
+        if col in data.columns:
+            data[col] = pd.factorize(data[col])[0]
+
+    # Apply K-Means Clustering
+    if "latitude" in data.columns and "longitude" in data.columns:
+        kmeans = KMeans(n_clusters=5, random_state=42, n_init=10)
+        data["fire_cluster"] = kmeans.fit_predict(data[["latitude", "longitude"]])
+
+    # Train Random Forest Model
+    if "confidence" in data.columns:
+        X_rf = data.drop(columns=["confidence"], errors="ignore")
+        y_rf = data["confidence"]
+        rf_model = RandomForestClassifier(n_estimators=100, random_state=42)
+        rf_model.fit(X_rf, y_rf)
+        predictions = rf_model.predict(X_rf)
+        data["predicted_confidence"] = predictions
+
+    # Save Predictions
+    future_predictions_file = os.path.join(UPLOAD_FOLDER, "future_wildfire_predictions.csv")
+    data.to_csv(future_predictions_file, index=False)
+
+    # Generate PDF Report
+    pdf = FPDF()
+    pdf.add_page()
+    pdf.set_font("Arial", style="B", size=20)
+    pdf.cell(200, 20, "Wildfire Future Prediction Report", ln=True, align="C")
+
+    plt.figure(figsize=(10, 5))
+    sns.histplot(data["predicted_confidence"], bins=3, kde=True, color="red")
+    plt.xlabel("Predicted Fire Confidence Level")
+    plt.ylabel("Count")
+    plt.title("Future Wildfire Predictions Distribution")
+    plt.savefig(os.path.join(UPLOAD_FOLDER, "prediction_distribution.png"))
+
+    pdf.add_page()
+    pdf.set_font("Arial", style="B", size=12)
+    pdf.cell(200, 10, "Distribution of Future Wildfire Predictions", ln=True, align="C")
+    pdf.image(os.path.join(UPLOAD_FOLDER, "prediction_distribution.png"), x=10, y=40, w=180)
+
+    pdf_file = os.path.join(UPLOAD_FOLDER, "wildfire_future_predictions_report.pdf")
+    pdf.output(pdf_file)
+
+    print("✅ Prediction & Report Generated Successfully!")
+
+    return jsonify({
+        "csv_file": f"/download/future_wildfire_predictions.csv",
+        "pdf_file": f"/download/wildfire_future_predictions_report.pdf"
+    }), 200
+
+
+@app.route("/download/<filename>")
+def download_file(filename):
+    """Serves the generated files for download."""
+    file_path = os.path.join(UPLOAD_FOLDER, filename)
+    if os.path.exists(file_path):
+        return send_file(file_path, as_attachment=True)
+    return jsonify({"error": "File not found"}), 404
+
+
 
 # ✅ Health Check Route
 @app.route('/')
