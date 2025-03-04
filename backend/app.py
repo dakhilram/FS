@@ -443,10 +443,11 @@ def predict_wildfire():
 
     print("✅ Prediction & Report Generated Successfully!")
 
-    # ✅ Step 15: Return the Download Links
+    BASE_URL = "https://fs-51ng.onrender.com"  # Replace with your actual Render backend URL
+
     return jsonify({
-        "csv_file": f"/download/future_wildfire_predictions.csv",
-        "pdf_file": f"/download/wildfire_future_predictions_report.pdf"
+        "csv_file": f"{BASE_URL}/download/future_wildfire_predictions.csv",
+        "pdf_file": f"{BASE_URL}/download/wildfire_future_predictions_report.pdf"
     }), 200
 
 @app.route("/predict-earthquake", methods=["POST"])
