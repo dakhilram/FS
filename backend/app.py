@@ -556,13 +556,44 @@ def predict_earthquake():
     forecast_df = pd.DataFrame({"Date": forecast_dates, "Predicted Magnitude": predictions})
     forecast_df.to_csv(forecast_filename, index=False)
 
+    # ✅ Generate PDF Report
+    pdf_filename = os.path.join(UPLOAD_FOLDER, "earthquake_report.pdf")
+    pdf = FPDF()
+    pdf.add_page()
+    pdf.set_font("Arial", style="B", size=20)
+    pdf.cell(0, 150, "Earthquake Forecasting Report", ln=True, align="C")
+
+    # Visualization 1: Earthquake Occurrences Over Time
+    fig, ax = plt.subplots(figsize=(12, 6))
+    df_clean.set_index("date_time").resample("M").size().plot(kind="line", marker="o", color="blue", ax=ax)
+    ax.set_title("Earthquake Occurrences Over Time")
+    ax.set_xlabel("Year")
+    ax.set_ylabel("Number of Earthquakes")
+    ax.grid(True)
+    plt.savefig("earthquake_occurrences.png")
+    pdf.add_page()
+    pdf.image("earthquake_occurrences.png", x=10, y=30, w=180)
+    pdf.set_font("Arial", size=10)
+    pdf.ln(120)
+    pdf.multi_cell(0, 10, "This graph shows the number of earthquakes occurring over time, revealing patterns and trends.")
+
+    # Save the PDF
+    pdf.output(pdf_filename)
+
+    # ✅ Ensure the files exist before returning them
+    if not os.path.exists(forecast_filename):
+        return jsonify({"error": "Earthquake forecast file not found"}), 500
+    if not os.path.exists(pdf_filename):
+        return jsonify({"error": "Earthquake report file not found"}), 500
+
     # ✅ Step 13: Return the Download Links
     BASE_URL = "https://fs-51ng.onrender.com"  # Update with your Render backend URL
 
     return jsonify({
-    "csv_file": f"{BASE_URL}/download/earthquake_forecast.csv",
-    "pdf_file": f"{BASE_URL}/download/earthquake_report.pdf"
-}), 200
+        "csv_file": f"{BASE_URL}/download/earthquake_forecast.csv",
+        "pdf_file": f"{BASE_URL}/download/earthquake_report.pdf"
+    }), 200
+
 
 
 @app.route("/predict-tornado", methods=["POST"])
