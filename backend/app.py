@@ -387,6 +387,22 @@ def predict_wildfire():
         "pdf_file": f"/download/wildfire_future_predictions_report.pdf"
     }), 200
 
+@app.route("/predict-earthquake", methods=["POST"])
+def predict_earthquake():
+    """Handles Earthquake Prediction Model"""
+    return jsonify({"csv_file": "/download/earthquake_predictions.csv", "pdf_file": "/download/earthquake_report.pdf"}), 200
+
+@app.route("/predict-tornado", methods=["POST"])
+def predict_tornado():
+    """Handles Tornado Prediction Model"""
+    return jsonify({"csv_file": "/download/tornado_predictions.csv", "pdf_file": "/download/tornado_report.pdf"}), 200
+
+@app.route("/predict-hurricane", methods=["POST"])
+def predict_hurricane():
+    """Handles Hurricane Prediction Model"""
+    return jsonify({"csv_file": "/download/hurricane_predictions.csv", "pdf_file": "/download/hurricane_report.pdf"}), 200
+
+
 
 @app.route("/download/<filename>")
 def download_file(filename):
