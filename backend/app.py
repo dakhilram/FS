@@ -13,10 +13,14 @@ import requests
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+from sklearn.preprocessing import MinMaxScaler, LabelEncoder
+from sklearn.model_selection import train_test_split
 import seaborn as sns
 from fpdf import FPDF
 from sklearn.cluster import KMeans
 from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import accuracy_score
+import xgboost as xgb
 
 
 # ✅ Load environment variables
@@ -314,74 +318,131 @@ def allowed_file(filename):
 @app.route("/predict-wildfire", methods=["POST"])
 def predict_wildfire():
     """Handles wildfire file uploads and runs the prediction model."""
+    
+    # ✅ Step 1: Check if a file is uploaded
     if "file" not in request.files:
         print("❌ No file uploaded")
         return jsonify({"error": "No file uploaded"}), 400
 
     file = request.files["file"]
-    if file.filename == "" or not allowed_file(file.filename):
+    if file.filename == "" or not file.filename.endswith(".csv"):
         print("❌ Invalid file format")
         return jsonify({"error": "Invalid file format"}), 400
 
+    # ✅ Step 2: Save File Securely
     filename = secure_filename(file.filename)
-    file_path = os.path.join(app.config["UPLOAD_FOLDER"], filename)
+    file_path = os.path.join(UPLOAD_FOLDER, filename)
     file.save(file_path)
     print(f"✅ File saved: {file_path}")
 
-    # Load dataset
+    # ✅ Step 3: Load Dataset
     try:
         data = pd.read_csv(file_path)
     except Exception as e:
         print(f"❌ Error loading CSV: {e}")
         return jsonify({"error": "Invalid CSV format"}), 400
 
-    # Encode categorical features
+    # ✅ Step 4: Encode Categorical Features
     categorical_cols = ["satellite", "instrument", "confidence", "version", "daynight"]
+    label_encoders = {}
+
     for col in categorical_cols:
         if col in data.columns:
-            data[col] = pd.factorize(data[col])[0]
+            le = LabelEncoder()
+            data[col] = le.fit_transform(data[col])
+            label_encoders[col] = le
 
-    # Apply K-Means Clustering
+    # ✅ Step 5: Apply K-Means Clustering (if location data is available)
     if "latitude" in data.columns and "longitude" in data.columns:
+        data = data.dropna(subset=["latitude", "longitude"])  # Drop missing locations
         kmeans = KMeans(n_clusters=5, random_state=42, n_init=10)
         data["fire_cluster"] = kmeans.fit_predict(data[["latitude", "longitude"]])
+        print("✅ K-Means Clustering Applied Successfully!")
 
-    # Train Random Forest Model
-    if "confidence" in data.columns:
-        X_rf = data.drop(columns=["confidence"], errors="ignore")
-        y_rf = data["confidence"]
-        rf_model = RandomForestClassifier(n_estimators=100, random_state=42)
-        rf_model.fit(X_rf, y_rf)
-        predictions = rf_model.predict(X_rf)
-        data["predicted_confidence"] = predictions
+    # ✅ Step 6: Drop Unnecessary Columns & Ensure Numeric Data
+    columns_to_drop = ["acq_date", "date"]
+    data = data.drop(columns=[col for col in columns_to_drop if col in data.columns], errors="ignore")
+    
+    if "confidence" not in data.columns:
+        print("❌ Missing 'confidence' column in dataset!")
+        return jsonify({"error": "Dataset is missing the 'confidence' column."}), 400
 
-    # Save Predictions
+    # ✅ Step 7: Prepare Data for Model Training
+    X_rf = data.select_dtypes(include=[np.number]).drop(columns=["confidence"], errors="ignore")
+    y_rf = data["confidence"]
+
+    # ✅ Step 8: Train-Test Split
+    X_train, X_test, y_train, y_test = train_test_split(X_rf, y_rf, test_size=0.2, random_state=42)
+
+    # ✅ Step 9: Train Random Forest Model
+    rf_model = RandomForestClassifier(n_estimators=100, random_state=42)
+    rf_model.fit(X_train, y_train)
+
+    # ✅ Step 10: Predict Wildfire Confidence
+    rf_predictions = rf_model.predict(X_test)
+    rf_accuracy = accuracy_score(y_test, rf_predictions)
+    print(f"✅ Model trained successfully! Accuracy: {rf_accuracy:.2f}")
+
+    # ✅ Step 11: Simulate Future Environmental Conditions for Prediction
+    future_data = X_test.copy()
+    future_data["bright_ti4"] = np.random.uniform(0.3, 0.9, size=len(future_data))
+    future_data["bright_ti5"] = np.random.uniform(0.3, 0.9, size=len(future_data))
+    future_data["scan"] = np.random.uniform(0.1, 1.0, size=len(future_data))
+    future_data["track"] = np.random.uniform(0.1, 1.0, size=len(future_data))
+
+    # Predict future fire occurrences
+    future_predictions = rf_model.predict(future_data)
+    future_data["predicted_confidence"] = future_predictions
+
+    # ✅ Step 12: Save Predictions to CSV
     future_predictions_file = os.path.join(UPLOAD_FOLDER, "future_wildfire_predictions.csv")
-    data.to_csv(future_predictions_file, index=False)
+    future_data.to_csv(future_predictions_file, index=False)
 
-    # Generate PDF Report
+    # ✅ Step 13: Generate Graphs & PDF Report
     pdf = FPDF()
     pdf.add_page()
     pdf.set_font("Arial", style="B", size=20)
-    pdf.cell(200, 20, "Wildfire Future Prediction Report", ln=True, align="C")
+    pdf.cell(0, 150, "Wildfire Future Prediction Report", ln=True, align="C")
 
+    # 📊 Fire Clusters Visualization
+    if "fire_cluster" in data.columns:
+        plt.figure(figsize=(10, 6))
+        sns.scatterplot(x=data["longitude"], y=data["latitude"], hue=data["fire_cluster"], palette="coolwarm")
+        plt.xlabel("Longitude")
+        plt.ylabel("Latitude")
+        plt.title("Wildfire Prone Areas (K-Means Clustering)")
+        plt.savefig("fire_clusters.png")
+        pdf.add_page()
+        pdf.image("fire_clusters.png", x=10, y=30, w=180)
+
+    # 📊 Feature Importance
+    feature_importance = pd.Series(rf_model.feature_importances_, index=X_rf.columns).sort_values(ascending=False)
     plt.figure(figsize=(10, 5))
-    sns.histplot(data["predicted_confidence"], bins=3, kde=True, color="red")
+    sns.barplot(x=feature_importance.values, y=feature_importance.index, palette="viridis")
+    plt.xlabel("Feature Importance")
+    plt.ylabel("Features")
+    plt.title("Important Factors Influencing Wildfire Occurrence")
+    plt.savefig("feature_importance.png")
+    pdf.add_page()
+    pdf.image("feature_importance.png", x=10, y=30, w=180)
+
+    # 📊 Predictions Distribution
+    plt.figure(figsize=(8, 5))
+    sns.histplot(future_data["predicted_confidence"], bins=3, kde=True, color="red")
     plt.xlabel("Predicted Fire Confidence Level")
     plt.ylabel("Count")
     plt.title("Future Wildfire Predictions Distribution")
-    plt.savefig(os.path.join(UPLOAD_FOLDER, "prediction_distribution.png"))
-
+    plt.savefig("prediction_distribution.png")
     pdf.add_page()
-    pdf.set_font("Arial", style="B", size=12)
-    pdf.cell(200, 10, "Distribution of Future Wildfire Predictions", ln=True, align="C")
-    pdf.image(os.path.join(UPLOAD_FOLDER, "prediction_distribution.png"), x=10, y=40, w=180)
+    pdf.image("prediction_distribution.png", x=10, y=30, w=180)
 
+    # ✅ Step 14: Save PDF Report
     pdf_file = os.path.join(UPLOAD_FOLDER, "wildfire_future_predictions_report.pdf")
     pdf.output(pdf_file)
 
     print("✅ Prediction & Report Generated Successfully!")
 
+    # ✅ Step 15: Return the Download Links
     return jsonify({
         "csv_file": f"/download/future_wildfire_predictions.csv",
         "pdf_file": f"/download/wildfire_future_predictions_report.pdf"

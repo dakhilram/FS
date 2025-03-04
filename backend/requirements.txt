@@ -13,3 +13,4 @@ matplotlib
 seaborn
 fpdf
 scikit-learn
+xgboost

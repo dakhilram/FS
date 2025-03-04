@@ -12,8 +12,9 @@ const Hero = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const serviceRef = useRef(null);
   const [selectedModel, setSelectedModel] = useState(null);
-  const [username, setUsername] = useState(localStorage.getItem("username"));
-  const [uploadedFileContent, setUploadedFileContent] = useState(null); // Store file content
+  const [file, setFile] = useState(null);
+  const [downloadLinks, setDownloadLinks] = useState(null);
+  const username = localStorage.getItem("username");
 
   // Disaster Trends Data
   const slides = [
@@ -41,41 +42,58 @@ const Hero = () => {
   // Scroll to Service Details when a service is selected
   const handleServiceClick = (model) => {
     setSelectedModel(model);
-    setUploadedFileContent(null); // Reset file content when switching services
+    setFile(null);
+    setDownloadLinks(null);
     setTimeout(() => {
       serviceRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
     }, 200);
   };
 
-  // Handle File Upload and Read Content
+  // Handle File Upload
   const handleFileUpload = (event) => {
-    const file = event.target.files[0];
+    setFile(event.target.files[0]);
+  };
 
-    if (!file) return;
+  // Function to Send File to Flask API
+  const sendFileToBackend = async (endpoint) => {
+    if (!file) {
+      alert("Please upload a file first!");
+      return;
+    }
 
-    if (file.type === "application/json") {
-      // Read JSON file
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        try {
-          const jsonData = JSON.parse(e.target.result);
-          setUploadedFileContent(JSON.stringify(jsonData, null, 2)); // Pretty print JSON
-        } catch (error) {
-          alert("Invalid JSON format");
-        }
-      };
-      reader.readAsText(file);
-    } else if (file.type === "text/csv") {
-      // Read CSV file
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const lines = e.target.result.split("\n").slice(0, 5); // Show first 5 lines
-        setUploadedFileContent(lines.join("\n"));
-      };
-      reader.readAsText(file);
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+      const response = await fetch(`https://fs-51ng.onrender.com/${endpoint}`, {
+        method: "POST",
+        body: formData,
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setDownloadLinks(data);
+      } else {
+        alert("Error processing the file. Please try again.");
+      }
+    } catch (error) {
+      alert("Network error. Check your connection.");
+    }
+  };
+
+  // Handle Predictions for Different Models
+  const handleGenerateReport = () => {
+    const modelEndpoints = {
+      Wildfire: "predict-wildfire",
+      Earthquake: "predict-earthquake",
+      Tornado: "predict-tornado",
+      Hurricane: "predict-hurricane",
+    };
+
+    if (selectedModel in modelEndpoints) {
+      sendFileToBackend(modelEndpoints[selectedModel]);
     } else {
-      alert("Please upload a valid CSV or JSON file.");
-      event.target.value = null; // Clear invalid file
+      alert("Invalid model selection!");
     }
   };
 
@@ -156,22 +174,22 @@ const Hero = () => {
             {selectedModel && (
               <>
                 <h3>{selectedModel} Prediction Model</h3>
-                <p>Details about {selectedModel} prediction.</p>
+                <p>Upload {selectedModel} data (CSV) to generate predictions.</p>
                 {username ? (
                   <>
-                    <label>Upload {selectedModel} Data (CSV/JSON):</label>
-                    <input type="file" accept=".csv, .json" onChange={handleFileUpload} />
-                    
-                    {/* File Content Preview */}
-                    {uploadedFileContent && (
-                      <pre className="file-preview">{uploadedFileContent}</pre>
-                    )}
-
-                    {/* Generate Report Button */}
-                    {uploadedFileContent && (
-                      <button className="btn generate-btn">
+                    <input type="file" accept=".csv" onChange={handleFileUpload} />
+                    {file && (
+                      <button className="btn generate-btn" onClick={handleGenerateReport}>
                         Generate Report
                       </button>
+                    )}
+
+                    {/* Show Download Links */}
+                    {downloadLinks && (
+                      <div className="download-links">
+                        <p><a href={downloadLinks.csv_file} download>📥 Download Predicted CSV</a></p>
+                        <p><a href={downloadLinks.pdf_file} download>📥 Download Report</a></p>
+                      </div>
                     )}
                   </>
                 ) : (
