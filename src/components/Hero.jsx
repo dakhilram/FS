@@ -6,7 +6,7 @@ import earthquakeTrend from "../assets/Earthquake/eqtrend.png";
 import wildfireTrend from "../assets/wildfire/WildFiretrend.png";
 import tornadoTrend from "../assets/Tornados/trend.png";
 import hurricaneTrend from "../assets/hurricane/hutrend.png";
-import LoadingScreen from "./LoadingScreen";
+import LoadingScreen from "../pages/LoadingScreen.jsx"; // ✅ Ensure correct path
 
 const Hero = () => {
   const navigate = useNavigate();
@@ -63,7 +63,7 @@ const Hero = () => {
       return;
     }
 
-    setLoading(true);
+    setLoading(true); // ✅ Show loading screen
 
     const formData = new FormData();
     formData.append("file", file);
@@ -83,11 +83,14 @@ const Hero = () => {
     } catch (error) {
       alert("Network error. Check your connection.");
     }
-    setLoading(false);
+
+    setLoading(false); // ✅ Hide loading screen when done
   };
 
   // Handle Predictions for Different Models
   const handleGenerateReport = () => {
+    if (loading) return; // ✅ Prevent multiple clicks while processing
+
     const modelEndpoints = {
       Wildfire: "predict-wildfire",
       Earthquake: "predict-earthquake",
@@ -104,7 +107,9 @@ const Hero = () => {
 
   return (
     <div className="page-container">
-      {loading && <LoadingScreen />}
+      {/* ✅ Show Loading Screen When Flask is Processing */}
+      {loading && <LoadingScreen />} 
+
       {/* Background Video */}
       <video autoPlay loop muted className="hero-video">
         <source src={videoBg} type="video/mp4" />
@@ -186,7 +191,7 @@ const Hero = () => {
                     <input type="file" accept=".csv" onChange={handleFileUpload} />
                     {file && (
                       <button className="btn generate-btn" onClick={handleGenerateReport} disabled={loading}>
-                        Generate Report
+                        {loading ? "Processing..." : "Generate Report"}
                       </button>
                     )}
 
