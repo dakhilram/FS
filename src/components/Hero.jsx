@@ -159,8 +159,8 @@ const Hero = () => {
           {/* Service List */}
           <div className="service-list">
             {["Earthquake", "Wildfire", "Tornado", "Hurricane"].map((model) => (
-              <button 
-                key={model} 
+              <button
+                key={model}
                 className={`service-btn ${selectedModel === model ? "active" : ""}`}
                 onClick={() => handleServiceClick(model)}
               >
@@ -187,8 +187,8 @@ const Hero = () => {
                     {/* Show Download Links */}
                     {downloadLinks && (
                       <div className="download-links">
-                        <p><a href={downloadLinks.csv_file} download>📥 Download Predicted CSV</a></p>
-                        <p><a href={downloadLinks.pdf_file} download>📥 Download Report</a></p>
+                        <p><a href={downloadLinks.csv_file} target="_blank" rel="noopener noreferrer">📥 Download Predicted CSV</a></p>
+                        <p><a href={downloadLinks.pdf_file} target="_blank" rel="noopener noreferrer">📥 Download Report</a></p>
                       </div>
                     )}
                   </>

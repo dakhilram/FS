@@ -32,6 +32,7 @@ app = Flask(__name__)
 # ✅ Allow CORS for GitHub Pages & Local Development
 allowed_origins = [
     "https://dakhilram.github.io",  # Frontend hosted on GitHub Pages
+    "https://fs-51ng.onrender.com", # Render.com for backend
     "http://localhost:5173"  # Local development (Vite)
 ]
 CORS(app, resources={r"/*": {"origins": allowed_origins}}, supports_credentials=True)
@@ -467,11 +468,15 @@ def predict_hurricane():
 
 @app.route("/download/<filename>")
 def download_file(filename):
-    """Serves the generated files for download."""
+    """Serves generated files for download."""
     file_path = os.path.join(UPLOAD_FOLDER, filename)
-    if os.path.exists(file_path):
-        return send_file(file_path, as_attachment=True)
-    return jsonify({"error": "File not found"}), 404
+    
+    if not os.path.exists(file_path):
+        print(f"❌ File not found: {file_path}")
+        return jsonify({"error": "File not found"}), 404
+
+    print(f"✅ File served: {file_path}")
+    return send_file(file_path, as_attachment=True)
 
 
 
