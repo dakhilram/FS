@@ -86,6 +86,23 @@ const Earthquake = () => {
         Indonesia tops the list, followed by Papua New Guinea and Chile. 
         These regions are located along major tectonic plate boundaries, making them more prone to seismic activity.</p>
       </div>
+      
+
+      <h2>🌍 Earthquake Prediction Map 🌍</h2>
+      <p className="map-description">
+        This interactive map provides a visual representation of wildfire predictions across the United States.
+        It helps in understanding the potential risk areas and planning for wildfire management and prevention.</p>
+      <div className="map-container">
+        <iframe
+          src={"https://www.weather.gov/#"}
+          title="Wildfire Prediction Map"
+          className="wildfire-map"
+          width="100%"
+          height="600px"
+          style={{ border: "none" }}
+        >
+        </iframe>
+      </div>
 
     </div>
   );
