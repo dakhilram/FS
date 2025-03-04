@@ -198,8 +198,8 @@ const Hero = () => {
                     {/* Show Download Links */}
                     {downloadLinks && (
                       <div className="download-links">
-                        <p><a href={downloadLinks.csv_file} target="_blank" rel="noopener noreferrer">📥 Download Predicted CSV</a></p>
-                        <p><a href={downloadLinks.pdf_file} target="_blank" rel="noopener noreferrer">📥 Download Report</a></p>
+                        <p><a href={downloadLinks.csv_file} target="_blank" rel="noopener noreferrer" style={{ color: "white", textDecoration: "none" }} >📥 Download Predicted CSV</a></p>
+                        <p><a href={downloadLinks.pdf_file} target="_blank" rel="noopener noreferrer" style={{ color: "white", textDecoration: "none" }} >📥 Download Report</a></p>
                       </div>
                     )}
                   </>
