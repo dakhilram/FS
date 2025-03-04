@@ -22,6 +22,8 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score
 import xgboost as xgb
 import folium
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import LSTM, Dense
 
 
 # ✅ Load environment variables
@@ -493,8 +495,71 @@ def predict_wildfire():
 
 @app.route("/predict-earthquake", methods=["POST"])
 def predict_earthquake():
-    """Handles Earthquake Prediction Model"""
-    return jsonify({"csv_file": "/download/earthquake_predictions.csv", "pdf_file": "/download/earthquake_report.pdf"}), 200
+    if "file" not in request.files:
+        return jsonify({"error": "No file uploaded"}), 400
+
+    file = request.files["file"]
+    if file.filename == "" or not file.filename.endswith(".csv"):
+        return jsonify({"error": "Invalid file format"}), 400
+
+    filename = secure_filename(file.filename)
+    file_path = os.path.join(UPLOAD_FOLDER, filename)
+    file.save(file_path)
+
+    try:
+        df = pd.read_csv(file_path)
+    except Exception:
+        return jsonify({"error": "Invalid CSV format"}), 400
+
+    if "date_time" in df.columns:
+        df["date_time"] = pd.to_datetime(df["date_time"], errors="coerce")
+    else:
+        return jsonify({"error": "Dataset must contain a 'date_time' column."}), 400
+
+    required_columns = ["latitude", "longitude", "magnitude", "depth"]
+    df_clean = df.dropna(subset=required_columns)
+    
+    df_clean[["magnitude", "depth", "latitude", "longitude"]] = MinMaxScaler().fit_transform(df_clean[["magnitude", "depth", "latitude", "longitude"]])
+
+    time_steps = 15
+    features = ["magnitude", "depth"]
+    
+    def create_sequences(data, time_steps):
+        X, y = [], []
+        for i in range(len(data) - time_steps):
+            X.append(data[i:i + time_steps])
+            y.append(data[i + time_steps])
+        return np.array(X), np.array(y)
+
+    X, y = create_sequences(df_clean[features].values, time_steps)
+
+    model = Sequential([
+        LSTM(50, return_sequences=True, input_shape=(X.shape[1], X.shape[2])),
+        LSTM(50, return_sequences=False),
+        Dense(25),
+        Dense(1)
+    ])
+    model.compile(optimizer='adam', loss='mse')
+    model.fit(X, y, epochs=10, batch_size=16)
+
+    future_steps = 50
+    X_future = df_clean[features].values[-time_steps:].reshape(1, time_steps, len(features))
+    predictions = []
+    for _ in range(future_steps):
+        pred = model.predict(X_future)
+        predictions.append(pred[0][0])
+        new_value = np.array([[pred[0][0], 0]]).reshape(1, 1, 2)
+        X_future = np.append(X_future[:, 1:, :], new_value, axis=1)
+
+    forecast_dates = pd.date_range(start=df_clean["date_time"].max(), periods=future_steps, freq='M')
+    forecast_filename = os.path.join(UPLOAD_FOLDER, "earthquake_forecast.csv")
+    forecast_df = pd.DataFrame({"Date": forecast_dates, "Predicted Magnitude": predictions})
+    forecast_df.to_csv(forecast_filename, index=False)
+
+    return jsonify({
+        "csv_file": f"/download/earthquake_forecast.csv",
+        "pdf_file": f"/download/earthquake_report.pdf"
+    }), 200
 
 @app.route("/predict-tornado", methods=["POST"])
 def predict_tornado():
