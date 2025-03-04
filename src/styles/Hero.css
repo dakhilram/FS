@@ -71,7 +71,7 @@ html {
 
 .hero-title {
   margin-top: 20%;
-  font-size: clamp(28px, 4vw, 42px);
+  font-size: clamp(50px, 4vw, 42px);
   font-weight: bold;
   color: white;
 }
@@ -125,7 +125,7 @@ html {
 }
 
 .carousel-title {
-  font-size: 28px;
+  font-size: 40px;
   color: white;
   margin-bottom: 15px;
 }
@@ -228,11 +228,85 @@ html {
 
 
 .service-title {
-  font-size: 24px;
+  font-size: 40px;
   color: white;
   margin-left: 350px;;
   margin-top: 10px;
 }
+
+/* 🔥 Feature Requirement Box - Fix transparency & contrast */
+.feature-requirements {
+  background: rgba(0, 0, 0, 0.7); /* Darker transparent background */
+  padding: 20px;
+  border-radius: 10px;
+  text-align: left;
+  color: white;
+  margin-top: 20px;
+  font-size: 20px;
+  line-height: 1.8;
+  width: 95%;
+  max-width: 800px;
+  box-shadow: 0px 4px 10px rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(8px); /* Blurry effect to make text stand out */
+}
+
+/* 🌎 Feature Requirement Heading */
+.feature-requirements h4 {
+  font-size: 22px;
+  color: #ffcc00; /* Bright yellow-gold */
+  margin-bottom: 10px;
+  text-align: center;
+  text-transform: uppercase;
+  font-weight: bold;
+  letter-spacing: 1px;
+  text-shadow: 1px 1px 8px rgba(255, 204, 0, 0.5);
+}
+
+/* ✅ Improved Bullet Point Styling */
+.feature-requirements ul {
+  list-style: none;
+  padding: 0;
+}
+
+.feature-requirements ul li {
+  position: relative;
+  padding-left: 30px;
+  margin-bottom: 10px;
+  font-size: 17px;
+}
+
+/* 🟠 Bullet Icons - Adjust for Each Model */
+.feature-requirements ul li::before {
+  position: absolute;
+  left: 0;
+  top: 4px;
+  font-size: 20px;
+}
+
+/* Wildfire */
+.wildfire-features ul li::before {
+  content: "🔥";
+  color: #ff5722;
+}
+
+/* Earthquake */
+.earthquake-features ul li::before {
+  content: "🌎";
+  color: #ff9800;
+}
+
+/* Tornado */
+.tornado-features ul li::before {
+  content: "🌪";
+  color: #80d8ff;
+}
+
+/* Hurricane */
+.hurricane-features ul li::before {
+  content: "🌀";
+  color: #007aff;
+}
+
 
 /* ✅ Hover Effect for Better Visibility */
 .service-btn:hover {
@@ -255,12 +329,16 @@ html {
 }
 
 
-/* ✅ Slide-In Animation for Description Box */
+/* ✅ Service Details Box Enhancement */
 .service-details {
-  width: 60%;
-  background: rgba(255, 255, 255, 0.2);
-  padding: 20px;
-  border-radius: 10px;
+  position: auto;
+  margin-left:60px;
+  z-index: 5;
+  width: 105%;
+  background: rgba(255, 255, 255, 0.12);
+  padding: 25px;
+  border-radius: 12px;
+  text-align: center;
   transition: transform 0.5s ease-in-out, opacity 0.5s ease-in-out;
   opacity: 0;
   transform: translateX(50px);
@@ -268,8 +346,21 @@ html {
 
 .service-container.expanded .service-details {
   opacity: 1;
-  transform: translate(0);
 }
+
+/* ✨ File Upload Box */
+input[type="file"] {
+  display: block;
+  margin: 15px auto;
+  padding: 8px;
+  border-radius: 5px;
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  font-size: 14px;
+  cursor: pointer;
+  text-align: center;
+}
+
 
 /* ✅ File Preview */
 .file-preview {
@@ -278,12 +369,14 @@ html {
   margin-top: 10px;
 }
 
-/* ✅ Login Restriction */
+/* 🛑 Login Prompt Styling */
 .login-prompt {
-  color: red;
+  font-size: 16px;
+  color: #ff4d4d;
   font-style: italic;
+  text-align: center;
+  margin-top: 15px;
 }
-
 .file-preview {
   color: white;
   background: rgba(0, 0, 0, 0.6);
@@ -296,14 +389,15 @@ html {
 }
 /* ✅ Generate Report Button */
 .generate-btn {
-  margin-top: 15px;
+  display: block;
+  margin: 20px auto;
   background: #ff9800;
   color: white;
-  padding: 10px 20px;
+  padding: 12px 25px;
   font-size: 16px;
-  border: none;
-  cursor: pointer;
-  transition: 0.3s ease;
+  font-weight: bold;
+  border-radius: 5px;
+  transition: background 0.3s ease;
 }
 
 .generate-btn:hover {

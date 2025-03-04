@@ -108,14 +108,14 @@ const Hero = () => {
   return (
     <div className="page-container">
       {/* ✅ Show Loading Screen When Flask is Processing */}
-      {loading && <LoadingScreen />} 
-
+      {loading && <LoadingScreen />}
+  
       {/* Background Video */}
       <video autoPlay loop muted className="hero-video">
         <source src={videoBg} type="video/mp4" />
       </video>
       <div className="overlay"></div>
-
+  
       {/* Hero Section */}
       <div className="hero-container">
         <h1 className="hero-heading">ForeSight</h1>
@@ -147,7 +147,7 @@ const Hero = () => {
           </div>
         </div>
       </div>
-
+  
       {/* Carousel for Disaster Trends */}
       <div className="carousel-container">
         <h2 className="carousel-title">Latest Trends & Insights</h2>
@@ -162,7 +162,7 @@ const Hero = () => {
           </div>
         </div>
       </div>
-
+  
       {/* Service Overview Section */}
       <div className="service-overview" ref={serviceRef}>
         <h2 className="service-title">Select a Service for Prediction</h2>
@@ -179,7 +179,7 @@ const Hero = () => {
               </button>
             ))}
           </div>
-
+  
           {/* Service Details */}
           <div className="service-details">
             {selectedModel && (
@@ -194,7 +194,7 @@ const Hero = () => {
                         {loading ? "Processing..." : "Generate Report"}
                       </button>
                     )}
-
+  
                     {/* Show Download Links */}
                     {downloadLinks && (
                       <div className="download-links">
@@ -206,13 +206,73 @@ const Hero = () => {
                 ) : (
                   <p className="login-prompt">🔒 Please log in to upload files.</p>
                 )}
+
+
+                {/* Display Required Features for Each Model */}
+                {selectedModel === "Wildfire" && (
+                  <div className="feature-requirements">
+                    <h4>🔥 Required Features for Wildfire Prediction</h4>
+                    <ul>
+                      <li><strong>latitude, longitude:</strong> Fire location (Geospatial data).</li>
+                      <li><strong>bright_ti4, bright_ti5:</strong> Brightness temperature (Fire heat levels).</li>
+                      <li><strong>scan, track:</strong> Satellite scanning width and angle.</li>
+                      <li><strong>acq_date, acq_time:</strong> Date & time of fire detection.</li>
+                      <li><strong>satellite, instrument:</strong> Data source (MODIS/VIIRS satellites).</li>
+                      <li><strong>confidence:</strong> Fire detection confidence (low, nominal, high).</li>
+                      <li><strong>frp:</strong> Fire Radiative Power (Indicates fire intensity).</li>
+                      <li><strong>daynight:</strong> Whether the fire was detected during the day or night.</li>
+                    </ul>
+                  </div>
+                )}
+  
+                {selectedModel === "Earthquake" && (
+                  <div className="feature-requirements">
+                    <h4>🌍 Required Features for Earthquake Prediction</h4>
+                    <ul>
+                      <li><strong>latitude, longitude:</strong> Earthquake epicenter location.</li>
+                      <li><strong>depth:</strong> Depth of the earthquake (in km).</li>
+                      <li><strong>magnitude:</strong> Earthquake magnitude on the Richter scale.</li>
+                      <li><strong>acq_date:</strong> Date of occurrence.</li>
+                      <li><strong>region:</strong> Geographic region of the earthquake.</li>
+                    </ul>
+                  </div>
+                )}
+  
+                {selectedModel === "Tornado" && (
+                  <div className="feature-requirements">
+                    <h4>🌪 Required Features for Tornado Prediction</h4>
+                    <ul>
+                      <li><strong>latitude, longitude:</strong> Tornado location.</li>
+                      <li><strong>wind_speed:</strong> Wind speed in km/h or mph.</li>
+                      <li><strong>pressure:</strong> Atmospheric pressure (if available).</li>
+                      <li><strong>acq_date:</strong> Date of tornado event.</li>
+                      <li><strong>severity:</strong> Tornado damage scale (EF-Scale).</li>
+                    </ul>
+                  </div>
+                )}
+  
+                {selectedModel === "Hurricane" && (
+                  <div className="feature-requirements">
+                    <h4>🌀 Required Features for Hurricane Prediction</h4>
+                    <ul>
+                      <li><strong>latitude, longitude:</strong> Hurricane location.</li>
+                      <li><strong>wind_speed:</strong> Sustained wind speed in km/h.</li>
+                      <li><strong>pressure:</strong> Atmospheric pressure in mb.</li>
+                      <li><strong>humidity:</strong> Humidity levels in percentage.</li>
+                      <li><strong>acq_date:</strong> Date of hurricane occurrence.</li>
+                      <li><strong>storm_category:</strong> Hurricane category (1-5).</li>
+                    </ul>
+                  </div>
+                )}
+  
+                
               </>
             )}
           </div>
         </div>
       </div>
     </div>
-  );
+  );  
 };
 
 export default Hero;

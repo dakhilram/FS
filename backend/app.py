@@ -393,6 +393,10 @@ def predict_wildfire():
         plt.savefig("fire_clusters.png")
         pdf.add_page()
         pdf.image("fire_clusters.png", x=10, y=30, w=180)
+        pdf.set_font("Arial", size=10)
+        pdf.ln(120)
+        pdf.multi_cell(0, 10, "This visualization displays wildfire-prone areas based on K-Means clustering. "
+                       "Each color represents a different cluster, helping in identifying high-risk wildfire zones.")
 
     # 📊 2. Feature Importance
     feature_importance = pd.Series(rf_model.feature_importances_, index=X_rf.columns).sort_values(ascending=False)
@@ -404,6 +408,10 @@ def predict_wildfire():
     plt.savefig("feature_importance.png")
     pdf.add_page()
     pdf.image("feature_importance.png", x=10, y=30, w=180)
+    pdf.set_font("Arial", size=10)
+    pdf.ln(110)
+    pdf.multi_cell(0, 10, "This bar chart represents the key factors influencing wildfire occurrences. "
+                       "Higher values indicate that a feature plays a more significant role in predicting wildfires.")
 
     # 📊 3. Predictions Distribution
     plt.figure(figsize=(8, 5))
@@ -414,6 +422,10 @@ def predict_wildfire():
     plt.savefig("prediction_distribution.png")
     pdf.add_page()
     pdf.image("prediction_distribution.png", x=10, y=30, w=180)
+    pdf.set_font("Arial", size=10)
+    pdf.ln(140)
+    pdf.multi_cell(0, 10, "This histogram shows the predicted confidence levels of future wildfires. "
+                       "Higher confidence values indicate a higher likelihood of a wildfire occurring in that area.")
 
     # 📊 4. Top 5 Wildfire-Prone Areas (Before Prediction)
     plt.figure(figsize=(10, 5))
@@ -425,6 +437,10 @@ def predict_wildfire():
     plt.savefig("top5_before.png")
     pdf.add_page()
     pdf.image("top5_before.png", x=10, y=30, w=180)
+    pdf.set_font("Arial", size=10)
+    pdf.ln(110)
+    pdf.multi_cell(0, 10, "This bar chart highlights the top 5 locations most affected by wildfires before prediction. "
+                       "These areas had the highest number of wildfire occurrences in the dataset.")
 
     # 📊 5. Top 5 Wildfire-Prone Areas (After Prediction)
     plt.figure(figsize=(10, 5))
@@ -436,6 +452,10 @@ def predict_wildfire():
     plt.savefig("top5_after.png")
     pdf.add_page()
     pdf.image("top5_after.png", x=10, y=30, w=180)
+    pdf.set_font("Arial", size=10)
+    pdf.ln(110)
+    pdf.multi_cell(0, 10, "This chart displays the predicted top 5 locations where wildfires are most likely to occur. "
+                       "These areas require higher monitoring and preparedness efforts to prevent future disasters.")
 
     # ✅ Step 12: Save PDF Report
     pdf_file = os.path.join(UPLOAD_FOLDER, "wildfire_future_predictions_report.pdf")
