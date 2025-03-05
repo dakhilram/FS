@@ -493,6 +493,8 @@ def predict_wildfire():
     pdf.set_text_color(0, 0, 255)  # Blue color for clickable link
     pdf.cell(0, 10, "Click here to download the wildfire prediction map", ln=True, link=map_download_url)
     pdf.set_text_color(0, 0, 0)  # Reset text color
+    pdf_file = os.path.join(UPLOAD_FOLDER, "wildfire_future_predictions_report.pdf")
+    pdf.output(pdf_file)
 
 
 
