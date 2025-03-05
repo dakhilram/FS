@@ -477,16 +477,15 @@ def predict_wildfire():
     pdf.cell(200, 10, "Interactive Wildfire Prediction Map", ln=True, align="C")
     pdf.ln(10)
     pdf.multi_cell(0, 10, "This map represents the predicted locations of wildfires, color-coded based on predicted confidence levels. Red markers indicate a high probability of fire occurrence, while orange markers indicate moderate risk.\n\n")
-    pdf.set_text_color(0, 0, 255)
-    pdf.cell(0, 10, "Click here to view the interactive wildfire prediction map", ln=True, link=map_file)
-    pdf.set_text_color(0, 0, 0)
 
-    # ✅ Step 12: Save PDF Report
-    pdf_file = os.path.join(UPLOAD_FOLDER, "wildfire_future_predictions_report.pdf")
-    pdf.output(pdf_file)
+# ✅ Set the correct URL for the downloadable map
+    BASE_URL = "https://fs-51ng.onrender.com"  # Update with your actual Render backend URL
+    map_download_url = f"{BASE_URL}/download/wildfire_predictions_map.html"
 
-    # ✅ Step 13: Return the Download Links
-    BASE_URL = "https://fs-51ng.onrender.com"  # Update with your Render backend URL
+    pdf.set_text_color(0, 0, 255)  # Blue color for clickable link
+    pdf.cell(0, 10, "Click here to download the wildfire prediction map", ln=True, link=map_download_url)
+    pdf.set_text_color(0, 0, 0)  # Reset text color
+
 
     return jsonify({
         "csv_file": f"{BASE_URL}/download/future_wildfire_predictions.csv",
@@ -661,13 +660,13 @@ def predict_hurricane():
 def download_file(filename):
     """Serves generated files for download."""
     file_path = os.path.join(UPLOAD_FOLDER, filename)
-    
+
     if not os.path.exists(file_path):
         print(f"❌ File not found: {file_path}")
         return jsonify({"error": "File not found"}), 404
 
     print(f"✅ File served: {file_path}")
-    return send_file(file_path, as_attachment=True)
+    return send_file(file_path, as_attachment=True)  # Allow downloading HTML files
 
 
 
