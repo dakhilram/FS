@@ -460,31 +460,40 @@ def predict_wildfire():
     pdf.multi_cell(0, 10, "This chart displays the predicted top 5 locations where wildfires are most likely to occur. "
                        "These areas require higher monitoring and preparedness efforts to prevent future disasters.")
     
+    # ✅ Save the Wildfire Prediction Map in the Uploads Directory
     map_file = os.path.join(UPLOAD_FOLDER, "wildfire_predictions_map.html")
-    m = folium.Map(location=[future_data["latitude"].mean(), future_data["longitude"].mean()], zoom_start=5)
-    for _, row in future_data.iterrows():
-        folium.CircleMarker(
+
+# Create Map Using Folium
+    if "latitude" in future_data.columns and "longitude" in future_data.columns:
+        m = folium.Map(location=[future_data["latitude"].mean(), future_data["longitude"].mean()], zoom_start=5)
+        for _, row in future_data.iterrows():
+            folium.CircleMarker(
             location=[row["latitude"], row["longitude"]],
             radius=5,
             color="red" if row["predicted_confidence"] > 1 else "orange",
             fill=True,
             fill_color="red" if row["predicted_confidence"] > 1 else "orange",
             fill_opacity=0.6,
-        ).add_to(m)
-    m.save(map_file)
+            ).add_to(m)
+        m.save(map_file)
+    else:
+        print("❌ Missing latitude/longitude data. Map cannot be generated.")
+
+
+    # ✅ Set the correct URL for the downloadable map
+    BASE_URL = "https://fs-51ng.onrender.com"  # Update with your actual Render backend URL
+    map_download_url = f"{BASE_URL}/download/wildfire_predictions_map.html"
 
     pdf.add_page()
     pdf.cell(200, 10, "Interactive Wildfire Prediction Map", ln=True, align="C")
     pdf.ln(10)
-    pdf.multi_cell(0, 10, "This map represents the predicted locations of wildfires, color-coded based on predicted confidence levels. Red markers indicate a high probability of fire occurrence, while orange markers indicate moderate risk.\n\n")
-
-# ✅ Set the correct URL for the downloadable map
-    BASE_URL = "https://fs-51ng.onrender.com"  # Update with your actual Render backend URL
-    map_download_url = f"{BASE_URL}/download/wildfire_predictions_map.html"
+    pdf.multi_cell(0, 10, "This map represents the predicted locations of wildfires, color-coded based on predicted confidence levels. "
+                       "Red markers indicate a high probability of fire occurrence, while orange markers indicate moderate risk.\n\n")
 
     pdf.set_text_color(0, 0, 255)  # Blue color for clickable link
     pdf.cell(0, 10, "Click here to download the wildfire prediction map", ln=True, link=map_download_url)
     pdf.set_text_color(0, 0, 0)  # Reset text color
+
 
 
     return jsonify({
