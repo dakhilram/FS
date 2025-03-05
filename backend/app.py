@@ -794,7 +794,7 @@ def predict_hurricane():
     pdf.cell(200, 10, "Interactive Hurricane Prediction Map", ln=True, align="C")
     pdf.ln(10)
     pdf.multi_cell(0, 10, "This map represents predicted hurricane locations, color-coded by severity:\n"
-                        "Green (Category <2), Yellow (2-3), Orange (3-4), Red (≥4).")
+                        "Green (Category <2), Yellow (2-3), Orange (3-4), Red (>=4).")
     pdf.set_text_color(0, 0, 255)
     pdf.cell(0, 10, "Click here to view the interactive hurricane prediction map", ln=True, link=f"{BASE_URL}/download/hurricane_predictions_map.html")
     pdf.set_text_color(0, 0, 0)
