@@ -25,7 +25,7 @@ import folium
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import LSTM, Dense, Conv1D, Flatten
 from sklearn.ensemble import RandomForestRegressor
-
+from statsmodels.tsa.arima.model import ARIMA
 
 # ✅ Load environment variables
 load_dotenv()
@@ -658,8 +658,108 @@ def predict_earthquake():
 
 @app.route("/predict-tornado", methods=["POST"])
 def predict_tornado():
-    """Handles Tornado Prediction Model"""
-    return jsonify({"csv_file": "/download/tornado_predictions.csv", "pdf_file": "/download/tornado_report.pdf"}), 200
+    """Handles tornado file uploads and runs the prediction model."""
+
+    # ✅ Step 1: Check if a file is uploaded
+    if "file" not in request.files:
+        return jsonify({"error": "No file uploaded"}), 400
+
+    file = request.files["file"]
+    if file.filename == "" or not file.filename.endswith(".csv"):
+        return jsonify({"error": "Invalid file format"}), 400
+
+    # ✅ Step 2: Save File Securely
+    filename = secure_filename(file.filename)
+    file_path = os.path.join(UPLOAD_FOLDER, filename)
+    file.save(file_path)
+
+    # ✅ Step 3: Load Dataset
+    try:
+        data = pd.read_csv(file_path)
+    except Exception as e:
+        return jsonify({"error": "Invalid CSV format"}), 400
+
+    # ✅ Step 4: Ensure Required Columns Exist
+    required_columns = ['yr', 'mo', 'dy', 'slat', 'slon', 'elat', 'elon', 'len', 'wid', 'mag', 'loss', 'closs', 'inj', 'fat', 'st']
+    missing_columns = [col for col in required_columns if col not in data.columns]
+    if missing_columns:
+        return jsonify({"error": f"Missing required columns: {missing_columns}"}), 400
+
+    # ✅ Step 5: Data Preprocessing
+    data = data[required_columns].dropna()
+    scaler = MinMaxScaler()
+    numeric_cols = ['len', 'wid', 'mag', 'loss', 'closs', 'inj', 'fat']
+    data[numeric_cols] = scaler.fit_transform(data[numeric_cols])
+
+    # ✅ Step 6: Tornado Yearly Occurrences
+    tornado_yearly = data.groupby('yr').size()
+
+    # ✅ Step 7: ARIMA Forecasting for Next 10 Years
+    forecast_generated = False
+    if len(tornado_yearly) > 10:
+        model_arima = ARIMA(tornado_yearly, order=(5,1,0))
+        model_arima_fit = model_arima.fit()
+        forecast_years = 10
+        future_years = list(range(tornado_yearly.index[-1] + 1, tornado_yearly.index[-1] + 1 + forecast_years))
+        forecast_arima = model_arima_fit.forecast(steps=forecast_years)
+
+        plt.figure(figsize=(10, 5))
+        plt.plot(tornado_yearly.index, tornado_yearly.values, label="Actual Tornado Occurrences", marker='o', linestyle='-')
+        plt.plot(future_years, forecast_arima, label="Forecasted Tornado Occurrences", marker='o', linestyle='--', color='red')
+        plt.xlabel("Year")
+        plt.ylabel("Number of Tornadoes")
+        plt.title("Tornado Occurrence Forecast (Next 10 Years)")
+        plt.legend()
+        plt.grid(True)
+        plt.savefig("tornado_forecast.png")
+        plt.close()
+        forecast_generated = True
+
+    # ✅ Step 8: Generate Interactive Tornado Map
+    map_file = os.path.join(UPLOAD_FOLDER, "tornado_map.html")
+    tornado_map = folium.Map(location=[38.0, -97.0], zoom_start=5)
+    for _, row in data.iterrows():
+        folium.Marker(
+            location=[row['slat'], row['slon']],
+            popup=f"Magnitude: {row['mag']} | Width: {row['wid']}m | Length: {row['len']}km",
+            icon=folium.Icon(color='red', icon='cloud')
+        ).add_to(tornado_map)
+    tornado_map.save(map_file)
+
+    # ✅ Step 9: Generate PDF Report
+    pdf = FPDF()
+    pdf.add_page()
+    pdf.set_font("Arial", "B", 16)
+    pdf.cell(200, 10, "Tornado Prediction Report", ln=True, align="C")
+    pdf.ln(10)
+    
+    if forecast_generated:
+        pdf.set_font("Arial", "B", 12)
+        pdf.cell(0, 10, "Future Tornado Occurrences Forecast", ln=True, align="L")
+        pdf.ln(5)
+        pdf.set_font("Arial", "", 10)
+        pdf.multi_cell(0, 10, "This forecast predicts tornado occurrences for the next 10 years using an ARIMA model.")
+        pdf.ln(5)
+        pdf.image("tornado_forecast.png", x=10, y=None, w=180)
+        pdf.ln(10)
+    
+    # ✅ Add Interactive Map Link to PDF
+    pdf.add_page()
+    pdf.cell(200, 10, "Interactive Tornado Prediction Map", ln=True, align="C")
+    pdf.ln(10)
+    pdf.multi_cell(0, 10, "This map shows the locations of tornadoes based on recorded data.")
+    pdf.set_text_color(0, 0, 255)
+    pdf.cell(0, 10, "Click here to view the interactive tornado prediction map", ln=True, link=f"{BASE_URL}/download/tornado_map.html")
+    pdf.set_text_color(0, 0, 0)
+    
+    pdf_file = os.path.join(UPLOAD_FOLDER, "tornado_report.pdf")
+    pdf.output(pdf_file)
+
+    # ✅ Step 10: Return JSON Response with File URLs
+    return jsonify({
+        "csv_file": f"{BASE_URL}/download/future_tornado_predictions.csv",
+        "pdf_file": f"{BASE_URL}/download/tornado_report.pdf"
+    }), 200
 
 @app.route("/predict-hurricane", methods=["POST"])
 def predict_hurricane():

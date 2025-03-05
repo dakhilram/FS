@@ -16,3 +16,4 @@ scikit-learn
 xgboost
 folium
 tensorflow-cpu
+statsmodels
