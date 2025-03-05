@@ -567,21 +567,61 @@ def predict_earthquake():
     })
     forecast_df.to_csv(forecast_filename, index=False)
 
+    # ✅ Generate Graphs
+    # Earthquake Occurrences Over Time
+    plt.figure(figsize=(12, 6))
+    df_clean.set_index("date_time").resample("M").size().plot(kind="line", marker="o", color="blue")
+    plt.title("Earthquake Occurrences Over Time")
+    plt.xlabel("Year")
+    plt.ylabel("Number of Earthquakes")
+    plt.grid(True)
+    plt.savefig("earthquake_occurrences.png")
+    
+    # Earthquake Magnitude Distribution Heatmap
+    plt.figure(figsize=(10, 6))
+    scatter = plt.scatter(df_clean['longitude'], df_clean['latitude'], c=df_clean['magnitude'],
+                           s=df_clean['magnitude'] * 20, cmap='coolwarm', alpha=0.6, edgecolor="k")
+    plt.title('Earthquake Magnitude Distribution')
+    plt.xlabel('Longitude')
+    plt.ylabel('Latitude')
+    plt.colorbar(scatter, label='Magnitude')
+    plt.savefig("magnitude_distribution.png")
+    
+    # Top 10 Most Affected Locations
+    df_clean['location'] = df_clean['latitude'].astype(str) + ", " + df_clean['longitude'].astype(str)
+    top_locations = df_clean['location'].value_counts().head(10)
+    plt.figure(figsize=(12, 6))
+    sns.barplot(x=top_locations.values, y=top_locations.index, palette="viridis")
+    plt.xlabel("Number of Earthquakes")
+    plt.ylabel("Location (Lat, Long)")
+    plt.title("Top 10 Most Affected Locations")
+    plt.grid(axis='x')
+    plt.savefig("top_10_affected.png")
+    
+    # Earthquake Activity Over Years
+    df_clean['year'] = df_clean['date_time'].dt.year
+    earthquakes_per_year = df_clean.groupby('year').size()
+    plt.figure(figsize=(12, 6))
+    earthquakes_per_year.plot(kind='bar', color='coral', edgecolor='black')
+    plt.xlabel("Year")
+    plt.ylabel("Number of Earthquakes")
+    plt.title("Earthquake Occurrences Per Year")
+    plt.grid(axis='y')
+    plt.savefig("earthquake_per_year.png")
+    
+    # ✅ Save Graphs into the PDF
     pdf_filename = os.path.join(UPLOAD_FOLDER, "earthquake_report.pdf")
     pdf = FPDF()
     pdf.add_page()
     pdf.set_font("Arial", style="B", size=20)
     pdf.cell(0, 150, "Earthquake Forecasting Report", ln=True, align="C")
     
-    # Add generated graphs to the PDF
-    graphs = ["earthquake_occurrences.png", "magnitude_distribution.png", "top_10_affected.png", "earthquake_per_year.png", "magnitude_forecast.png", "predicted_locations.png"]
+    graphs = ["earthquake_occurrences.png", "magnitude_distribution.png", "top_10_affected.png", "earthquake_per_year.png"]
     descriptions = [
         "This graph shows the number of earthquakes occurring over time, revealing patterns and trends.",
         "This scatter plot represents earthquake magnitudes at different locations, with color indicating intensity.",
         "This bar chart displays the top 10 locations most affected by earthquakes based on historical data.",
-        "This bar chart shows earthquake occurrences per year, helping to understand yearly variations.",
-        "This plot forecasts earthquake magnitudes for the next 50 months using deep learning models.",
-        "This scatter plot shows predicted earthquake locations, allowing for risk analysis in affected areas."
+        "This bar chart shows earthquake occurrences per year, helping to understand yearly variations."
     ]
     
     for i, graph in enumerate(graphs):
