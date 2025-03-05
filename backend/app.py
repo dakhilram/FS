@@ -24,6 +24,7 @@ import xgboost as xgb
 import folium
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import LSTM, Dense, Conv1D, Flatten
+from sklearn.ensemble import RandomForestRegressor
 
 
 # ✅ Load environment variables
@@ -662,8 +663,199 @@ def predict_tornado():
 
 @app.route("/predict-hurricane", methods=["POST"])
 def predict_hurricane():
-    """Handles Hurricane Prediction Model"""
-    return jsonify({"csv_file": "/download/hurricane_predictions.csv", "pdf_file": "/download/hurricane_report.pdf"}), 200
+    """Handles hurricane file uploads and runs the prediction model."""
+
+    # ✅ Step 1: Check if a file is uploaded
+    if "file" not in request.files:
+        return jsonify({"error": "No file uploaded"}), 400
+
+    file = request.files["file"]
+    if file.filename == "" or not file.filename.endswith(".csv"):
+        return jsonify({"error": "Invalid file format"}), 400
+
+    # ✅ Step 2: Save File Securely
+    filename = secure_filename(file.filename)
+    file_path = os.path.join(UPLOAD_FOLDER, filename)
+    file.save(file_path)
+
+    # ✅ Step 3: Load Dataset
+    try:
+        data = pd.read_csv(file_path)
+    except Exception as e:
+        return jsonify({"error": "Invalid CSV format"}), 400
+
+    # ✅ Step 4: Encode Categorical Features
+    categorical_cols = ["Name", "Areas affected"]
+    label_encoders = {}
+
+    for col in categorical_cols:
+        if col in data.columns:
+            le = LabelEncoder()
+            data[col] = le.fit_transform(data[col])
+            label_encoders[col] = le
+
+    # ✅ Step 5: Drop Unnecessary Columns and Normalize
+    columns_to_drop = ["Start Date", "End Date"]
+    X = data.drop(columns=[col for col in columns_to_drop if col in data.columns], errors="ignore")
+    X = X.dropna()
+
+    scaler = MinMaxScaler()
+    X_scaled = pd.DataFrame(scaler.fit_transform(X), columns=X.columns)
+
+    # ✅ Step 6: Define Target Variable
+    if "Category" not in data.columns:
+        return jsonify({"error": "Dataset is missing the 'Category' column."}), 400
+
+    y = data["Category"]
+
+    # ✅ Step 7: Train-Test Split
+    X_train, X_test, y_train, y_test = train_test_split(X_scaled, y, test_size=0.2, random_state=42)
+
+    # ✅ Step 8: Train Random Forest Model
+    rf_model = RandomForestRegressor(n_estimators=100, random_state=42)
+    rf_model.fit(X_train, y_train)
+
+    # ✅ Step 9: Simulate Future Predictions
+    future_data = X_test.copy()
+    future_data["Wind speed"] = np.random.uniform(50, 200, size=len(future_data))
+    future_data["Pressure"] = np.random.uniform(900, 1020, size=len(future_data))
+    future_data["Latitude"] = np.random.uniform(15.0, 45.0, size=len(future_data))
+    future_data["Longitude"] = np.random.uniform(-100.0, -60.0, size=len(future_data))
+
+    # ✅ Step 10: Predict Hurricane Categories
+    future_predictions = rf_model.predict(future_data[X_train.columns])
+    future_data["predicted_category"] = future_predictions
+
+    # ✅ Step 11: Save Predictions to CSV
+    future_predictions_file = os.path.join(UPLOAD_FOLDER, "future_hurricane_predictions.csv")
+    future_data.to_csv(future_predictions_file, index=False)
+
+    # ✅ Step 12: Generate Graphs & PDF Report
+    pdf = FPDF()
+    pdf.add_page()
+    pdf.set_font("Arial", style="B", size=20)
+    pdf.cell(0, 150, "Hurricane Future Prediction Report", ln=True, align="C")
+
+    # 📊 1. Feature Importance Plot
+    feature_importance = pd.Series(rf_model.feature_importances_, index=X.columns).sort_values(ascending=False)
+    plt.figure(figsize=(10, 5))
+    sns.barplot(x=feature_importance.values, y=feature_importance.index, palette="viridis")
+    plt.xlabel("Feature Importance")
+    plt.ylabel("Features")
+    plt.title("Important Factors Influencing Hurricane Category")
+    plt.savefig("feature_importance.png")
+    pdf.add_page()
+    pdf.image("feature_importance.png", x=10, y=30, w=180)
+    pdf.ln(110)
+    pdf.multi_cell(0, 10, "This bar chart represents the importance of different factors in predicting hurricanes. Features with higher importance scores have a stronger influence on the predicted hurricane category.")
+
+
+    # 📊 2. Predicted Hurricane Distribution
+    plt.figure(figsize=(8, 5))
+    sns.histplot(future_data["predicted_category"], bins=5, kde=True, color="red")
+    plt.xlabel("Predicted Hurricane Category")
+    plt.ylabel("Count")
+    plt.title("Future Hurricane Predictions Distribution")
+    plt.savefig("prediction_distribution.png")
+    pdf.add_page()
+    pdf.image("prediction_distribution.png", x=10, y=30, w=180)
+    pdf.ln(110)
+    pdf.multi_cell(0, 10, "This histogram displays the distribution of predicted hurricane categories. The spread of values provides insight into the intensity of future hurricanes.")
+
+
+    # 📊 3. Wind Speed vs Pressure
+    plt.figure(figsize=(8, 6))
+    sns.scatterplot(x=future_data["Pressure"], y=future_data["Wind speed"], hue=future_data["predicted_category"], palette="coolwarm")
+    plt.xlabel("Pressure")
+    plt.ylabel("Wind Speed")
+    plt.title("Wind Speed vs Pressure Across Predicted Hurricanes")
+    plt.savefig("wind_vs_pressure.png")
+    pdf.add_page()
+    pdf.image("wind_vs_pressure.png", x=10, y=30, w=180)
+    pdf.ln(110)
+    pdf.multi_cell(0, 10, "This scatter plot highlights the relationship between wind speed and pressure in predicted hurricanes. Typically, stronger hurricanes have higher wind speeds and lower pressure values.")
+
+
+    # 4. Top 5 Affected Areas (Before Prediction)
+    top5_affected_before = data["Areas affected"].value_counts().nlargest(5)
+    plt.figure(figsize=(10, 5))
+    sns.barplot(x=top5_affected_before.index, y=top5_affected_before.values, palette="Blues")
+    plt.xlabel("Region")
+    plt.ylabel("Number of Hurricanes")
+    plt.title("Top 5 Affected Regions Before Prediction")
+    plt.xticks(rotation=45)
+    plt.savefig("top5_affected_before.png")
+    pdf.add_page()
+    pdf.cell(200, 10, "Top 5 Affected Regions (Before Prediction)", ln=True, align="C")
+    pdf.image("top5_affected_before.png", x=10, y=30, w=180)
+    pdf.ln(110)
+    pdf.multi_cell(0, 10, "This bar chart shows the top 5 regions most affected by hurricanes before making predictions. These areas have historically experienced the highest number of hurricanes.")
+
+
+    # 5. Predicted Hurricane Categories
+    plt.figure(figsize=(10, 5))
+    sns.countplot(x=future_data["predicted_category"], palette="Oranges")
+    plt.xlabel("Predicted Category")
+    plt.ylabel("Count")
+    plt.title("Predicted Hurricane Categories Distribution")
+    plt.savefig("predicted_categories.png")
+    pdf.add_page()
+    pdf.cell(200, 10, "Predicted Hurricane Categories Distribution", ln=True, align="C")
+    pdf.image("predicted_categories.png", x=10, y=30, w=180)
+    pdf.ln(110)
+    pdf.multi_cell(0, 10, "This distribution chart shows the predicted hurricane categories, helping in understanding the likelihood of different hurricane intensities in future scenarios.")
+
+
+    # ✅ Step 13: Generate Interactive Map
+    map_file = os.path.join(UPLOAD_FOLDER, "hurricane_predictions_map.html")
+    if "Latitude" in future_data.columns and "Longitude" in future_data.columns:
+        hurricane_map = folium.Map(location=[30.0, -85.0], zoom_start=4)
+        for _, row in future_data.iterrows():
+            category = row["predicted_category"]
+            if category < 2:
+                color = "green"
+            elif category < 3:
+                color = "yellow"
+            elif category < 4:
+                color = "orange"
+            else:
+                color = "red"
+
+            folium.CircleMarker(
+                location=[row["Latitude"], row["Longitude"]],
+                radius=max(5, row["predicted_category"] * 3),
+                color=color,
+                fill=True,
+                fill_color=color,
+                fill_opacity=0.7,
+                popup=f"Predicted Category: {row['predicted_category']:.1f}"
+            ).add_to(hurricane_map)
+        hurricane_map.save(map_file)
+    else:
+        print("❌ Missing latitude/longitude data. Map cannot be generated.")
+
+    # ✅ Set the correct URL for downloading the map
+    BASE_URL = "https://fs-51ng.onrender.com"  # Update with your actual Render backend URL
+    map_download_url = f"{BASE_URL}/download/hurricane_predictions_map.html"
+
+    pdf.add_page()
+    pdf.cell(200, 10, "Interactive Hurricane Prediction Map", ln=True, align="C")
+    pdf.ln(10)
+    pdf.multi_cell(0, 10, "This map represents the predicted locations of hurricanes, color-coded based on intensity. "
+                           "Green for Category <2, Yellow for Category 2-3, Orange for Category 3-4, and Red for Category ≥4.\n\n")
+    pdf.set_text_color(0, 0, 255)
+    pdf.cell(0, 10, "Click here to download the hurricane prediction map", ln=True, link=map_download_url)
+    pdf.set_text_color(0, 0, 0)
+
+    pdf_file = os.path.join(UPLOAD_FOLDER, "hurricane_future_predictions_report.pdf")
+    pdf.output(pdf_file)
+
+    # ✅ Step 14: Return JSON Response with File URLs
+    return jsonify({
+        "csv_file": f"{BASE_URL}/download/future_hurricane_predictions.csv",
+        "pdf_file": f"{BASE_URL}/download/hurricane_future_predictions_report.pdf"
+    }), 200
+
 
 
 
