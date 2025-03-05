@@ -518,20 +518,15 @@ def predict_earthquake():
 
     required_columns = ["latitude", "longitude", "magnitude", "depth"]
     df_clean = df.dropna(subset=required_columns)
-    
     df_clean[["magnitude", "depth", "latitude", "longitude"]] = MinMaxScaler().fit_transform(df_clean[["magnitude", "depth", "latitude", "longitude"]])
-
+    
     time_steps = 15
     features = ["magnitude", "depth"]
-    
-    def create_sequences(data, time_steps):
-        X, y = [], []
-        for i in range(len(data) - time_steps):
-            X.append(data[i:i + time_steps])
-            y.append(data[i + time_steps])
-        return np.array(X), np.array(y)
-
-    X, y = create_sequences(df_clean[features].values, time_steps)
+    X, y = [], []
+    for i in range(len(df_clean[features]) - time_steps):
+        X.append(df_clean[features].values[i:i + time_steps])
+        y.append(df_clean[features].values[i + time_steps])
+    X, y = np.array(X), np.array(y)
 
     model = Sequential([
         LSTM(50, return_sequences=True, input_shape=(X.shape[1], X.shape[2])),
@@ -551,44 +546,58 @@ def predict_earthquake():
         new_value = np.array([[pred[0][0], 0]]).reshape(1, 1, 2)
         X_future = np.append(X_future[:, 1:, :], new_value, axis=1)
 
+    spatial_features = df_clean[['latitude', 'longitude']].values.reshape(-1, 2, 1)
+    cnn_model = Sequential([
+        Conv1D(filters=64, kernel_size=2, activation='relu', input_shape=(2, 1)),
+        Flatten(),
+        Dense(50, activation='relu'),
+        Dense(2)
+    ])
+    cnn_model.compile(optimizer='adam', loss='mse')
+    cnn_model.fit(spatial_features, df_clean[['latitude', 'longitude']].values, epochs=10, batch_size=16)
+
+    future_locations = cnn_model.predict(spatial_features[-future_steps:])
     forecast_dates = pd.date_range(start=df_clean["date_time"].max(), periods=future_steps, freq='M')
     forecast_filename = os.path.join(UPLOAD_FOLDER, "earthquake_forecast.csv")
-    forecast_df = pd.DataFrame({"Date": forecast_dates, "Predicted Magnitude": predictions})
+    forecast_df = pd.DataFrame({
+        'Date': forecast_dates,
+        'Predicted Magnitude': predictions,
+        'Latitude': future_locations[:, 0],
+        'Longitude': future_locations[:, 1]
+    })
     forecast_df.to_csv(forecast_filename, index=False)
 
-    # ✅ Generate PDF Report
     pdf_filename = os.path.join(UPLOAD_FOLDER, "earthquake_report.pdf")
     pdf = FPDF()
     pdf.add_page()
     pdf.set_font("Arial", style="B", size=20)
     pdf.cell(0, 150, "Earthquake Forecasting Report", ln=True, align="C")
-
-    # Visualization 1: Earthquake Occurrences Over Time
-    fig, ax = plt.subplots(figsize=(12, 6))
-    df_clean.set_index("date_time").resample("M").size().plot(kind="line", marker="o", color="blue", ax=ax)
-    ax.set_title("Earthquake Occurrences Over Time")
-    ax.set_xlabel("Year")
-    ax.set_ylabel("Number of Earthquakes")
-    ax.grid(True)
-    plt.savefig("earthquake_occurrences.png")
-    pdf.add_page()
-    pdf.image("earthquake_occurrences.png", x=10, y=30, w=180)
-    pdf.set_font("Arial", size=10)
-    pdf.ln(120)
-    pdf.multi_cell(0, 10, "This graph shows the number of earthquakes occurring over time, revealing patterns and trends.")
-
-    # Save the PDF
+    
+    # Add generated graphs to the PDF
+    graphs = ["earthquake_occurrences.png", "magnitude_distribution.png", "top_10_affected.png", "earthquake_per_year.png", "magnitude_forecast.png", "predicted_locations.png"]
+    descriptions = [
+        "This graph shows the number of earthquakes occurring over time, revealing patterns and trends.",
+        "This scatter plot represents earthquake magnitudes at different locations, with color indicating intensity.",
+        "This bar chart displays the top 10 locations most affected by earthquakes based on historical data.",
+        "This bar chart shows earthquake occurrences per year, helping to understand yearly variations.",
+        "This plot forecasts earthquake magnitudes for the next 50 months using deep learning models.",
+        "This scatter plot shows predicted earthquake locations, allowing for risk analysis in affected areas."
+    ]
+    
+    for i, graph in enumerate(graphs):
+        if os.path.exists(graph):
+            pdf.add_page()
+            pdf.image(graph, x=10, y=30, w=180)
+            pdf.set_font("Arial", size=10)
+            pdf.ln(110)
+            pdf.multi_cell(0, 10, descriptions[i])
+    
     pdf.output(pdf_filename)
 
-    # ✅ Ensure the files exist before returning them
-    if not os.path.exists(forecast_filename):
-        return jsonify({"error": "Earthquake forecast file not found"}), 500
-    if not os.path.exists(pdf_filename):
-        return jsonify({"error": "Earthquake report file not found"}), 500
+    if not os.path.exists(forecast_filename) or not os.path.exists(pdf_filename):
+        return jsonify({"error": "Generated report files not found."}), 500
 
-    # ✅ Step 13: Return the Download Links
-    BASE_URL = "https://fs-51ng.onrender.com"  # Update with your Render backend URL
-
+    BASE_URL = "https://fs-51ng.onrender.com"
     return jsonify({
         "csv_file": f"{BASE_URL}/download/earthquake_forecast.csv",
         "pdf_file": f"{BASE_URL}/download/earthquake_report.pdf"
