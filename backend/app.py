@@ -722,16 +722,16 @@ def predict_tornado():
     numeric_data = data.select_dtypes(include=[np.number])  # Drop non-numeric columns
     
     visualizations = [
-        ("Tornado Occurrences Over the Years", "tornado_trend.png", tornado_yearly.plot(kind='line', marker='o', color='b')),
-        ("Feature Correlation Heatmap", "tornado_heatmap.png", sns.heatmap(numeric_data.corr(), annot=True, cmap='coolwarm', fmt='.2f')),
-        ("Tornado Magnitude Distribution", "tornado_magnitude.png", sns.histplot(data['mag'], bins=10, kde=True, color='g')),
-        ("Tornado Width Distribution", "tornado_width.png", sns.histplot(data['wid'], bins=10, kde=True, color='purple')),
-        ("Tornado Length Distribution", "tornado_length.png", sns.histplot(data['len'], bins=10, kde=True, color='orange'))
+        ("Tornado Occurrences Over the Years", "tornado_trend.png", lambda: tornado_yearly.plot(kind='line', marker='o', color='b')),
+        ("Feature Correlation Heatmap", "tornado_heatmap.png", lambda: sns.heatmap(numeric_data.corr(), annot=True, cmap='coolwarm', fmt='.2f')),
+        ("Tornado Magnitude Distribution", "tornado_magnitude.png", lambda: sns.histplot(data['mag'], bins=10, kde=True, color='g')),
+        ("Tornado Width Distribution", "tornado_width.png", lambda: sns.histplot(data['wid'], bins=10, kde=True, color='purple')),
+        ("Tornado Length Distribution", "tornado_length.png", lambda: sns.histplot(data['len'], bins=10, kde=True, color='orange'))
     ]
 
-    for title, file_name, plot in visualizations:
+    for title, file_name, plot_func in visualizations:
         plt.figure(figsize=(10, 5))
-        plot
+        plot_func()  # Call the function to generate the plot
         plt.title(title)
         plt.grid(True)
         plt.savefig(file_name, bbox_inches='tight')
