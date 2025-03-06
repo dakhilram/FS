@@ -711,11 +711,28 @@ def predict_tornado():
         plt.title("Tornado Occurrence Forecast (Next 10 Years)")
         plt.legend()
         plt.grid(True)
-        plt.savefig("tornado_forecast.png")
+        plt.savefig("tornado_forecast.png", bbox_inches='tight')
         plt.close()
         forecast_generated = True
 
-    # ✅ Step 8: Generate Interactive Tornado Map
+    # ✅ Step 8: Generate Additional Graphs
+    visualizations = [
+        ("Tornado Occurrences Over the Years", "tornado_trend.png", tornado_yearly.plot(kind='line', marker='o', color='b')),
+        ("Feature Correlation Heatmap", "tornado_heatmap.png", sns.heatmap(data.corr(), annot=True, cmap='coolwarm', fmt='.2f')),
+        ("Tornado Magnitude Distribution", "tornado_magnitude.png", sns.histplot(data['mag'], bins=10, kde=True, color='g')),
+        ("Tornado Width Distribution", "tornado_width.png", sns.histplot(data['wid'], bins=10, kde=True, color='purple')),
+        ("Tornado Length Distribution", "tornado_length.png", sns.histplot(data['len'], bins=10, kde=True, color='orange'))
+    ]
+
+    for title, file_name, plot in visualizations:
+        plt.figure(figsize=(10, 5))
+        plot
+        plt.title(title)
+        plt.grid(True)
+        plt.savefig(file_name, bbox_inches='tight')
+        plt.close()
+    
+    # ✅ Step 9: Generate Interactive Tornado Map
     map_file = os.path.join(UPLOAD_FOLDER, "tornado_map.html")
     tornado_map = folium.Map(location=[38.0, -97.0], zoom_start=5)
     for _, row in data.iterrows():
@@ -726,21 +743,17 @@ def predict_tornado():
         ).add_to(tornado_map)
     tornado_map.save(map_file)
 
-    # ✅ Step 9: Generate PDF Report
+    # ✅ Step 10: Generate PDF Report
     pdf = FPDF()
     pdf.add_page()
     pdf.set_font("Arial", "B", 16)
     pdf.cell(200, 10, "Tornado Prediction Report", ln=True, align="C")
     pdf.ln(10)
     
-    if forecast_generated:
-        pdf.set_font("Arial", "B", 12)
-        pdf.cell(0, 10, "Future Tornado Occurrences Forecast", ln=True, align="L")
-        pdf.ln(5)
-        pdf.set_font("Arial", "", 10)
-        pdf.multi_cell(0, 10, "This forecast predicts tornado occurrences for the next 10 years using an ARIMA model.")
-        pdf.ln(5)
-        pdf.image("tornado_forecast.png", x=10, y=None, w=180)
+    for title, file_name, _ in visualizations:
+        pdf.add_page()
+        pdf.cell(200, 10, title, ln=True, align="C")
+        pdf.image(file_name, x=10, y=None, w=180)
         pdf.ln(10)
     
     # ✅ Add Interactive Map Link to PDF
@@ -754,11 +767,13 @@ def predict_tornado():
     
     pdf_file = os.path.join(UPLOAD_FOLDER, "tornado_report.pdf")
     pdf.output(pdf_file)
-    # ✅ Step 10: Return JSON Response with File URLs
+
+    # ✅ Step 11: Return JSON Response with File URLs
     return jsonify({
         "csv_file": f"{BASE_URL}/download/future_tornado_predictions.csv",
         "pdf_file": f"{BASE_URL}/download/tornado_report.pdf"
     }), 200
+
 
 @app.route("/predict-hurricane", methods=["POST"])
 def predict_hurricane():
