@@ -722,11 +722,16 @@ def predict_tornado():
     numeric_data = data.select_dtypes(include=[np.number])  # Drop non-numeric columns
     
     visualizations = [
-        ("Tornado Occurrences Over the Years", "tornado_trend.png", lambda: tornado_yearly.plot(kind='line', marker='o', color='b')),
-        ("Feature Correlation Heatmap", "tornado_heatmap.png", lambda: sns.heatmap(numeric_data.corr(), annot=True, cmap='coolwarm', fmt='.2f')),
-        ("Tornado Magnitude Distribution", "tornado_magnitude.png", lambda: sns.histplot(data['mag'], bins=10, kde=True, color='g')),
-        ("Tornado Width Distribution", "tornado_width.png", lambda: sns.histplot(data['wid'], bins=10, kde=True, color='purple')),
-        ("Tornado Length Distribution", "tornado_length.png", lambda: sns.histplot(data['len'], bins=10, kde=True, color='orange'))
+        ("Tornado Occurrences Over the Years", "tornado_trend.png", lambda: tornado_yearly.plot(kind='line', marker='o', color='b'),
+         "This graph illustrates the trend of tornado occurrences per year, allowing for the identification of patterns and significant changes over time."),
+        ("Feature Correlation Heatmap", "tornado_heatmap.png", lambda: sns.heatmap(numeric_data.corr(), annot=True, cmap='coolwarm', fmt='.2f'),
+         "The heatmap highlights the correlation between different tornado-related factors, helping to understand which variables are closely linked."),
+        ("Tornado Magnitude Distribution", "tornado_magnitude.png", lambda: sns.histplot(data['mag'], bins=10, kde=True, color='g'),
+         "This histogram shows the frequency distribution of tornado magnitudes, indicating the most common intensity levels."),
+        ("Tornado Width Distribution", "tornado_width.png", lambda: sns.histplot(data['wid'], bins=10, kde=True, color='purple'),
+         "This graph represents the distribution of tornado widths, illustrating how wide tornadoes typically are when they form."),
+        ("Tornado Length Distribution", "tornado_length.png", lambda: sns.histplot(data['len'], bins=10, kde=True, color='orange'),
+         "This histogram displays the length distribution of tornadoes, showing how far they typically travel.")
     ]
 
     for title, file_name, plot_func in visualizations:
