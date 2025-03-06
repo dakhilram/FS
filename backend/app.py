@@ -695,7 +695,7 @@ def predict_tornado():
     tornado_yearly = data.groupby('yr').size()
 
     # ✅ Fix: Convert 'yr' to DateTime index
-    tornado_yearly.index = pd.to_datetime(tornado_yearly.index, format='%Y')
+    tornado_yearly.index = pd.to_datetime(tornado_yearly.index, format='%Y').to_period('Y')
 
     # ✅ Step 7: ARIMA Forecasting for Next 10 Years
     forecast_generated = False
@@ -703,7 +703,7 @@ def predict_tornado():
         model_arima = ARIMA(tornado_yearly, order=(5,1,0))
         model_arima_fit = model_arima.fit()
         forecast_years = 10
-        future_years = pd.date_range(start=tornado_yearly.index[-1] + pd.DateOffset(years=1), periods=forecast_years, freq='Y')
+        future_years = pd.period_range(start=tornado_yearly.index[-1] + 1, periods=forecast_years, freq='Y')
         forecast_arima = model_arima_fit.forecast(steps=forecast_years)
 
         plt.figure(figsize=(10, 5))
@@ -734,7 +734,7 @@ def predict_tornado():
          "This histogram displays the length distribution of tornadoes, showing how far they typically travel.")
     ]
 
-    for title, file_name, plot_func in visualizations:
+    for title, file_name, plot_func, description in visualizations:
         plt.figure(figsize=(10, 5))
         plot_func()  # Call the function to generate the plot
         plt.title(title)
