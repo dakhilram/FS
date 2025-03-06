@@ -729,7 +729,7 @@ def predict_tornado():
         })
 
     # ✅ Save to CSV
-    future_data.to_csv(future_predictions_file, index=False)
+        future_data.to_csv(future_predictions_file, index=False)
 
     # ✅ Step 8: Generate Additional Graphs
     numeric_data = data.select_dtypes(include=[np.number])  # Drop non-numeric columns
