@@ -680,7 +680,7 @@ def predict_tornado():
         return jsonify({"error": "Invalid CSV format"}), 400
 
     # ✅ Step 4: Ensure Required Columns Exist
-    required_columns = ['yr', 'mo', 'dy', 'slat', 'slon', 'elat', 'elon', 'len', 'wid', 'mag', 'loss', 'closs', 'inj', 'fat', 'st']
+    required_columns = ['yr', 'mo', 'dy', 'slat', 'slon', 'len', 'wid', 'mag', 'fat', 'st']
     missing_columns = [col for col in required_columns if col not in data.columns]
     if missing_columns:
         return jsonify({"error": f"Missing required columns: {missing_columns}"}), 400
@@ -688,7 +688,7 @@ def predict_tornado():
     # ✅ Step 5: Data Preprocessing
     data = data[required_columns].dropna()
     scaler = MinMaxScaler()
-    numeric_cols = ['len', 'wid', 'mag', 'loss', 'closs', 'inj', 'fat']
+    numeric_cols = ['len', 'wid', 'mag', 'fat']
     data[numeric_cols] = scaler.fit_transform(data[numeric_cols])
 
     # ✅ Step 6: Tornado Yearly Occurrences
@@ -754,7 +754,6 @@ def predict_tornado():
     
     pdf_file = os.path.join(UPLOAD_FOLDER, "tornado_report.pdf")
     pdf.output(pdf_file)
-
     # ✅ Step 10: Return JSON Response with File URLs
     return jsonify({
         "csv_file": f"{BASE_URL}/download/future_tornado_predictions.csv",
