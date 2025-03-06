@@ -729,14 +729,23 @@ def predict_tornado():
             "Predicted Tornadoes": forecast_arima
         })
 
-        # ✅ Save to CSV
-        future_data.to_csv(future_predictions_file, index=False)
-        
-        # ✅ Check if File is Actually Saved
+        # ✅ Save to CSV with Exception Handling
+        try:
+            future_data.to_csv(future_predictions_file, index=False)
+            print(f"✅ Tornado Predictions File Successfully Created: {future_predictions_file}")
+        except Exception as e:
+            print(f"❌ CSV Save Error: {e}")
+
+        # ✅ Final Check to Ensure File Exists
+        if not os.path.exists(future_predictions_file):
+            print(f"❌ ERROR: CSV file was NOT found after writing. Re-attempting to save...")
+            future_data.to_csv(future_predictions_file, index=False)
+
+        # ✅ Verify File Again
         if os.path.exists(future_predictions_file):
-            print(f"✅ Tornado Predictions File Saved: {future_predictions_file}")
+            print(f"✅ Tornado Predictions File Verified and Ready: {future_predictions_file}")
         else:
-            print(f"❌ Error: File not saved at {future_predictions_file}")
+            print(f"❌ CRITICAL ERROR: Tornado Predictions CSV still missing.")
 
 
     # ✅ Step 8: Generate Additional Graphs
