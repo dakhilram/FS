@@ -703,12 +703,12 @@ def predict_tornado():
         model_arima = ARIMA(tornado_yearly, order=(5,1,0))
         model_arima_fit = model_arima.fit()
         forecast_years = 10
-        future_years = pd.date_range(start=tornado_yearly.index[-1] + pd.DateOffset(years=1), periods=forecast_years, freq='Y')
+        future_years = pd.period_range(start=tornado_yearly.index[-1] + 1, periods=forecast_years, freq='Y')
         forecast_arima = model_arima_fit.forecast(steps=forecast_years)
 
         plt.figure(figsize=(10, 5))
-        plt.plot(tornado_yearly.index, tornado_yearly.values, label="Actual Tornado Occurrences", marker='o', linestyle='-')
-        plt.plot(future_years, forecast_arima, label="Forecasted Tornado Occurrences", marker='o', linestyle='--', color='red')
+        plt.plot(tornado_yearly.index.astype(str), tornado_yearly.values, label="Actual Tornado Occurrences", marker='o', linestyle='-')
+        plt.plot(future_years.astype(str), forecast_arima, label="Forecasted Tornado Occurrences", marker='o', linestyle='--', color='red')
         plt.xlabel("Year")
         plt.ylabel("Number of Tornadoes")
         plt.title("Tornado Occurrence Forecast (Next 10 Years)")
@@ -717,19 +717,27 @@ def predict_tornado():
         plt.savefig("tornado_forecast.png", bbox_inches='tight')
         plt.close()
         forecast_generated = True
-            
+        
+        # ✅ Step 7.1: Ensure Predictions Are Saved to CSV
         future_predictions_file = os.path.join(UPLOAD_FOLDER, "future_tornado_predictions.csv")
         if not os.path.exists(UPLOAD_FOLDER):
             os.makedirs(UPLOAD_FOLDER)  # Create the directory if it does not exist
 
         # ✅ Create a DataFrame for Future Predictions
         future_data = pd.DataFrame({
-            "Year": future_years.astype(str),
+            "Year": [str(year) for year in future_years],  # Convert years to strings for saving
             "Predicted Tornadoes": forecast_arima
         })
 
-    # ✅ Save to CSV
+        # ✅ Save to CSV
         future_data.to_csv(future_predictions_file, index=False)
+        
+        # ✅ Check if File is Actually Saved
+        if os.path.exists(future_predictions_file):
+            print(f"✅ Tornado Predictions File Saved: {future_predictions_file}")
+        else:
+            print(f"❌ Error: File not saved at {future_predictions_file}")
+
 
     # ✅ Step 8: Generate Additional Graphs
     numeric_data = data.select_dtypes(include=[np.number])  # Drop non-numeric columns
