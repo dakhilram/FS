@@ -694,13 +694,16 @@ def predict_tornado():
     # ✅ Step 6: Tornado Yearly Occurrences
     tornado_yearly = data.groupby('yr').size()
 
+    # ✅ Fix: Convert 'yr' to DateTime index
+    tornado_yearly.index = pd.to_datetime(tornado_yearly.index, format='%Y')
+
     # ✅ Step 7: ARIMA Forecasting for Next 10 Years
     forecast_generated = False
     if len(tornado_yearly) > 10:
         model_arima = ARIMA(tornado_yearly, order=(5,1,0))
         model_arima_fit = model_arima.fit()
         forecast_years = 10
-        future_years = list(range(tornado_yearly.index[-1] + 1, tornado_yearly.index[-1] + 1 + forecast_years))
+        future_years = pd.date_range(start=tornado_yearly.index[-1] + pd.DateOffset(years=1), periods=forecast_years, freq='Y')
         forecast_arima = model_arima_fit.forecast(steps=forecast_years)
 
         plt.figure(figsize=(10, 5))
@@ -716,9 +719,11 @@ def predict_tornado():
         forecast_generated = True
 
     # ✅ Step 8: Generate Additional Graphs
+    numeric_data = data.select_dtypes(include=[np.number])  # Drop non-numeric columns
+    
     visualizations = [
         ("Tornado Occurrences Over the Years", "tornado_trend.png", tornado_yearly.plot(kind='line', marker='o', color='b')),
-        ("Feature Correlation Heatmap", "tornado_heatmap.png", sns.heatmap(data.corr(), annot=True, cmap='coolwarm', fmt='.2f')),
+        ("Feature Correlation Heatmap", "tornado_heatmap.png", sns.heatmap(numeric_data.corr(), annot=True, cmap='coolwarm', fmt='.2f')),
         ("Tornado Magnitude Distribution", "tornado_magnitude.png", sns.histplot(data['mag'], bins=10, kde=True, color='g')),
         ("Tornado Width Distribution", "tornado_width.png", sns.histplot(data['wid'], bins=10, kde=True, color='purple')),
         ("Tornado Length Distribution", "tornado_length.png", sns.histplot(data['len'], bins=10, kde=True, color='orange'))
@@ -773,6 +778,7 @@ def predict_tornado():
         "csv_file": f"{BASE_URL}/download/future_tornado_predictions.csv",
         "pdf_file": f"{BASE_URL}/download/tornado_report.pdf"
     }), 200
+
 
 
 @app.route("/predict-hurricane", methods=["POST"])
