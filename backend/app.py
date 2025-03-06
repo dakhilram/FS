@@ -695,7 +695,7 @@ def predict_tornado():
     tornado_yearly = data.groupby('yr').size()
 
     # ✅ Fix: Convert 'yr' to DateTime index
-    tornado_yearly.index = pd.to_datetime(tornado_yearly.index, format='%Y').to_period('Y')
+    tornado_yearly.index = pd.to_datetime(tornado_yearly.index, format='%Y')
 
     # ✅ Step 7: ARIMA Forecasting for Next 10 Years
     forecast_generated = False
@@ -703,7 +703,7 @@ def predict_tornado():
         model_arima = ARIMA(tornado_yearly, order=(5,1,0))
         model_arima_fit = model_arima.fit()
         forecast_years = 10
-        future_years = pd.period_range(start=tornado_yearly.index[-1] + 1, periods=forecast_years, freq='Y')
+        future_years = pd.date_range(start=tornado_yearly.index[-1] + pd.DateOffset(years=1), periods=forecast_years, freq='Y')
         forecast_arima = model_arima_fit.forecast(steps=forecast_years)
 
         plt.figure(figsize=(10, 5))
@@ -722,19 +722,14 @@ def predict_tornado():
     numeric_data = data.select_dtypes(include=[np.number])  # Drop non-numeric columns
     
     visualizations = [
-        ("Tornado Occurrences Over the Years", "tornado_trend.png", lambda: tornado_yearly.plot(kind='line', marker='o', color='b'),
-         "This graph illustrates the trend of tornado occurrences per year, allowing for the identification of patterns and significant changes over time."),
-        ("Feature Correlation Heatmap", "tornado_heatmap.png", lambda: sns.heatmap(numeric_data.corr(), annot=True, cmap='coolwarm', fmt='.2f'),
-         "The heatmap highlights the correlation between different tornado-related factors, helping to understand which variables are closely linked."),
-        ("Tornado Magnitude Distribution", "tornado_magnitude.png", lambda: sns.histplot(data['mag'], bins=10, kde=True, color='g'),
-         "This histogram shows the frequency distribution of tornado magnitudes, indicating the most common intensity levels."),
-        ("Tornado Width Distribution", "tornado_width.png", lambda: sns.histplot(data['wid'], bins=10, kde=True, color='purple'),
-         "This graph represents the distribution of tornado widths, illustrating how wide tornadoes typically are when they form."),
-        ("Tornado Length Distribution", "tornado_length.png", lambda: sns.histplot(data['len'], bins=10, kde=True, color='orange'),
-         "This histogram displays the length distribution of tornadoes, showing how far they typically travel.")
+        ("Tornado Occurrences Over the Years", "tornado_trend.png", lambda: tornado_yearly.plot(kind='line', marker='o', color='b')),
+        ("Feature Correlation Heatmap", "tornado_heatmap.png", lambda: sns.heatmap(numeric_data.corr(), annot=True, cmap='coolwarm', fmt='.2f')),
+        ("Tornado Magnitude Distribution", "tornado_magnitude.png", lambda: sns.histplot(data['mag'], bins=10, kde=True, color='g')),
+        ("Tornado Width Distribution", "tornado_width.png", lambda: sns.histplot(data['wid'], bins=10, kde=True, color='purple')),
+        ("Tornado Length Distribution", "tornado_length.png", lambda: sns.histplot(data['len'], bins=10, kde=True, color='orange'))
     ]
 
-    for title, file_name, plot_func, description in visualizations:
+    for title, file_name, plot_func in visualizations:
         plt.figure(figsize=(10, 5))
         plot_func()  # Call the function to generate the plot
         plt.title(title)
