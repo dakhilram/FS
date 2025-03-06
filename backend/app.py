@@ -717,6 +717,19 @@ def predict_tornado():
         plt.savefig("tornado_forecast.png", bbox_inches='tight')
         plt.close()
         forecast_generated = True
+            
+        future_predictions_file = os.path.join(UPLOAD_FOLDER, "future_tornado_predictions.csv")
+        if not os.path.exists(UPLOAD_FOLDER):
+            os.makedirs(UPLOAD_FOLDER)  # Create the directory if it does not exist
+
+        # ✅ Create a DataFrame for Future Predictions
+        future_data = pd.DataFrame({
+            "Year": future_years.astype(str),
+            "Predicted Tornadoes": forecast_arima
+        })
+
+    # ✅ Save to CSV
+    future_data.to_csv(future_predictions_file, index=False)
 
     # ✅ Step 8: Generate Additional Graphs
     numeric_data = data.select_dtypes(include=[np.number])  # Drop non-numeric columns
