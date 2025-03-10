@@ -251,7 +251,7 @@ def forgot_password():
         algorithm="HS256"
     )
 
-    reset_link = f"https://dakhilram.github.io/reset-password/{token}"
+    reset_link = f"https://dakhilram.github.io/FS/reset-password/{token}"
 
     try:
         msg = Message("Password Reset Request", sender=app.config["MAIL_USERNAME"], recipients=[email])
