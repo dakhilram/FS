@@ -26,6 +26,10 @@ from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import LSTM, Dense, Conv1D, Flatten
 from sklearn.ensemble import RandomForestRegressor
 from statsmodels.tsa.arima.model import ARIMA
+import hashlib
+import jwt
+import datetime
+from flask_mail import Mail, Message
 
 # ✅ Load environment variables
 load_dotenv()
@@ -220,6 +224,73 @@ def login():
         return jsonify({"message": "Login successful", "username": user.username}), 200
     else:
         return jsonify({"message": "Invalid password"}), 401
+
+# Configure Flask-Mail using environment variables
+app.config["MAIL_SERVER"] = os.getenv("SMTP_SERVER")
+app.config["MAIL_PORT"] = int(os.getenv("SMTP_PORT"))
+app.config["MAIL_USE_TLS"] = True
+app.config["MAIL_USERNAME"] = os.getenv("SMTP_USERNAME")
+app.config["MAIL_PASSWORD"] = os.getenv("SMTP_PASSWORD")
+
+mail = Mail(app)
+app.config["SECRET_KEY"] = os.getenv("JWT_SECRET", "your_default_secret")
+
+
+@app.route('/forgot-password', methods=['POST'])
+def forgot_password():
+    data = request.json
+    email = data.get("email")
+
+    if not email:
+        return jsonify({"message": "Email is required"}), 400
+
+    # Generate JWT Token valid for 1 hour
+    token = jwt.encode(
+        {"email": email, "exp": datetime.datetime.utcnow() + datetime.timedelta(hours=1)},
+        app.config["SECRET_KEY"], 
+        algorithm="HS256"
+    )
+
+    reset_link = f"https://dakhilram.github.io/reset-password/{token}"
+
+    try:
+        msg = Message("Password Reset Request", sender=app.config["MAIL_USERNAME"], recipients=[email])
+        msg.body = f"This link is only valid for 1 hour. Click the link to reset your password: {reset_link}"
+        mail.send(msg)
+        return jsonify({"message": "Reset link sent to email."}), 200
+    except Exception as e:
+        return jsonify({"message": "Email sending failed.", "error": str(e)}), 500
+
+
+@app.route('/reset-password', methods=['POST'])
+def reset_password():
+    data = request.json
+    token = data.get("token")
+    new_password = data.get("password")
+
+    if not token or not new_password:
+        return jsonify({"message": "Invalid request"}), 400
+
+    try:
+        decoded = jwt.decode(token, app.config["SECRET_KEY"], algorithms=["HS256"])
+        email = decoded["email"]
+
+        # Hash the new password before storing it
+        hashed_password = generate_password_hash(new_password, method='pbkdf2:sha256')
+
+        # Update password in database
+        user = User.query.filter_by(email=email).first()
+        if user:
+            user.password = hashed_password
+            db.session.commit()
+            return jsonify({"message": "Password updated successfully."}), 200
+        else:
+            return jsonify({"message": "User not found."}), 404
+    except jwt.ExpiredSignatureError:
+        return jsonify({"message": "Reset link expired."}), 400
+    except jwt.InvalidTokenError:
+        return jsonify({"message": "Invalid token."}), 400
+
 
 # ✅ Fetch User Details API
 @app.route('/user-details', methods=['GET'])

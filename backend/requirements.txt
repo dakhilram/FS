@@ -17,3 +17,5 @@ xgboost
 folium
 tensorflow-cpu
 statsmodels
+PyJWT
+Flask-Mail
