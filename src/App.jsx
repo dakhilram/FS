@@ -13,7 +13,7 @@ import Alerts from "./pages/Alerts";
 import Account from "./pages/Account"; // ✅ Import the Account component properly
 import VerifyEmail from "./pages/VerifyEmail";
 import ForgotPassword from "./pages/ForgotPassword";
-
+import ResetPassword from "./pages/ResetPassword";
 
 
 
@@ -34,7 +34,8 @@ function App() {
         <Route path="/alerts" element={<Alerts />} />
         <Route path="/verify-email" element={<VerifyEmail />} />
         <Route path="/account" element={<Account />} />
-        <Route path="/forgot-password" element={<ForgotPassword />} /> 
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password/:token" element={<ResetPassword />} /> 
       </Routes>
     </>
   );
