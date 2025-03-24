@@ -15,7 +15,7 @@ fpdf
 scikit-learn
 #xgboost
 folium
-#tensorflow-cpu
+tensorflow-cpu
 statsmodels
 PyJWT
 Flask-Mail

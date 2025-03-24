@@ -20,7 +20,7 @@ from fpdf import FPDF
 from sklearn.cluster import KMeans
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score
-import xgboost as xgb
+#import xgboost as xgb
 import folium
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import LSTM, Dense, Conv1D, Flatten
