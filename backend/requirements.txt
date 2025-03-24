@@ -13,9 +13,9 @@ matplotlib
 seaborn
 fpdf
 scikit-learn
-xgboost
+#xgboost
 folium
-tensorflow-cpu
+#tensorflow-cpu
 statsmodels
 PyJWT
 Flask-Mail
