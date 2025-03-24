@@ -408,7 +408,10 @@ def allowed_file(filename):
     return "." in filename and filename.rsplit(".", 1)[1].lower() in ALLOWED_EXTENSIONS
 
 @app.route("/predict-wildfire", methods=["POST"])
-def predict_wildfire():
+def predict_wildfire(): 
+    """Handles wildfire file uploads and runs the prediction model."""
+
+    # ✅ Step 1: Check if a file is uploaded
     if "file" not in request.files:
         return jsonify({"error": "No file uploaded"}), 400
 
@@ -416,164 +419,177 @@ def predict_wildfire():
     if file.filename == "" or not file.filename.endswith(".csv"):
         return jsonify({"error": "Invalid file format"}), 400
 
+    # ✅ Step 2: Save File Securely
     filename = secure_filename(file.filename)
     file_path = os.path.join(UPLOAD_FOLDER, filename)
     file.save(file_path)
 
+    # ✅ Step 3: Load Dataset
     try:
-        df = pd.read_csv(file_path)
-        df.drop(columns=['Unnamed: 0'], inplace=True, errors='ignore')
-        df['datetime'] = pd.to_datetime(df['acq_date'] + ' ' + df['acq_time'].astype(str).str.zfill(4), format='%Y-%m-%d %H%M')
-        df['confidence'] = df['confidence'].map({'low': 0, 'nominal': 1, 'high': 2})
-        df['confidence'] = df['confidence'].fillna(df['frp'].apply(lambda x: 2 if x > 50 else (1 if x > 20 else 0)))
-        df['risk_level'] = df.apply(lambda row: 2 if row['confidence'] == 2 and row['frp'] > 50 else (1 if row['confidence'] == 1 else 0), axis=1)
-        df['daynight'] = df['daynight'].map({'D': 0, 'N': 1})
+        data = pd.read_csv(file_path)
+    except Exception as e:
+        return jsonify({"error": "Invalid CSV format"}), 400
 
-        features = ['bright_ti4', 'bright_ti5', 'frp', 'latitude', 'longitude', 'daynight']
-        df['intensity_ratio'] = df['bright_ti4'] / df['bright_ti5']
-        df['temp_diff'] = df['bright_ti4'] - df['bright_ti5']
-        df['lat_long_interaction'] = df['latitude'] * df['longitude']
-        df['fire_intensity_ratio'] = df['frp'] / (df['bright_ti4'] + df['bright_ti5'])
-        df['temp_variation'] = abs(df['bright_ti4'] - df['bright_ti5'])
-        df['fire_energy'] = df['frp'] * df['bright_ti4']
+    # ✅ Step 4: Encode Categorical Features
+    categorical_cols = ["satellite", "instrument", "confidence", "version", "daynight"]
+    label_encoders = {}
 
-        kmeans = KMeans(n_clusters=5, random_state=42)
-        df['fire_zone'] = kmeans.fit_predict(df[['latitude', 'longitude']])
-        dbscan = DBSCAN(eps=0.5, min_samples=5)
-        df['fire_zone'] = dbscan.fit_predict(df[['latitude', 'longitude']])
-        df['fire_zone'] = np.where(df['fire_zone'] == -1, 0, df['fire_zone'])
+    for col in categorical_cols:
+        if col in data.columns:
+            le = LabelEncoder()
+            data[col] = le.fit_transform(data[col])
+            label_encoders[col] = le
 
-        model_features = ['bright_ti4', 'bright_ti5', 'latitude', 'longitude', 'intensity_ratio',
-                          'temp_diff', 'lat_long_interaction', 'fire_zone', 'fire_intensity_ratio', 'temp_variation', 'fire_energy']
+    # ✅ Step 5: Apply K-Means Clustering (if location data is available)
+    if "latitude" in data.columns and "longitude" in data.columns:
+        data = data.dropna(subset=["latitude", "longitude"])  
+        kmeans = KMeans(n_clusters=5, random_state=42, n_init=10)
+        data["fire_cluster"] = kmeans.fit_predict(data[["latitude", "longitude"]])
 
-        X = df[model_features]
-        y = df['risk_level']
-        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, stratify=y, random_state=42)
+    # ✅ Step 6: Prepare Data for Model Training
+    if "confidence" not in data.columns:
+        return jsonify({"error": "Dataset is missing the 'confidence' column."}), 400
 
-        smote = SMOTE(sampling_strategy='auto', random_state=42)
-        X_train_resampled, y_train_resampled = smote.fit_resample(X_train, y_train)
+    X_rf = data.select_dtypes(include=[np.number]).drop(columns=["confidence"], errors="ignore")
+    y_rf = data["confidence"]
 
-        model = XGBClassifier(n_estimators=200, max_depth=8, learning_rate=0.1,
-                              objective='multi:softmax', eval_metric='mlogloss', random_state=42)
-        model.fit(X_train_resampled, y_train_resampled)
+    # ✅ Step 7: Train-Test Split
+    X_train, X_test, y_train, y_test = train_test_split(X_rf, y_rf, test_size=0.2, random_state=42)
 
-        # === FUTURE WILDFIRE PREDICTION ===
-        future_days = 30
-        future_dates = pd.date_range(df['datetime'].max(), periods=future_days+1, freq='D')[1:]
+    # ✅ Step 8: Train Random Forest Model
+    rf_model = RandomForestClassifier(n_estimators=100, random_state=42)
+    rf_model.fit(X_train, y_train)
 
-        future_data = []
-        for date in future_dates:
-            for _ in range(50):
-                random_fire = df.sample(1).iloc[0]
-                entry = {
-                    'date': date,
-                    'latitude': random_fire['latitude'] + np.random.uniform(-0.1, 0.1),
-                    'longitude': random_fire['longitude'] + np.random.uniform(-0.1, 0.1),
-                    'bright_ti4': random_fire['bright_ti4'] + np.random.uniform(-5, 5),
-                    'bright_ti5': random_fire['bright_ti5'] + np.random.uniform(-5, 5),
-                    'frp': random_fire['frp'] + np.random.uniform(-10, 10)
-                }
-                future_data.append(entry)
+    # ✅ Step 9: Simulate Future Predictions
+    future_data = X_test.copy()
+    future_data["predicted_confidence"] = rf_model.predict(future_data)
 
-        df_future = pd.DataFrame(future_data)
-        df_future['daynight'] = 0
-        df_future['intensity_ratio'] = df_future['bright_ti4'] / df_future['bright_ti5']
-        df_future['temp_diff'] = df_future['bright_ti4'] - df_future['bright_ti5']
-        df_future['lat_long_interaction'] = df_future['latitude'] * df_future['longitude']
-        df_future['fire_zone'] = 0
-        df_future['fire_intensity_ratio'] = df_future['frp'] / (df_future['bright_ti4'] + df_future['bright_ti5'])
-        df_future['temp_variation'] = abs(df_future['bright_ti4'] - df_future['bright_ti5'])
-        df_future['fire_energy'] = df_future['frp'] * df_future['bright_ti4']
+    # ✅ Step 10: Save Predictions to CSV
+    future_predictions_file = os.path.join(UPLOAD_FOLDER, "future_wildfire_predictions.csv")
+    future_data.to_csv(future_predictions_file, index=False)
 
-        X_future = df_future[model_features]
-        df_future['predicted_risk_level'] = model.predict(X_future)
+    # ✅ Step 11: Generate Graphs & PDF Report
+    pdf = FPDF()
+    pdf.add_page()
+    pdf.set_font("Arial", style="B", size=20)
+    pdf.cell(0, 150, "Wildfire Future Prediction Report", ln=True, align="C")
 
-        csv_file = os.path.join(UPLOAD_FOLDER, "future_wildfire_predictions.csv")
-        df_future.to_csv(csv_file, index=False)
+    # 📊 1. Wildfire Prone Areas (K-Means Clustering)
+    if "fire_cluster" in data.columns:
+        plt.figure(figsize=(10, 6))
+        sns.scatterplot(x=data["longitude"], y=data["latitude"], hue=data["fire_cluster"], palette="coolwarm")
+        plt.xlabel("Longitude")
+        plt.ylabel("Latitude")
+        plt.title("Wildfire Prone Areas (K-Means Clustering)")
+        plt.savefig("fire_clusters.png")
+        pdf.add_page()
+        pdf.image("fire_clusters.png", x=10, y=30, w=180)
+        pdf.set_font("Arial", size=10)
+        pdf.ln(120)
+        pdf.multi_cell(0, 10, "This visualization displays wildfire-prone areas based on K-Means clustering. "
+                       "Each color represents a different cluster, helping in identifying high-risk wildfire zones.")
 
-        # === FUTURE WILDFIRE MAP GENERATION ===
-        map_file = os.path.join(UPLOAD_FOLDER, "future_wildfire_map.html")
-        m = folium.Map(location=[df_future["latitude"].mean(), df_future["longitude"].mean()], zoom_start=5)
-        for _, row in df_future.iterrows():
+    # 📊 2. Feature Importance
+    feature_importance = pd.Series(rf_model.feature_importances_, index=X_rf.columns).sort_values(ascending=False)
+    plt.figure(figsize=(10, 5))
+    sns.barplot(x=feature_importance.values, y=feature_importance.index, palette="viridis")
+    plt.xlabel("Feature Importance")
+    plt.ylabel("Features")
+    plt.title("Important Factors Influencing Wildfire Occurrence")
+    plt.savefig("feature_importance.png")
+    pdf.add_page()
+    pdf.image("feature_importance.png", x=10, y=30, w=180)
+    pdf.set_font("Arial", size=10)
+    pdf.ln(110)
+    pdf.multi_cell(0, 10, "This bar chart represents the key factors influencing wildfire occurrences. "
+                       "Higher values indicate that a feature plays a more significant role in predicting wildfires.")
+
+    # 📊 3. Predictions Distribution
+    plt.figure(figsize=(8, 5))
+    sns.histplot(future_data["predicted_confidence"], bins=3, kde=True, color="red")
+    plt.xlabel("Predicted Fire Confidence Level")
+    plt.ylabel("Count")
+    plt.title("Future Wildfire Predictions Distribution")
+    plt.savefig("prediction_distribution.png")
+    pdf.add_page()
+    pdf.image("prediction_distribution.png", x=10, y=30, w=180)
+    pdf.set_font("Arial", size=10)
+    pdf.ln(140)
+    pdf.multi_cell(0, 10, "This histogram shows the predicted confidence levels of future wildfires. "
+                       "Higher confidence values indicate a higher likelihood of a wildfire occurring in that area.")
+
+    # 📊 4. Top 5 Wildfire-Prone Areas (Before Prediction)
+    plt.figure(figsize=(10, 5))
+    top5_before = data["fire_cluster"].value_counts().nlargest(5)
+    sns.barplot(x=top5_before.index, y=top5_before.values, palette="Blues")
+    plt.xlabel("Cluster ID (Before Prediction)")
+    plt.ylabel("Number of Wildfires")
+    plt.title("Top 5 Wildfire-Prone Areas (Before Prediction)")
+    plt.savefig("top5_before.png")
+    pdf.add_page()
+    pdf.image("top5_before.png", x=10, y=30, w=180)
+    pdf.set_font("Arial", size=10)
+    pdf.ln(110)
+    pdf.multi_cell(0, 10, "This bar chart highlights the top 5 locations most affected by wildfires before prediction. "
+                       "These areas had the highest number of wildfire occurrences in the dataset.")
+
+    # 📊 5. Top 5 Wildfire-Prone Areas (After Prediction)
+    plt.figure(figsize=(10, 5))
+    top5_after = future_data["predicted_confidence"].value_counts().nlargest(5)
+    sns.barplot(x=top5_after.index, y=top5_after.values, palette="Oranges")
+    plt.xlabel("Predicted Fire Confidence Level")
+    plt.ylabel("Count")
+    plt.title("Top 5 Wildfire-Prone Areas (After Prediction)")
+    plt.savefig("top5_after.png")
+    pdf.add_page()
+    pdf.image("top5_after.png", x=10, y=30, w=180)
+    pdf.set_font("Arial", size=10)
+    pdf.ln(110)
+    pdf.multi_cell(0, 10, "This chart displays the predicted top 5 locations where wildfires are most likely to occur. "
+                       "These areas require higher monitoring and preparedness efforts to prevent future disasters.")
+    
+    # ✅ Save the Wildfire Prediction Map in the Uploads Directory
+    map_file = os.path.join(UPLOAD_FOLDER, "wildfire_predictions_map.html")
+
+# Create Map Using Folium
+    if "latitude" in future_data.columns and "longitude" in future_data.columns:
+        m = folium.Map(location=[future_data["latitude"].mean(), future_data["longitude"].mean()], zoom_start=5)
+        for _, row in future_data.iterrows():
             folium.CircleMarker(
-                location=[row["latitude"], row["longitude"]],
-                radius=5,
-                color="red" if row["predicted_risk_level"] == 2 else "orange" if row["predicted_risk_level"] == 1 else "green",
-                fill=True,
-                fill_color="red" if row["predicted_risk_level"] == 2 else "orange" if row["predicted_risk_level"] == 1 else "green",
-                fill_opacity=0.6,
-                popup=folium.Popup(f"<b>Date:</b> {row['date']}<br><b>Latitude:</b> {row['latitude']}<br><b>Longitude:</b> {row['longitude']}<br><b>Predicted Risk Level:</b> {row['predicted_risk_level']}", max_width=300)
+            location=[row["latitude"], row["longitude"]],
+            radius=5,
+            color="red" if row["predicted_confidence"] > 1 else "orange",
+            fill=True,
+            fill_color="red" if row["predicted_confidence"] > 1 else "orange",
+            fill_opacity=0.6,
             ).add_to(m)
         m.save(map_file)
+    else:
+        print("❌ Missing latitude/longitude data. Map cannot be generated.")
 
-        # === GENERATE GRAPHS & REPORT ===
-        graph_paths = []
-        descriptions = [
-            "This bar chart represents the distribution of wildfire risk levels categorized as low (0), moderate (1), and high (2).",
-            "This scatter plot examines the relationship between FRP and Brightness Temperature.",
-            "This heatmap visualizes the spatial distribution of wildfire occurrences.",
-            "This heatmap displays correlations between different numerical features.",
-            "This boxplot shows how FRP varies across different wildfire risk levels."
-        ]
-        titles = [
-            "Class Distribution of Wildfire Risk Levels",
-            "Fire Radiative Power (FRP) vs. Brightness Temperature",
-            "Wildfire Occurrences Heatmap (Latitude vs. Longitude)",
-            "Feature Correlation Heatmap",
-            "Fire Intensity (FRP) Distribution Across Risk Levels"
-        ]
 
-        graphs = [
-            lambda: sns.countplot(x=df['risk_level'], palette='coolwarm'),
-            lambda: sns.scatterplot(data=df, x='bright_ti4', y='frp', hue='risk_level', alpha=0.6, palette='coolwarm'),
-            lambda: sns.kdeplot(x=df['longitude'], y=df['latitude'], cmap="Reds", fill=True, levels=50),
-            lambda: sns.heatmap(df.corr(numeric_only=True), annot=True, cmap="coolwarm", fmt=".2f"),
-            lambda: sns.boxplot(x=df['risk_level'], y=df['frp'], palette='coolwarm')
-        ]
+    # ✅ Set the correct URL for the downloadable map
+    
+    map_download_url = f"{BASE_URL}/download/wildfire_predictions_map.html"
 
-        for i, plot_func in enumerate(graphs):
-            plt.figure(figsize=(10, 6))
-            plot_func()
-            plt.title(titles[i])
-            path = os.path.join(UPLOAD_FOLDER, f"graph{i+1}.png")
-            plt.savefig(path)
-            graph_paths.append(path)
-            plt.close()
+    pdf.add_page()
+    pdf.cell(200, 10, "Interactive Wildfire Prediction Map", ln=True, align="C")
+    pdf.ln(10)
+    pdf.multi_cell(0, 10, "This map represents the predicted locations of wildfires, color-coded based on predicted confidence levels. "
+                       "Red markers indicate a high probability of fire occurrence, while orange markers indicate moderate risk.\n\n")
 
-        pdf = FPDF()
-        pdf.set_auto_page_break(auto=True, margin=15)
-        pdf.add_page()
-        pdf.set_font("Arial", style="B", size=20)
-        pdf.cell(0, 10, "Wildfire Prediction Report", ln=True, align="C")
+    pdf.set_text_color(0, 0, 255)  # Blue color for clickable link
+    pdf.cell(0, 10, "Click here to download the wildfire prediction map", ln=True, link=map_download_url)
+    pdf.set_text_color(0, 0, 0)  # Reset text color
+    pdf_file = os.path.join(UPLOAD_FOLDER, "wildfire_future_predictions_report.pdf")
+    pdf.output(pdf_file)
 
-        for i in range(len(graph_paths)):
-            pdf.add_page()
-            pdf.set_font("Arial", style='B', size=12)
-            pdf.cell(0, 10, titles[i], ln=True)
-            pdf.ln(5)
-            pdf.set_font("Arial", size=10)
-            pdf.multi_cell(0, 5, descriptions[i])
-            pdf.ln(3)
-            pdf.image(graph_paths[i], w=180)
 
-        # Add map link
-        pdf.add_page()
-        pdf.set_font("Arial", size=12)
-        pdf.multi_cell(0, 10, "This map visualizes predicted wildfire risk zones for the next 30 days.")
-        pdf.set_text_color(0, 0, 255)
-        pdf.cell(0, 10, "Open Future Wildfire Map", ln=True, link=f"{BASE_URL}/download/future_wildfire_map.html")
-        pdf.set_text_color(0, 0, 0)
 
-        pdf_file = os.path.join(UPLOAD_FOLDER, "wildfire_future_predictions_report.pdf")
-        pdf.output(pdf_file)
-
-        return jsonify({
-            "csv_file": f"{BASE_URL}/download/future_wildfire_predictions.csv",
-            "pdf_file": f"{BASE_URL}/download/wildfire_future_predictions_report.pdf"
-        }), 200
-
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
+    return jsonify({
+        "csv_file": f"{BASE_URL}/download/future_wildfire_predictions.csv",
+        "pdf_file": f"{BASE_URL}/download/wildfire_future_predictions_report.pdf"
+    }), 200
 
 @app.route("/predict-earthquake", methods=["POST"])
 def predict_earthquake():
