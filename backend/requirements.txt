@@ -13,7 +13,7 @@ matplotlib
 seaborn
 fpdf
 scikit-learn
-xgboost
+xgboost==1.6.2
 folium
 tensorflow-cpu
 statsmodels
