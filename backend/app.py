@@ -1,50 +1,35 @@
-import os
-import random
-import hashlib
-import datetime
-from collections import Counter
-import requests
-import smtplib
-from email.mime.text import MIMEText
-from email.mime.multipart import MIMEMultipart
-
-import pandas as pd
-import numpy as np
-import matplotlib.pyplot as plt
-import seaborn as sns
-import folium
-
 from flask import Flask, request, jsonify, send_file, render_template
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
-from flask_migrate import Migrate
-from flask_mail import Mail, Message
-
-from werkzeug.utils import secure_filename
 from werkzeug.security import generate_password_hash, check_password_hash
-
+from werkzeug.utils import secure_filename
+from flask_migrate import Migrate
 from dotenv import load_dotenv
-
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+import os
+import requests
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
 from sklearn.preprocessing import MinMaxScaler, LabelEncoder
 from sklearn.model_selection import train_test_split
-from sklearn.cluster import KMeans, DBSCAN
-from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
-from sklearn.metrics import accuracy_score
-
-from xgboost import XGBClassifier
-import xgboost as xgb
-
-from imblearn.over_sampling import SMOTE
-
-from statsmodels.tsa.arima.model import ARIMA
-
+import seaborn as sns
 from fpdf import FPDF
-
+from sklearn.cluster import KMeans
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import accuracy_score
+import xgboost as xgb
+import folium
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import LSTM, Dense, Conv1D, Flatten
-
+from sklearn.ensemble import RandomForestRegressor
+from statsmodels.tsa.arima.model import ARIMA
+import hashlib
 import jwt
-
+import datetime
+from flask_mail import Mail, Message
 
 # ✅ Load environment variables
 load_dotenv()
@@ -130,7 +115,7 @@ def contact():
         msg["From"] = SMTP_USERNAME
         msg["To"] = "foresight.usa.noreply@gmail.com" 
         msg["Subject"] = f"Contact Form: {subject}"
-        
+
         msg.attach(MIMEText(f"From: {user_email}\n\n{message_body}", "plain"))
 
         with smtplib.SMTP(SMTP_SERVER, SMTP_PORT) as server:
@@ -379,7 +364,7 @@ OPENWEATHER_API_KEY = os.getenv("OPENWEATHER_API_KEY")
 def get_weather():
     city = request.args.get('q')  # Get city name
     zipcode = request.args.get('zip')  # Get ZIP code
-    
+
     if not city and not zipcode:
         return jsonify({"error": "City or ZIP code is required"}), 400
 
@@ -408,7 +393,7 @@ def allowed_file(filename):
     return "." in filename and filename.rsplit(".", 1)[1].lower() in ALLOWED_EXTENSIONS
 
 @app.route("/predict-wildfire", methods=["POST"])
-def predict_wildfire(): 
+def predict_wildfire():
     """Handles wildfire file uploads and runs the prediction model."""
 
     # ✅ Step 1: Check if a file is uploaded
@@ -547,7 +532,7 @@ def predict_wildfire():
     pdf.ln(110)
     pdf.multi_cell(0, 10, "This chart displays the predicted top 5 locations where wildfires are most likely to occur. "
                        "These areas require higher monitoring and preparedness efforts to prevent future disasters.")
-    
+
     # ✅ Save the Wildfire Prediction Map in the Uploads Directory
     map_file = os.path.join(UPLOAD_FOLDER, "wildfire_predictions_map.html")
 
@@ -569,7 +554,7 @@ def predict_wildfire():
 
 
     # ✅ Set the correct URL for the downloadable map
-    
+
     map_download_url = f"{BASE_URL}/download/wildfire_predictions_map.html"
 
     pdf.add_page()
@@ -617,7 +602,7 @@ def predict_earthquake():
     required_columns = ["latitude", "longitude", "magnitude", "depth"]
     df_clean = df.dropna(subset=required_columns)
     df_clean[["magnitude", "depth", "latitude", "longitude"]] = MinMaxScaler().fit_transform(df_clean[["magnitude", "depth", "latitude", "longitude"]])
-    
+
     time_steps = 15
     features = ["magnitude", "depth"]
     X, y = [], []
@@ -674,7 +659,7 @@ def predict_earthquake():
     plt.ylabel("Number of Earthquakes")
     plt.grid(True)
     plt.savefig("earthquake_occurrences.png")
-    
+
     # Earthquake Magnitude Distribution Heatmap
     plt.figure(figsize=(10, 6))
     scatter = plt.scatter(df_clean['longitude'], df_clean['latitude'], c=df_clean['magnitude'],
@@ -684,7 +669,7 @@ def predict_earthquake():
     plt.ylabel('Latitude')
     plt.colorbar(scatter, label='Magnitude')
     plt.savefig("magnitude_distribution.png")
-    
+
     # Top 10 Most Affected Locations
     df_clean['location'] = df_clean['latitude'].astype(str) + ", " + df_clean['longitude'].astype(str)
     top_locations = df_clean['location'].value_counts().head(10)
@@ -695,7 +680,7 @@ def predict_earthquake():
     plt.title("Top 10 Most Affected Locations")
     plt.grid(axis='x')
     plt.savefig("top_10_affected.png")
-    
+
     # Earthquake Activity Over Years
     df_clean['year'] = df_clean['date_time'].dt.year
     earthquakes_per_year = df_clean.groupby('year').size()
@@ -706,14 +691,14 @@ def predict_earthquake():
     plt.title("Earthquake Occurrences Per Year")
     plt.grid(axis='y')
     plt.savefig("earthquake_per_year.png")
-    
+
     # ✅ Save Graphs into the PDF
     pdf_filename = os.path.join(UPLOAD_FOLDER, "earthquake_report.pdf")
     pdf = FPDF()
     pdf.add_page()
     pdf.set_font("Arial", style="B", size=20)
     pdf.cell(0, 150, "Earthquake Forecasting Report", ln=True, align="C")
-    
+
     graphs = ["earthquake_occurrences.png", "magnitude_distribution.png", "top_10_affected.png", "earthquake_per_year.png"]
     descriptions = [
         "This graph shows the number of earthquakes occurring over time, revealing patterns and trends.",
@@ -721,7 +706,7 @@ def predict_earthquake():
         "This bar chart displays the top 10 locations most affected by earthquakes based on historical data.",
         "This bar chart shows earthquake occurrences per year, helping to understand yearly variations."
     ]
-    
+
     for i, graph in enumerate(graphs):
         if os.path.exists(graph):
             pdf.add_page()
@@ -729,7 +714,7 @@ def predict_earthquake():
             pdf.set_font("Arial", size=10)
             pdf.ln(110)
             pdf.multi_cell(0, 10, descriptions[i])
-    
+
     pdf.output(pdf_filename)
 
     if not os.path.exists(forecast_filename) or not os.path.exists(pdf_filename):
@@ -803,7 +788,7 @@ def predict_tornado():
         plt.savefig("tornado_forecast.png", bbox_inches='tight')
         plt.close()
         forecast_generated = True
-            
+
         future_predictions_file = os.path.join(UPLOAD_FOLDER, "future_tornado_predictions.csv")
         if not os.path.exists(UPLOAD_FOLDER):
             os.makedirs(UPLOAD_FOLDER)  # Create the directory if it does not exist
@@ -819,7 +804,7 @@ def predict_tornado():
 
     # ✅ Step 8: Generate Additional Graphs
     numeric_data = data.select_dtypes(include=[np.number])  # Drop non-numeric columns
-    
+
     visualizations = [
         ("Tornado Occurrences Over the Years", "tornado_trend.png", lambda: tornado_yearly.plot(kind='line', marker='o', color='b')),
         ("Feature Correlation Heatmap", "tornado_heatmap.png", lambda: sns.heatmap(numeric_data.corr(), annot=True, cmap='coolwarm', fmt='.2f')),
@@ -835,7 +820,7 @@ def predict_tornado():
         plt.grid(True)
         plt.savefig(file_name, bbox_inches='tight')
         plt.close()
-    
+
     # ✅ Step 9: Generate Interactive Tornado Map
     map_file = os.path.join(UPLOAD_FOLDER, "tornado_map.html")
     tornado_map = folium.Map(location=[38.0, -97.0], zoom_start=5)
@@ -853,13 +838,13 @@ def predict_tornado():
     pdf.set_font("Arial", "B", 16)
     pdf.cell(200, 10, "Tornado Prediction Report", ln=True, align="C")
     pdf.ln(10)
-    
+
     for title, file_name, _ in visualizations:
         pdf.add_page()
         pdf.cell(200, 10, title, ln=True, align="C")
         pdf.image(file_name, x=10, y=None, w=180)
         pdf.ln(10)
-    
+
     # ✅ Add Interactive Map Link to PDF
     pdf.add_page()
     pdf.cell(200, 10, "Interactive Tornado Prediction Map", ln=True, align="C")
@@ -868,7 +853,7 @@ def predict_tornado():
     pdf.set_text_color(0, 0, 255)
     pdf.cell(0, 10, "Click here to view the interactive tornado prediction map", ln=True, link=f"{BASE_URL}/download/tornado_map.html")
     pdf.set_text_color(0, 0, 0)
-    
+
     pdf_file = os.path.join(UPLOAD_FOLDER, "tornado_report.pdf")
     pdf.output(pdf_file)
 
