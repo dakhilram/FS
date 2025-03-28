@@ -553,13 +553,22 @@ def predict_wildfire():
 
         future_map = folium.Map(location=[df_future["latitude"].mean(), df_future["longitude"].mean()], zoom_start=5)
         for _, row in df_future.iterrows():
+            risk_level = row["predicted_risk_level"]
+            popup_text = f"""
+            <b>Date:</b> {row['date']}<br>
+            <b>Latitude:</b> {row['latitude']}<br>
+            <b>Longitude:</b> {row['longitude']}<br>
+            <b>Predicted Risk Level:</b> {risk_level}
+            """
+
             folium.CircleMarker(
                 location=[row["latitude"], row["longitude"]],
                 radius=5,
                 color=risk_colors[row['predicted_risk_level']],
                 fill=True,
                 fill_color=risk_colors[row['predicted_risk_level']],
-                fill_opacity=0.7
+                fill_opacity=0.7,
+                popup=folium.Popup(popup_text, max_width=300)
             ).add_to(future_map)
         future_map_path = os.path.join(UPLOAD_FOLDER, "future_wildfire_map.html")
         future_map.save(future_map_path)
@@ -575,12 +584,38 @@ def predict_wildfire():
         pdf.ln(10)
 
         descriptions = [
-            "This chart shows class distribution.",
-            "FRP vs brightness scatter plot.",
-            "Wildfire heatmap.",
-            "Feature correlation heatmap.",
-            "FRP vs risk level boxplot."
-        ]
+    ("Class Distribution of Wildfire Risk Levels",
+     "This bar chart represents the distribution of wildfire risk levels categorized as low (0), moderate (1), and high (2)."
+     "The data indicates that low-risk wildfires are the most common, followed by moderate and high-risk incidents."
+     "This imbalance suggests that most fire events in the dataset are not severe, though significant occurrences of moderate and high-risk fires still exist."
+     "The imbalance in risk levels can impact predictive modeling, requiring techniques like SMOTE to ensure better class representation."
+     "The fire radiative power (FRP) and brightness temperatures likely play a crucial role in determining risk levels."
+     "The importance of high-risk wildfires lies in their potential to cause severe environmental and economic damage. Understanding this distribution helps in designing appropriate mitigation and response strategies."
+     "The dataset's risk level classification is essential for forecasting fire-prone areas and preparing for potential fire outbreaks. Such data-driven insights assist in wildfire management, resource allocation, and emergency response."),
+
+    ("Fire Radiative Power (FRP) vs. Brightness Temperature",
+     "This scatter plot examines the relationship between fire radiative power (FRP) and brightness temperature (Ti4), with wildfire risk levels represented using different colors."
+     "Higher brightness temperatures generally correlate with higher FRP values, indicating more intense fire events. High-risk wildfires (risk level 2) appear more frequently in regions with FRP above 50, confirming the importance of fire intensity in risk assessment. "
+     "Some moderate-risk wildfires (risk level 1) overlap with low-risk cases, suggesting a continuum in fire intensity rather than distinct separations. Temperature anomalies in satellite imagery provide an early warning system for detecting active fire zones. "
+     "This graph emphasizes the usefulness of remote sensing in fire detection by linking temperature variations to fire intensity. The concentration of high-risk cases in specific temperature ranges can help calibrate threshold values for predictive models. "
+     "This relationship also validates the use of brightness temperature as a key predictive feature in machine learning models."),
+
+    ("Wildfire Occurrences Heatmap (Latitude vs. Longitude)",
+     "This heatmap visualizes the spatial distribution of wildfire occurrences, highlighting areas with the most frequent fire events. The darker red regions indicate high-density wildfire zones, suggesting repeated fire activity in those locations. Geographic clustering of wildfires may be influenced by factors like dry climate, vegetation type, and human activities."
+     " Such visualizations help in identifying high-risk wildfire-prone areas and prioritizing resource allocation for fire prevention. "
+     " The concentration of fire hotspots suggests that certain regions experience frequent and recurring wildfires, likely due to weather patterns or topography. This heatmap can guide the development of preventive measures and real-time monitoring systems in high-risk zones."
+     "Wildfire intensity may also vary by geographical regions, necessitating different firefighting strategies. Identifying these trends can aid policymakers in formulating better land management and conservation strategies."
+     " This heatmap serves as a vital tool in disaster preparedness and early intervention planning."),
+
+    ("Feature Correlation Heatmap",
+     "This heatmap displays the correlation between different numerical features in the dataset, helping to identify strong relationships between variables. Fire Radiative Power (FRP) and brightness temperature (Ti4 & Ti5) show a strong positive correlation, confirming their significance in wildfire intensity. "
+     "Features with high correlation may indicate redundancy, which is essential when selecting the best predictors for machine learning models. The presence of spatial interaction terms like latitude and longitude provides insight into geographical dependencies in wildfire spread. High correlations between temperature variables suggest that extreme temperature shifts are a key indicator of wildfire activity."
+     " Some variables may have low correlations with wildfire intensity, suggesting they contribute minimally to risk assessment. Understanding these relationships helps in feature selection and model optimization."
+     "This heatmap serves as a diagnostic tool for detecting multicollinearity, which can affect model accuracy. Data scientists use such heatmaps to refine predictive algorithms and improve model performance."),
+
+    ("Fire Intensity (FRP) Distribution Across Risk Levels",
+     "This boxplot illustrates how fire radiative power (FRP) varies across different risk levels, giving insight into wildfire intensity. The median FRP increases with higher risk levels, confirming that high-risk wildfires tend to have significantly greater intensity. The presence of outliers in high-risk cases suggests extreme fire events with exceptionally high FRP values. Moderate-risk wildfires display a wider range of FRP values, indicating variability in their intensity. Low-risk cases generally have lower and less variable FRP, which is expected given their classification. The boxplot helps in detecting thresholds for risk categorization, which can aid in wildfire prediction. Understanding fire intensity variations helps in refining machine learning classification boundaries for risk levels. This visualization also validates the importance of FRP as a key determinant in wildfire severity assessment. The overlap between moderate and high-risk cases suggests the need for additional factors in classification. These findings help in developing more accurate models for wildfire risk prediction.")
+]
 
         for i, path in enumerate(graph_paths):
             pdf.add_page()
@@ -593,6 +628,10 @@ def predict_wildfire():
         pdf.add_page()
         pdf.set_font("Arial", style='B', size=12)
         pdf.cell(0, 10, "Interactive Map: Historical", ln=True)
+        pdf.ln(10)
+        pdf.set_font("Arial", size=10)
+        pdf.multi_cell(0, 8, "This map shows past wildfire occurrences and their respective risk levels based on satellite data.\nClick the link below to open the interactive version in a browser.")
+        pdf.ln(5)
         pdf.set_text_color(0, 0, 255)
         pdf.cell(0, 10, "Click to view Wildfire Map", ln=True, link=f"{BASE_URL}/download/wildfire_map.html")
         pdf.set_text_color(0, 0, 0)
@@ -600,6 +639,10 @@ def predict_wildfire():
         pdf.add_page()
         pdf.set_font("Arial", style='B', size=12)
         pdf.cell(0, 10, "Interactive Map: Future", ln=True)
+        pdf.ln(10)
+        pdf.set_font("Arial", size=10)
+        pdf.multi_cell(0, 8, "This map visualizes predicted wildfire risk zones for the next 30 days.\nClick the link below to open the interactive version in a browser.")
+        pdf.ln(5)
         pdf.set_text_color(0, 0, 255)
         pdf.cell(0, 10, "Click to view Future Wildfire Map", ln=True, link=f"{BASE_URL}/download/future_wildfire_map.html")
         pdf.set_text_color(0, 0, 0)
