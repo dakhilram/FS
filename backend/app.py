@@ -23,10 +23,10 @@ from sklearn.ensemble import RandomForestClassifier
 from xgboost import XGBClassifier
 from imblearn.over_sampling import SMOTE
 import folium
-#from tensorflow.keras.models import Sequential
-#from tensorflow.keras.layers import LSTM, Dense, Conv1D, Flatten
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import LSTM, Dense, Conv1D, Flatten
 #from sklearn.ensemble import RandomForestRegressor
-#from statsmodels.tsa.arima.model import ARIMA
+from statsmodels.tsa.arima.model import ARIMA
 import hashlib
 import jwt
 import datetime
@@ -578,6 +578,292 @@ def predict_wildfire():
         "pdf_file": f"{BASE_URL}/download/wildfire_future_predictions_report.pdf"
     }), 200
 
+@app.route("/predict-earthquake", methods=["POST"])
+def predict_earthquake():
+    if "file" not in request.files:
+        return jsonify({"error": "No file uploaded"}), 400
+
+    file = request.files["file"]
+    if file.filename == "" or not file.filename.endswith(".csv"):
+        return jsonify({"error": "Invalid file format"}), 400
+
+    filename = secure_filename(file.filename)
+    file_path = os.path.join(UPLOAD_FOLDER, filename)
+    file.save(file_path)
+
+    try:
+        df = pd.read_csv(file_path)
+    except Exception:
+        return jsonify({"error": "Invalid CSV format"}), 400
+
+    if "date_time" in df.columns:
+        df["date_time"] = pd.to_datetime(df["date_time"], errors="coerce")
+    else:
+        return jsonify({"error": "Dataset must contain a 'date_time' column."}), 400
+
+    required_columns = ["latitude", "longitude", "magnitude", "depth"]
+    df_clean = df.dropna(subset=required_columns)
+    df_clean[["magnitude", "depth", "latitude", "longitude"]] = MinMaxScaler().fit_transform(df_clean[["magnitude", "depth", "latitude", "longitude"]])
+
+    time_steps = 15
+    features = ["magnitude", "depth"]
+    X, y = [], []
+    for i in range(len(df_clean[features]) - time_steps):
+        X.append(df_clean[features].values[i:i + time_steps])
+        y.append(df_clean[features].values[i + time_steps])
+    X, y = np.array(X), np.array(y)
+
+    model = Sequential([
+        LSTM(50, return_sequences=True, input_shape=(X.shape[1], X.shape[2])),
+        LSTM(50, return_sequences=False),
+        Dense(25),
+        Dense(1)
+    ])
+    model.compile(optimizer='adam', loss='mse')
+    model.fit(X, y, epochs=10, batch_size=16)
+
+    future_steps = 50
+    X_future = df_clean[features].values[-time_steps:].reshape(1, time_steps, len(features))
+    predictions = []
+    for _ in range(future_steps):
+        pred = model.predict(X_future)
+        predictions.append(pred[0][0])
+        new_value = np.array([[pred[0][0], 0]]).reshape(1, 1, 2)
+        X_future = np.append(X_future[:, 1:, :], new_value, axis=1)
+
+    spatial_features = df_clean[['latitude', 'longitude']].values.reshape(-1, 2, 1)
+    cnn_model = Sequential([
+        Conv1D(filters=64, kernel_size=2, activation='relu', input_shape=(2, 1)),
+        Flatten(),
+        Dense(50, activation='relu'),
+        Dense(2)
+    ])
+    cnn_model.compile(optimizer='adam', loss='mse')
+    cnn_model.fit(spatial_features, df_clean[['latitude', 'longitude']].values, epochs=10, batch_size=16)
+
+    future_locations = cnn_model.predict(spatial_features[-future_steps:])
+    forecast_dates = pd.date_range(start=df_clean["date_time"].max(), periods=future_steps, freq='M')
+    forecast_filename = os.path.join(UPLOAD_FOLDER, "earthquake_forecast.csv")
+    forecast_df = pd.DataFrame({
+        'Date': forecast_dates,
+        'Predicted Magnitude': predictions,
+        'Latitude': future_locations[:, 0],
+        'Longitude': future_locations[:, 1]
+    })
+    forecast_df.to_csv(forecast_filename, index=False)
+
+    # ✅ Generate Graphs
+    # Earthquake Occurrences Over Time
+    plt.figure(figsize=(12, 6))
+    df_clean.set_index("date_time").resample("M").size().plot(kind="line", marker="o", color="blue")
+    plt.title("Earthquake Occurrences Over Time")
+    plt.xlabel("Year")
+    plt.ylabel("Number of Earthquakes")
+    plt.grid(True)
+    plt.savefig("earthquake_occurrences.png")
+
+    # Earthquake Magnitude Distribution Heatmap
+    plt.figure(figsize=(10, 6))
+    scatter = plt.scatter(df_clean['longitude'], df_clean['latitude'], c=df_clean['magnitude'],
+                           s=df_clean['magnitude'] * 20, cmap='coolwarm', alpha=0.6, edgecolor="k")
+    plt.title('Earthquake Magnitude Distribution')
+    plt.xlabel('Longitude')
+    plt.ylabel('Latitude')
+    plt.colorbar(scatter, label='Magnitude')
+    plt.savefig("magnitude_distribution.png")
+
+    # Top 10 Most Affected Locations
+    df_clean['location'] = df_clean['latitude'].astype(str) + ", " + df_clean['longitude'].astype(str)
+    top_locations = df_clean['location'].value_counts().head(10)
+    plt.figure(figsize=(12, 6))
+    sns.barplot(x=top_locations.values, y=top_locations.index, palette="viridis")
+    plt.xlabel("Number of Earthquakes")
+    plt.ylabel("Location (Lat, Long)")
+    plt.title("Top 10 Most Affected Locations")
+    plt.grid(axis='x')
+    plt.savefig("top_10_affected.png")
+
+    # Earthquake Activity Over Years
+    df_clean['year'] = df_clean['date_time'].dt.year
+    earthquakes_per_year = df_clean.groupby('year').size()
+    plt.figure(figsize=(12, 6))
+    earthquakes_per_year.plot(kind='bar', color='coral', edgecolor='black')
+    plt.xlabel("Year")
+    plt.ylabel("Number of Earthquakes")
+    plt.title("Earthquake Occurrences Per Year")
+    plt.grid(axis='y')
+    plt.savefig("earthquake_per_year.png")
+
+    # ✅ Save Graphs into the PDF
+    pdf_filename = os.path.join(UPLOAD_FOLDER, "earthquake_report.pdf")
+    pdf = FPDF()
+    pdf.add_page()
+    pdf.set_font("Arial", style="B", size=20)
+    pdf.cell(0, 150, "Earthquake Forecasting Report", ln=True, align="C")
+
+    graphs = ["earthquake_occurrences.png", "magnitude_distribution.png", "top_10_affected.png", "earthquake_per_year.png"]
+    descriptions = [
+        "This graph shows the number of earthquakes occurring over time, revealing patterns and trends.",
+        "This scatter plot represents earthquake magnitudes at different locations, with color indicating intensity.",
+        "This bar chart displays the top 10 locations most affected by earthquakes based on historical data.",
+        "This bar chart shows earthquake occurrences per year, helping to understand yearly variations."
+    ]
+
+    for i, graph in enumerate(graphs):
+        if os.path.exists(graph):
+            pdf.add_page()
+            pdf.image(graph, x=10, y=30, w=180)
+            pdf.set_font("Arial", size=10)
+            pdf.ln(110)
+            pdf.multi_cell(0, 10, descriptions[i])
+
+    pdf.output(pdf_filename)
+
+    if not os.path.exists(forecast_filename) or not os.path.exists(pdf_filename):
+        return jsonify({"error": "Generated report files not found."}), 500
+
+    return jsonify({
+        "csv_file": f"{BASE_URL}/download/earthquake_forecast.csv",
+        "pdf_file": f"{BASE_URL}/download/earthquake_report.pdf"
+    }), 200
+
+
+
+@app.route("/predict-tornado", methods=["POST"])
+def predict_tornado():
+    """Handles tornado file uploads and runs the prediction model."""
+
+    # ✅ Step 1: Check if a file is uploaded
+    if "file" not in request.files:
+        return jsonify({"error": "No file uploaded"}), 400
+
+    file = request.files["file"]
+    if file.filename == "" or not file.filename.endswith(".csv"):
+        return jsonify({"error": "Invalid file format"}), 400
+
+    # ✅ Step 2: Save File Securely
+    filename = secure_filename(file.filename)
+    file_path = os.path.join(UPLOAD_FOLDER, filename)
+    file.save(file_path)
+
+    # ✅ Step 3: Load Dataset
+    try:
+        data = pd.read_csv(file_path)
+    except Exception as e:
+        return jsonify({"error": "Invalid CSV format"}), 400
+
+    # ✅ Step 4: Ensure Required Columns Exist
+    required_columns = ['yr', 'mo', 'dy', 'slat', 'slon', 'len', 'wid', 'mag', 'fat', 'st']
+    missing_columns = [col for col in required_columns if col not in data.columns]
+    if missing_columns:
+        return jsonify({"error": f"Missing required columns: {missing_columns}"}), 400
+
+    # ✅ Step 5: Data Preprocessing
+    data = data[required_columns].dropna()
+    scaler = MinMaxScaler()
+    numeric_cols = ['len', 'wid', 'mag', 'fat']
+    data[numeric_cols] = scaler.fit_transform(data[numeric_cols])
+
+    # ✅ Step 6: Tornado Yearly Occurrences
+    tornado_yearly = data.groupby('yr').size()
+
+    # ✅ Fix: Convert 'yr' to DateTime index
+    tornado_yearly.index = pd.to_datetime(tornado_yearly.index, format='%Y')
+
+    # ✅ Step 7: ARIMA Forecasting for Next 10 Years
+    forecast_generated = False
+    if len(tornado_yearly) > 10:
+        model_arima = ARIMA(tornado_yearly, order=(5,1,0))
+        model_arima_fit = model_arima.fit()
+        forecast_years = 10
+        future_years = pd.date_range(start=tornado_yearly.index[-1] + pd.DateOffset(years=1), periods=forecast_years, freq='Y')
+        forecast_arima = model_arima_fit.forecast(steps=forecast_years)
+
+        plt.figure(figsize=(10, 5))
+        plt.plot(tornado_yearly.index, tornado_yearly.values, label="Actual Tornado Occurrences", marker='o', linestyle='-')
+        plt.plot(future_years, forecast_arima, label="Forecasted Tornado Occurrences", marker='o', linestyle='--', color='red')
+        plt.xlabel("Year")
+        plt.ylabel("Number of Tornadoes")
+        plt.title("Tornado Occurrence Forecast (Next 10 Years)")
+        plt.legend()
+        plt.grid(True)
+        plt.savefig("tornado_forecast.png", bbox_inches='tight')
+        plt.close()
+        forecast_generated = True
+
+        future_predictions_file = os.path.join(UPLOAD_FOLDER, "future_tornado_predictions.csv")
+        if not os.path.exists(UPLOAD_FOLDER):
+            os.makedirs(UPLOAD_FOLDER)  # Create the directory if it does not exist
+
+        # ✅ Create a DataFrame for Future Predictions
+        future_data = pd.DataFrame({
+            "Year": future_years.astype(str),
+            "Predicted Tornadoes": forecast_arima
+        })
+
+    # ✅ Save to CSV
+        future_data.to_csv(future_predictions_file, index=False)
+
+    # ✅ Step 8: Generate Additional Graphs
+    numeric_data = data.select_dtypes(include=[np.number])  # Drop non-numeric columns
+
+    visualizations = [
+        ("Tornado Occurrences Over the Years", "tornado_trend.png", lambda: tornado_yearly.plot(kind='line', marker='o', color='b')),
+        ("Feature Correlation Heatmap", "tornado_heatmap.png", lambda: sns.heatmap(numeric_data.corr(), annot=True, cmap='coolwarm', fmt='.2f')),
+        ("Tornado Magnitude Distribution", "tornado_magnitude.png", lambda: sns.histplot(data['mag'], bins=10, kde=True, color='g')),
+        ("Tornado Width Distribution", "tornado_width.png", lambda: sns.histplot(data['wid'], bins=10, kde=True, color='purple')),
+        ("Tornado Length Distribution", "tornado_length.png", lambda: sns.histplot(data['len'], bins=10, kde=True, color='orange'))
+    ]
+
+    for title, file_name, plot_func in visualizations:
+        plt.figure(figsize=(10, 5))
+        plot_func()  # Call the function to generate the plot
+        plt.title(title)
+        plt.grid(True)
+        plt.savefig(file_name, bbox_inches='tight')
+        plt.close()
+
+    # ✅ Step 9: Generate Interactive Tornado Map
+    map_file = os.path.join(UPLOAD_FOLDER, "tornado_map.html")
+    tornado_map = folium.Map(location=[38.0, -97.0], zoom_start=5)
+    for _, row in data.iterrows():
+        folium.Marker(
+            location=[row['slat'], row['slon']],
+            popup=f"Magnitude: {row['mag']} | Width: {row['wid']}m | Length: {row['len']}km",
+            icon=folium.Icon(color='red', icon='cloud')
+        ).add_to(tornado_map)
+    tornado_map.save(map_file)
+
+    # ✅ Step 10: Generate PDF Report
+    pdf = FPDF()
+    pdf.add_page()
+    pdf.set_font("Arial", "B", 16)
+    pdf.cell(200, 10, "Tornado Prediction Report", ln=True, align="C")
+    pdf.ln(10)
+
+    for title, file_name, _ in visualizations:
+        pdf.add_page()
+        pdf.cell(200, 10, title, ln=True, align="C")
+        pdf.image(file_name, x=10, y=None, w=180)
+        pdf.ln(10)
+
+    # ✅ Add Interactive Map Link to PDF
+    pdf.add_page()
+    pdf.cell(200, 10, "Interactive Tornado Prediction Map", ln=True, align="C")
+    pdf.ln(10)
+    pdf.multi_cell(0, 10, "This map shows the locations of tornadoes based on recorded data.")
+    pdf.set_text_color(0, 0, 255)
+    pdf.cell(0, 10, "Click here to view the interactive tornado prediction map", ln=True, link=f"{BASE_URL}/download/tornado_map.html")
+    pdf.set_text_color(0, 0, 0)
+
+    pdf_file = os.path.join(UPLOAD_FOLDER, "tornado_report.pdf")
+    pdf.output(pdf_file)
+
+    # ✅ Step 11: Return JSON Response with File URLs
+    return jsonify({
+        "csv_file": f"{BASE_URL}/download/future_tornado_predictions.csv",
+        "pdf_file": f"{BASE_URL}/download/tornado_report.pdf"
+    }), 200
 
 
 
