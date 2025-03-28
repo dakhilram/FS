@@ -17,7 +17,8 @@ import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
 import seaborn as sns
 from fpdf import FPDF
-#from sklearn.cluster import KMeans
+from sklearn.cluster import KMeans, DBSCAN
+from collections import Counter
 #from sklearn.ensemble import RandomForestClassifier
 #from sklearn.metrics import accuracy_score
 from xgboost import XGBClassifier
@@ -427,75 +428,91 @@ def predict_wildfire():
         df['risk_level'] = df.apply(assign_risk, axis=1)
 
         df['intensity_ratio'] = df['bright_ti4'] / df['bright_ti5']
-        df['temp_diff'] = df['bright_ti4'] - df['bright_ti5']
-        df['lat_long_interaction'] = df['latitude'] * df['longitude']
-        df['fire_intensity_ratio'] = df['frp'] / (df['bright_ti4'] + df['bright_ti5'])
-        df['temp_variation'] = abs(df['bright_ti4'] - df['bright_ti5'])
-        df['fire_energy'] = df['frp'] * df['bright_ti4']
-
-        features = ['bright_ti4', 'bright_ti5', 'latitude', 'longitude', 'intensity_ratio', 'temp_diff', 'lat_long_interaction', 'fire_intensity_ratio', 'temp_variation', 'fire_energy']
+        features = ['bright_ti4', 'bright_ti5', 'latitude', 'longitude', 'daynight', 'intensity_ratio']
         X = df[features]
         y = df['risk_level']
         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, stratify=y, random_state=42)
 
+        df['temp_diff'] = df['bright_ti4'] - df['bright_ti5']
+        df['lat_long_interaction'] = df['latitude'] * df['longitude']
+        features.extend(['temp_diff', 'lat_long_interaction'])
+
         smote = SMOTE(sampling_strategy='auto', random_state=42)
         X_train_resampled, y_train_resampled = smote.fit_resample(X_train, y_train)
 
-        model = XGBClassifier(
-            n_estimators=200,
-            max_depth=8,
-            learning_rate=0.1,
-            objective='multi:softmax',
-            eval_metric='mlogloss',
-            random_state=42
-        )
+        kmeans = KMeans(n_clusters=5, random_state=42)
+        df['fire_zone'] = kmeans.fit_predict(df[['latitude', 'longitude']])
+        dbscan = DBSCAN(eps=0.5, min_samples=5)
+        df['fire_zone'] = dbscan.fit_predict(df[['latitude', 'longitude']])
+        df['fire_zone'] = np.where(df['fire_zone'] == -1, 0, df['fire_zone'])
+        features.append('fire_zone')
+
+        class_counts = Counter(y_train_resampled)
+        smote = SMOTE(sampling_strategy={1: int(class_counts[0] * 0.8)}, random_state=42)
+        X_train_resampled, y_train_resampled = smote.fit_resample(X_train, y_train)
+
+        df['fire_intensity_ratio'] = df['frp'] / (df['bright_ti4'] + df['bright_ti5'])
+        df['temp_variation'] = abs(df['bright_ti4'] - df['bright_ti5'])
+        df['fire_energy'] = df['frp'] * df['bright_ti4']
+        features.extend(['fire_intensity_ratio', 'temp_variation', 'fire_energy'])
+
+        model = XGBClassifier(n_estimators=200, max_depth=8, learning_rate=0.1, objective='multi:softmax', eval_metric='mlogloss', random_state=42)
         model.fit(X_train_resampled, y_train_resampled)
+
+        y_pred_probs = model.predict_proba(X_test)
+        y_pred_adjusted = np.argmax(y_pred_probs, axis=1)
+        y_pred_adjusted[(y_pred_probs[:,1] > 0.35)] = 1
+        y_pred_adjusted[(y_pred_probs[:,2] > 0.4)] = 2
 
         y_pred = model.predict(X_test)
         df_predictions = X_test.copy()
         df_predictions['Predicted_Risk_Level'] = y_pred
-        prediction_csv = os.path.join(UPLOAD_FOLDER, "future_wildfire_predictions.csv")
-        df_predictions.to_csv(prediction_csv, index=False)
+        df_predictions.to_csv(os.path.join(UPLOAD_FOLDER, "wildfire_predictions.csv"), index=False)
 
-        # Generate Graphs
+        # === Graphs Generation ===
         graph_paths = []
 
         plt.figure(figsize=(8, 5))
         sns.countplot(x=df['risk_level'], palette='coolwarm')
         plt.title("Class Distribution of Wildfire Risk Levels")
-        graph_paths.append(os.path.join(UPLOAD_FOLDER, "graph1_class_distribution.png"))
-        plt.savefig(graph_paths[-1])
+        graph_path1 = os.path.join(UPLOAD_FOLDER, "graph1_class_distribution.png")
+        plt.savefig(graph_path1)
+        graph_paths.append(graph_path1)
         plt.close()
 
         plt.figure(figsize=(8, 5))
         sns.scatterplot(data=df, x='bright_ti4', y='frp', hue='risk_level', alpha=0.6, palette='coolwarm')
         plt.title("Fire Radiative Power (FRP) vs. Brightness Temperature")
-        graph_paths.append(os.path.join(UPLOAD_FOLDER, "graph2_frp_vs_brightness.png"))
-        plt.savefig(graph_paths[-1])
+        graph_path2 = os.path.join(UPLOAD_FOLDER, "graph2_frp_vs_brightness.png")
+        plt.savefig(graph_path2)
+        graph_paths.append(graph_path2)
         plt.close()
 
         plt.figure(figsize=(10, 6))
         sns.kdeplot(x=df['longitude'], y=df['latitude'], cmap="Reds", fill=True, levels=50)
         plt.title("Wildfire Occurrences Heatmap (Latitude vs. Longitude)")
-        graph_paths.append(os.path.join(UPLOAD_FOLDER, "graph3_fire_heatmap.png"))
-        plt.savefig(graph_paths[-1])
+        graph_path3 = os.path.join(UPLOAD_FOLDER, "graph3_fire_heatmap.png")
+        plt.savefig(graph_path3)
+        graph_paths.append(graph_path3)
         plt.close()
 
         plt.figure(figsize=(10, 6))
         sns.heatmap(df.corr(numeric_only=True), annot=True, cmap="coolwarm", fmt=".2f")
         plt.title("Feature Correlation Heatmap")
-        graph_paths.append(os.path.join(UPLOAD_FOLDER, "graph4_feature_correlation.png"))
-        plt.savefig(graph_paths[-1])
+        graph_path4 = os.path.join(UPLOAD_FOLDER, "graph4_feature_correlation.png")
+        plt.savefig(graph_path4)
+        graph_paths.append(graph_path4)
         plt.close()
 
         plt.figure(figsize=(8, 5))
         sns.boxplot(x=df['risk_level'], y=df['frp'], palette='coolwarm')
         plt.title("Fire Intensity (FRP) Distribution Across Risk Levels")
-        graph_paths.append(os.path.join(UPLOAD_FOLDER, "graph5_frp_vs_risk.png"))
-        plt.savefig(graph_paths[-1])
+        graph_path5 = os.path.join(UPLOAD_FOLDER, "graph5_frp_vs_risk.png")
+        plt.savefig(graph_path5)
+        graph_paths.append(graph_path5)
         plt.close()
 
-        # Generate Historical Wildfire Map
+        # === Historical Map ===
         risk_colors = {0: "green", 1: "orange", 2: "red"}
         map_center = [df["latitude"].mean(), df["longitude"].mean()]
         wildfire_map = folium.Map(location=map_center, zoom_start=5)
@@ -511,7 +528,7 @@ def predict_wildfire():
         wildfire_map_path = os.path.join(UPLOAD_FOLDER, "wildfire_map.html")
         wildfire_map.save(wildfire_map_path)
 
-        # Generate Future Wildfire Map
+        # === Future Predictions & Map ===
         future_days = 30
         future_dates = pd.date_range(df['datetime'].max(), periods=future_days + 1, freq='D')[1:]
         future_data = []
@@ -547,7 +564,9 @@ def predict_wildfire():
         future_map_path = os.path.join(UPLOAD_FOLDER, "future_wildfire_map.html")
         future_map.save(future_map_path)
 
-        # Generate PDF
+        df_future.to_csv(os.path.join(UPLOAD_FOLDER, "future_wildfire_predictions.csv"), index=False)
+
+        # === PDF Report ===
         pdf = FPDF()
         pdf.set_auto_page_break(auto=True, margin=15)
         pdf.add_page()
@@ -555,10 +574,20 @@ def predict_wildfire():
         pdf.cell(200, 10, "Wildfire Prediction Report", ln=True, align='C')
         pdf.ln(10)
 
+        descriptions = [
+            "This chart shows class distribution.",
+            "FRP vs brightness scatter plot.",
+            "Wildfire heatmap.",
+            "Feature correlation heatmap.",
+            "FRP vs risk level boxplot."
+        ]
+
         for i, path in enumerate(graph_paths):
             pdf.add_page()
             pdf.set_font("Arial", style='B', size=12)
             pdf.cell(0, 10, f"Graph {i+1}", ln=True)
+            pdf.set_font("Arial", size=10)
+            pdf.multi_cell(0, 5, descriptions[i])
             pdf.image(path, w=180)
 
         pdf.add_page()
@@ -575,15 +604,13 @@ def predict_wildfire():
         pdf.cell(0, 10, "Click to view Future Wildfire Map", ln=True, link=f"{BASE_URL}/download/future_wildfire_map.html")
         pdf.set_text_color(0, 0, 0)
 
-        pdf_file = os.path.join(UPLOAD_FOLDER, "wildfire_report.pdf")
-        pdf.output(pdf_file)
-
+        pdf.output(os.path.join(UPLOAD_FOLDER, "wildfire_report.pdf"))
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
     return jsonify({
-        "csv_file": f"{BASE_URL}/download/future_wildfire_predictions.csv",
-        "pdf_file": f"{BASE_URL}/download/wildfire_report.pdf"
+            "csv_file": f"{BASE_URL}/download/future_wildfire_predictions.csv",
+            "pdf_file": f"{BASE_URL}/download/wildfire_report.pdf",
     }), 200
 
 
