@@ -13,7 +13,10 @@ matplotlib
 seaborn
 fpdf
 scikit-learn
+xgboost
 folium
+tensorflow-cpu
 statsmodels
 PyJWT
 Flask-Mail
+imblearn
