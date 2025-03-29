@@ -623,7 +623,8 @@ def predict_wildfire():
             pdf.set_font("Arial", style='B', size=12)
             pdf.cell(0, 10, f"Graph {i+1}", ln=True)
             pdf.set_font("Arial", size=10)
-            pdf.multi_cell(0, 5, descriptions[i])
+            pdf.cell(0, 10, f"Graph {i+1}: {descriptions[i][0]}", ln=True)
+            pdf.multi_cell(0, 5, descriptions[i][1])
             pdf.image(path, w=180)
 
         pdf.add_page()
