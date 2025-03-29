@@ -32,6 +32,7 @@ import hashlib
 import jwt
 import datetime
 from flask_mail import Mail, Message
+import traceback
 
 # ✅ Load environment variables
 load_dotenv()
@@ -649,7 +650,9 @@ def predict_wildfire():
 
         pdf.output(os.path.join(UPLOAD_FOLDER, "wildfire_report.pdf"))
     except Exception as e:
+        traceback.print_exc()  # ⬅️ Add this line to print full error in logs
         return jsonify({"error": str(e)}), 500
+
 
     return jsonify({
             "csv_file": f"{BASE_URL}/download/future_wildfire_predictions.csv",
