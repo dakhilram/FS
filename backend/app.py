@@ -362,8 +362,8 @@ def delete_account():
 
     return jsonify({"message": "Account deleted successfully"}), 200
 
-#OPENWEATHER_API_KEY = os.getenv("OPENWEATHER_API_KEY")
-OPENWEATHER_API_KEY = "9d5acc1d1bff9b8ef76a089b7f0b7a60"
+OPENWEATHER_API_KEY = os.getenv("OPENWEATHER_API_KEY")
+#OPENWEATHER_API_KEY = "9d5acc1d1bff9b8ef76a089b7f0b7a60"
 
 @app.route('/weather', methods=['GET'])
 def get_weather():
@@ -380,10 +380,12 @@ def get_weather():
         geo_url = f"http://api.openweathermap.org/geo/1.0/direct?q={city}&limit=1&appid={OPENWEATHER_API_KEY}"
 
     geo_response = requests.get(geo_url)
-    geo_data = geo_response.json()
+    if geo_response.status_code != 200:
+        return jsonify({"error": "Failed to get coordinates"}), geo_response.status_code
 
-    if geo_response.status_code != 200 or not geo_data:
-        return jsonify({"error": "Failed to get coordinates for location"}), 400
+    geo_data = geo_response.json()
+    if not geo_data:
+        return jsonify({"error": "Invalid location"}), 400
 
     if zipcode:
         lat = geo_data['lat']
@@ -392,24 +394,22 @@ def get_weather():
     else:
         lat = geo_data[0]['lat']
         lon = geo_data[0]['lon']
-        location_name = geo_data[0]['name']
+        location_name = geo_data[0].get('name', city)
 
     # Step 2: Call One Call API 3.0 with lat/lon
-    weather_url = (
-        f"https://api.openweathermap.org/data/3.0/onecall"
-        f"?lat={lat}&lon={lon}"
-        f"&exclude=minutely"  # we'll keep current, hourly, daily, alerts
+    one_call_url = (
+        f"https://api.openweathermap.org/data/3.0/onecall?"
+        f"lat={lat}&lon={lon}"
+        f"&exclude=minutely"
         f"&units=metric"
         f"&appid={OPENWEATHER_API_KEY}"
     )
 
-    weather_response = requests.get(weather_url)
-    weather_data = weather_response.json()
-
+    weather_response = requests.get(one_call_url)
     if weather_response.status_code != 200:
         return jsonify({"error": "Failed to fetch weather data"}), weather_response.status_code
 
-    # Add location name and coordinates for frontend
+    weather_data = weather_response.json()
     weather_data["location"] = {
         "name": location_name,
         "lat": lat,
