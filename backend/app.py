@@ -362,7 +362,8 @@ def delete_account():
 
     return jsonify({"message": "Account deleted successfully"}), 200
 
-OPENWEATHER_API_KEY = os.getenv("OPENWEATHER_API_KEY")
+#OPENWEATHER_API_KEY = os.getenv("OPENWEATHER_API_KEY")
+OPENWEATHER_API_KEY = "9d5acc1d1bff9b8ef76a089b7f0b7a60"
 
 @app.route('/weather', methods=['GET'])
 def get_weather():
