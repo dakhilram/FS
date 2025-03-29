@@ -363,26 +363,59 @@ def delete_account():
     return jsonify({"message": "Account deleted successfully"}), 200
 
 OPENWEATHER_API_KEY = os.getenv("OPENWEATHER_API_KEY")
+
 @app.route('/weather', methods=['GET'])
 def get_weather():
-    city = request.args.get('q')  # Get city name
-    zipcode = request.args.get('zip')  # Get ZIP code
+    city = request.args.get('q')
+    zipcode = request.args.get('zip')
 
     if not city and not zipcode:
         return jsonify({"error": "City or ZIP code is required"}), 400
 
+    # Step 1: Convert to lat/lon using Geocoding API
     if zipcode:
-        url = f"http://api.openweathermap.org/data/2.5/weather?zip={zipcode},US&appid={OPENWEATHER_API_KEY}&units=metric"
+        geo_url = f"http://api.openweathermap.org/geo/1.0/zip?zip={zipcode},US&appid={OPENWEATHER_API_KEY}"
     else:
-        url = f"http://api.openweathermap.org/data/2.5/weather?q={city}&appid={OPENWEATHER_API_KEY}&units=metric"
+        geo_url = f"http://api.openweathermap.org/geo/1.0/direct?q={city}&limit=1&appid={OPENWEATHER_API_KEY}"
 
-    response = requests.get(url)
-    data = response.json()
+    geo_response = requests.get(geo_url)
+    geo_data = geo_response.json()
 
-    if response.status_code != 200:
-        return jsonify({"error": data.get("message", "Failed to fetch weather data")}), response.status_code
+    if geo_response.status_code != 200 or not geo_data:
+        return jsonify({"error": "Failed to get coordinates for location"}), 400
 
-    return jsonify(data)
+    if zipcode:
+        lat = geo_data['lat']
+        lon = geo_data['lon']
+        location_name = geo_data.get('name', zipcode)
+    else:
+        lat = geo_data[0]['lat']
+        lon = geo_data[0]['lon']
+        location_name = geo_data[0]['name']
+
+    # Step 2: Call One Call API 3.0 with lat/lon
+    weather_url = (
+        f"https://api.openweathermap.org/data/3.0/onecall"
+        f"?lat={lat}&lon={lon}"
+        f"&exclude=minutely"  # we'll keep current, hourly, daily, alerts
+        f"&units=metric"
+        f"&appid={OPENWEATHER_API_KEY}"
+    )
+
+    weather_response = requests.get(weather_url)
+    weather_data = weather_response.json()
+
+    if weather_response.status_code != 200:
+        return jsonify({"error": "Failed to fetch weather data"}), weather_response.status_code
+
+    # Add location name and coordinates for frontend
+    weather_data["location"] = {
+        "name": location_name,
+        "lat": lat,
+        "lon": lon
+    }
+
+    return jsonify(weather_data)
 
 # ✅ Fetch WIldFire Data
 UPLOAD_FOLDER = "uploads"
