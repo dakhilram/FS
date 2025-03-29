@@ -586,16 +586,16 @@ def predict_wildfire():
 
         descriptions = [
     ("Class Distribution of Wildfire Risk Levels",
-     "This bar chart represents the distribution of wildfire risk levels categorized as low (0), moderate (1), and high (2)."
-     "The data indicates that low-risk wildfires are the most common, followed by moderate and high-risk incidents."
-     "This imbalance suggests that most fire events in the dataset are not severe, though significant occurrences of moderate and high-risk fires still exist."
-     "The imbalance in risk levels can impact predictive modeling, requiring techniques like SMOTE to ensure better class representation."
-     "The fire radiative power (FRP) and brightness temperatures likely play a crucial role in determining risk levels."
-     "The importance of high-risk wildfires lies in their potential to cause severe environmental and economic damage. Understanding this distribution helps in designing appropriate mitigation and response strategies."
+     "This bar chart represents the distribution of wildfire risk levels categorized as low (0), moderate (1), and high (2). "
+     "The data indicates that low-risk wildfires are the most common, followed by moderate and high-risk incidents. "
+     "This imbalance suggests that most fire events in the dataset are not severe, though significant occurrences of moderate and high-risk fires still exist. "
+     "The imbalance in risk levels can impact predictive modeling, requiring techniques like SMOTE to ensure better class representation. "
+     "The fire radiative power (FRP) and brightness temperatures likely play a crucial role in determining risk levels. "
+     "The importance of high-risk wildfires lies in their potential to cause severe environmental and economic damage. Understanding this distribution helps in designing appropriate mitigation and response strategies. "
      "The dataset's risk level classification is essential for forecasting fire-prone areas and preparing for potential fire outbreaks. Such data-driven insights assist in wildfire management, resource allocation, and emergency response."),
 
     ("Fire Radiative Power (FRP) vs. Brightness Temperature",
-     "This scatter plot examines the relationship between fire radiative power (FRP) and brightness temperature (Ti4), with wildfire risk levels represented using different colors."
+     "This scatter plot examines the relationship between fire radiative power (FRP) and brightness temperature (Ti4), with wildfire risk levels represented using different colors. "
      "Higher brightness temperatures generally correlate with higher FRP values, indicating more intense fire events. High-risk wildfires (risk level 2) appear more frequently in regions with FRP above 50, confirming the importance of fire intensity in risk assessment. "
      "Some moderate-risk wildfires (risk level 1) overlap with low-risk cases, suggesting a continuum in fire intensity rather than distinct separations. Temperature anomalies in satellite imagery provide an early warning system for detecting active fire zones. "
      "This graph emphasizes the usefulness of remote sensing in fire detection by linking temperature variations to fire intensity. The concentration of high-risk cases in specific temperature ranges can help calibrate threshold values for predictive models. "
@@ -610,8 +610,8 @@ def predict_wildfire():
 
     ("Feature Correlation Heatmap",
      "This heatmap displays the correlation between different numerical features in the dataset, helping to identify strong relationships between variables. Fire Radiative Power (FRP) and brightness temperature (Ti4 & Ti5) show a strong positive correlation, confirming their significance in wildfire intensity. "
-     "Features with high correlation may indicate redundancy, which is essential when selecting the best predictors for machine learning models. The presence of spatial interaction terms like latitude and longitude provides insight into geographical dependencies in wildfire spread. High correlations between temperature variables suggest that extreme temperature shifts are a key indicator of wildfire activity."
-     " Some variables may have low correlations with wildfire intensity, suggesting they contribute minimally to risk assessment. Understanding these relationships helps in feature selection and model optimization."
+     "Features with high correlation may indicate redundancy, which is essential when selecting the best predictors for machine learning models. The presence of spatial interaction terms like latitude and longitude provides insight into geographical dependencies in wildfire spread. High correlations between temperature variables suggest that extreme temperature shifts are a key indicator of wildfire activity. "
+     "Some variables may have low correlations with wildfire intensity, suggesting they contribute minimally to risk assessment. Understanding these relationships helps in feature selection and model optimization. "
      "This heatmap serves as a diagnostic tool for detecting multicollinearity, which can affect model accuracy. Data scientists use such heatmaps to refine predictive algorithms and improve model performance."),
 
     ("Fire Intensity (FRP) Distribution Across Risk Levels",
