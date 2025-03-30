@@ -1,97 +1,80 @@
 /* Alerts.css */
 
+/* Base styles */
 .alerts-container {
-  max-width: 1000px;
-  margin: 2rem auto;
-  padding: 1rem 2rem;
-  background: #f8f9fa;
-  border-radius: 10px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  padding: 1rem;
+  color: #fff;
+  min-height: 100vh;
+  transition: background 0.5s ease-in-out;
 }
 
 .alerts-header {
   text-align: center;
   font-size: 2rem;
   margin-bottom: 1rem;
-  color: #333;
+  color: #27619c;
 }
+
 
 .search-box {
   display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
   justify-content: center;
+  gap: 1rem;
   margin-bottom: 1rem;
 }
 
 .search-box input {
-  padding: 0.6rem 1rem;
+  padding: 0.5rem;
   font-size: 1rem;
-  border: 2px solid #ccc;
-  border-radius: 6px;
-  width: 250px;
-}
-
-.get-alerts,
-.refresh-btn {
-  padding: 0.6rem 1.2rem;
-  font-size: 1rem;
-  background-color: #007bff;
-  color: white;
+  border-radius: 5px;
   border: none;
-  border-radius: 6px;
+}
+
+.get-alerts, .refresh-btn {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 5px;
+  background-color: #1e90ff;
+  color: #fff;
   cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 5px;
 }
 
-.refresh-btn {
-  background-color: #28a745;
-}
-
-.get-alerts:hover,
-.refresh-btn:hover {
-  opacity: 0.9;
+.get-alerts:hover, .refresh-btn:hover {
+  background-color: #0c75d2;
 }
 
 .error-text {
-  color: red;
+  color: #ff4c4c;
   text-align: center;
-  margin-top: 0.5rem;
 }
 
 .weather-card {
-  background-color: #ffffff;
+  background-color: rgba(0, 0, 0, 0.4);
   padding: 1rem;
-  margin-bottom: 1.5rem;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  margin: 1rem auto;
+  max-width: 500px;
+  border-radius: 10px;
+  text-align: center;
+  backdrop-filter: blur(6px);
 }
 
 .weather-details p {
-  margin: 0.3rem 0;
-  font-size: 1rem;
-  display: flex;
-  align-items: center;
-  gap: 8px;
+  margin: 0.5rem 0;
 }
 
 .alerts-section {
+  background-color: rgba(255, 69, 58, 0.2);
+  padding: 1rem;
+  border-radius: 10px;
   margin-bottom: 2rem;
 }
 
 .alert-box {
-  background-color: #fff3cd;
-  border-left: 6px solid #ffc107;
+  background-color: rgba(255, 0, 0, 0.3);
   padding: 1rem;
-  margin-bottom: 1rem;
-  border-radius: 6px;
-}
-
-.alert-box h4 {
-  margin: 0 0 0.5rem 0;
+  margin-top: 1rem;
+  border-radius: 8px;
 }
 
 .forecast-section {
@@ -102,31 +85,94 @@
   display: flex;
   overflow-x: auto;
   gap: 1rem;
-  padding-bottom: 1rem;
+  padding: 0.5rem 0;
 }
 
 .forecast-card {
-  min-width: 100px;
-  background: #8f8686a1;
-  border-radius: 8px;
-  padding: 0.8rem;
+  background-color: rgba(0, 0, 0, 0.4);
+  padding: 0.75rem;
+  border-radius: 10px;
+  min-width: 120px;
   text-align: center;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-}
-
-.forecast-card p {
-  margin: 0.2rem 0;
 }
 
 .map-header {
-  margin-bottom: 0.5rem;
-  font-size: 1.25rem;
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+  text-align: center;
 }
 
 .weather-map {
   height: 400px;
-  width: 100%;
-  border-radius: 10px;
+  border-radius: 12px;
   overflow: hidden;
   margin-bottom: 2rem;
+}
+
+/* Weather condition backgrounds */
+.clear {
+  background: linear-gradient(to top, #56ccf2, #2f80ed);
+}
+
+.rain {
+  background: linear-gradient(to top, #314755, #26a0da);
+}
+
+.thunderstorm {
+  background: linear-gradient(to top, #0f2027, #203a43, #2c5364);
+}
+
+.clouds {
+  background: linear-gradient(to top, #bdc3c7, #2c3e50);
+}
+
+.snow {
+  background: linear-gradient(to top, #e6dada, #274046);
+}
+
+.drizzle {
+  background: linear-gradient(to top, #3a6073, #16222a);
+}
+
+.mist, .fog, .haze {
+  background: linear-gradient(to top, #606c88, #3f4c6b);
+}
+
+/* Full page alert effect */
+.alerts-section {
+  width: 100%;
+  background: rgba(255, 0, 0, 0.2);
+  padding: 2rem;
+  box-sizing: border-box;
+  border: 1px solid #ffcccc;
+  box-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
+}
+
+.alert-box h4 {
+  margin-bottom: 0.5rem;
+}
+
+.alert-box p {
+  font-size: 0.95rem;
+  margin: 0.25rem 0;
+}
+
+/* Custom scrollbar for forecast */
+.forecast-scroll::-webkit-scrollbar {
+  height: 8px;
+}
+
+.forecast-scroll::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.3);
+  border-radius: 5px;
+}
+
+.search-wrapper{
+  background: #cfcfd0;
+  padding: 30px;
+  border-radius: 16px;
+  max-width: 700px;
+  margin: 0 auto 50px;
+  box-shadow: 0 0 30px rgba(0, 0, 0, 0.1);
+  text-align: center;
 }

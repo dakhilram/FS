@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import "../styles/Alerts.css";
-import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
+import L from "leaflet";
 import {
   FaCloudSun,
   FaWind,
@@ -13,24 +14,29 @@ import {
   FaSyncAlt,
   FaBell,
 } from "react-icons/fa";
-import L from "leaflet";
-import markerIcon2x from "leaflet/dist/images/marker-icon-2x.png";
-import markerIcon from "leaflet/dist/images/marker-icon.png";
-import markerShadow from "leaflet/dist/images/marker-shadow.png";
-
-// Fix Leaflet's default icon paths
-delete L.Icon.Default.prototype._getIconUrl;
-
-L.Icon.Default.mergeOptions({
-  iconRetinaUrl: markerIcon2x,
-  iconUrl: markerIcon,
-  shadowUrl: markerShadow,
-});
-
 
 const API_BASE_URL = window.location.hostname === "localhost"
   ? "http://localhost:5000"
   : "https://fs-51ng.onrender.com";
+
+const weatherIcons = {
+  Clear: "https://cdn-icons-png.flaticon.com/512/869/869869.png",
+  Rain: "https://cdn-icons-png.flaticon.com/512/3075/3075858.png",
+  Thunderstorm: "https://cdn-icons-png.flaticon.com/512/1146/1146860.png",
+  Snow: "https://cdn-icons-png.flaticon.com/512/642/642102.png",
+  Clouds: "https://cdn-icons-png.flaticon.com/512/414/414825.png",
+  Default: "https://cdn-icons-png.flaticon.com/512/1163/1163661.png"
+};
+
+const RecenterMap = ({ coords }) => {
+  const map = useMap();
+  useEffect(() => {
+    if (coords) {
+      map.setView([coords.lat, coords.lon], 10);
+    }
+  }, [coords]);
+  return null;
+};
 
 const Alerts = () => {
   const [location, setLocation] = useState("");
@@ -66,12 +72,16 @@ const Alerts = () => {
   };
 
   useEffect(() => {
-    fetchWeather(); // Fetch default Houston data on load
+    fetchWeather();
   }, []);
 
+  const weatherClass = weatherData?.current?.weather[0]?.main?.toLowerCase() || "";
+  const iconUrl = weatherIcons[weatherData?.current?.weather[0]?.main] || weatherIcons.Default;
+
   return (
-    <div className="alerts-container">
+    <div className={`alerts-container ${weatherClass}`}>
       <h2 className="alerts-header">🌍 Weather Alerts & Forecasts</h2>
+      <div className="search-wrapper">
 
       <div className="search-box">
         <input
@@ -80,22 +90,20 @@ const Alerts = () => {
           onChange={(e) => setLocation(e.target.value)}
           placeholder="Enter city name or ZIP code"
         />
-        <button className="get-alerts" onClick={fetchWeather}>
-          Search
-        </button>
+        <button className="get-alerts" onClick={fetchWeather}>Search</button>
         <button className="refresh-btn" onClick={fetchWeather}>
           <FaSyncAlt /> Refresh
         </button>
       </div>
-
+      </div>
       {error && <p className="error-text">{error}</p>}
 
       {weatherData && (
         <>
-          {/* ✅ Current Weather Section */}
           <div className="weather-card">
             <h3>📍 {weatherData.location.name}</h3>
             <div className="weather-details">
+              <img src={iconUrl} alt="weather icon" style={{ width: 60 }} />
               <p><FaTemperatureHigh /> Temp: {weatherData.current.temp}°C</p>
               <p><FaTint /> Humidity: {weatherData.current.humidity}%</p>
               <p><FaWind /> Wind: {weatherData.current.wind_speed} m/s</p>
@@ -105,7 +113,6 @@ const Alerts = () => {
             </div>
           </div>
 
-          {/* ✅ Weather Alerts */}
           <div className="alerts-section">
             <h3><FaBell /> Weather Alerts</h3>
             {weatherData.alerts && weatherData.alerts.length > 0 ? (
@@ -123,7 +130,6 @@ const Alerts = () => {
             )}
           </div>
 
-          {/* ✅ Hourly Forecast (Today Only) */}
           <div className="forecast-section">
             <h3>🕐 Today's Hourly Forecast</h3>
             <div className="forecast-scroll">
@@ -137,7 +143,6 @@ const Alerts = () => {
             </div>
           </div>
 
-          {/* ✅ 8-Day Daily Forecast */}
           <div className="forecast-section">
             <h3>📅 8-Day Forecast</h3>
             <div className="forecast-scroll">
@@ -151,11 +156,14 @@ const Alerts = () => {
             </div>
           </div>
 
-          {/* ✅ Map Component */}
           <h3 className="map-header">📍 Location Map</h3>
           <MapContainer center={[coords.lat, coords.lon]} zoom={10} className="weather-map">
+            <RecenterMap coords={coords} />
             <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-            <Marker position={[coords.lat, coords.lon]}>
+            <Marker
+              position={[coords.lat, coords.lon]}
+              icon={L.icon({ iconUrl, iconSize: [40, 40] })}
+            >
               <Popup>
                 {weatherData.location.name} <br /> {weatherData.current.weather[0].description}
               </Popup>
