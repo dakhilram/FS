@@ -136,7 +136,7 @@
 }
 
 .mist, .fog, .haze {
-  background: linear-gradient(to top, #606c88, #3f4c6b);
+  background: linear-gradient(to top, #606c88, #3f4c6b57);
 }
 
 /* Full page alert effect */
