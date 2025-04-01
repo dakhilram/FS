@@ -1,7 +1,25 @@
 /* Alerts.css */
 
-/* Base styles */
+/* === Global Layout === */
+.alerts-page-wrapper {
+  position: relative;
+  overflow: hidden;
+}
+
+.weather-video-bg {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  width: 100vw;
+  object-fit: cover;
+  z-index: -1;
+  opacity: 0.45;
+}
+
 .alerts-container {
+  position: relative;
+  z-index: 1;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   padding: 1rem;
   color: #fff;
@@ -9,6 +27,7 @@
   transition: background 0.5s ease-in-out;
 }
 
+/* === Search Section === */
 .alerts-header {
   text-align: center;
   font-size: 2rem;
@@ -16,6 +35,15 @@
   color: #27619c;
 }
 
+.search-wrapper {
+  background: #cfcfd0;
+  padding: 30px;
+  border-radius: 16px;
+  max-width: 700px;
+  margin: 0 auto 50px;
+  box-shadow: 0 0 30px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
 
 .search-box {
   display: flex;
@@ -29,9 +57,11 @@
   font-size: 1rem;
   border-radius: 5px;
   border: none;
+  background-color: white;
 }
 
-.get-alerts, .refresh-btn {
+.get-alerts,
+.refresh-btn {
   padding: 0.5rem 1rem;
   border: none;
   border-radius: 5px;
@@ -40,7 +70,8 @@
   cursor: pointer;
 }
 
-.get-alerts:hover, .refresh-btn:hover {
+.get-alerts:hover,
+.refresh-btn:hover {
   background-color: #0c75d2;
 }
 
@@ -49,6 +80,7 @@
   text-align: center;
 }
 
+/* === Weather Card === */
 .weather-card {
   background-color: rgba(0, 0, 0, 0.4);
   padding: 1rem;
@@ -63,9 +95,14 @@
   margin: 0.5rem 0;
 }
 
+/* === Alerts Section === */
 .alerts-section {
-  background-color: rgba(255, 69, 58, 0.2);
-  padding: 1rem;
+  width: 100%;
+  background: rgba(255, 0, 0, 0.2);
+  padding: 2rem;
+  box-sizing: border-box;
+  border: 1px solid #ffcccc;
+  box-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
   border-radius: 10px;
   margin-bottom: 2rem;
 }
@@ -77,6 +114,16 @@
   border-radius: 8px;
 }
 
+.alert-box h4 {
+  margin-bottom: 0.5rem;
+}
+
+.alert-box p {
+  font-size: 0.95rem;
+  margin: 0.25rem 0;
+}
+
+/* === Forecast Section === */
 .forecast-section {
   margin-bottom: 2rem;
 }
@@ -96,6 +143,16 @@
   text-align: center;
 }
 
+.forecast-scroll::-webkit-scrollbar {
+  height: 8px;
+}
+
+.forecast-scroll::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.3);
+  border-radius: 5px;
+}
+
+/* === Map === */
 .map-header {
   margin-top: 2rem;
   margin-bottom: 1rem;
@@ -109,70 +166,15 @@
   margin-bottom: 2rem;
 }
 
-/* Weather condition backgrounds */
-.clear {
-  background: linear-gradient(to top, #56ccf2, #2f80ed);
-}
-
-.rain {
-  background: linear-gradient(to top, #314755, #26a0da);
-}
-
-.thunderstorm {
-  background: linear-gradient(to top, #0f2027, #203a43, #2c5364);
-}
-
-.clouds {
-  background: linear-gradient(to top, #bdc3c7, #2c3e50);
-}
-
-.snow {
-  background: linear-gradient(to top, #e6dada, #274046);
-}
-
-.drizzle {
-  background: linear-gradient(to top, #3a6073, #16222a);
-}
-
-.mist, .fog, .haze {
-  background: linear-gradient(to top, #606c88, #3f4c6b);
-}
-
-/* Full page alert effect */
-.alerts-section {
-  width: 100%;
-  background: rgba(255, 0, 0, 0.2);
-  padding: 2rem;
-  box-sizing: border-box;
-  border: 1px solid #ffcccc;
-  box-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
-}
-
-.alert-box h4 {
-  margin-bottom: 0.5rem;
-}
-
-.alert-box p {
-  font-size: 0.95rem;
-  margin: 0.25rem 0;
-}
-
-/* Custom scrollbar for forecast */
-.forecast-scroll::-webkit-scrollbar {
-  height: 8px;
-}
-
-.forecast-scroll::-webkit-scrollbar-thumb {
-  background-color: rgba(255, 255, 255, 0.3);
-  border-radius: 5px;
-}
-
-.search-wrapper{
-  background: #cfcfd0;
-  padding: 30px;
-  border-radius: 16px;
-  max-width: 700px;
-  margin: 0 auto 50px;
-  box-shadow: 0 0 30px rgba(0, 0, 0, 0.1);
-  text-align: center;
+/* === Remove conflicting backgrounds so video shows === */
+.clear,
+.rain,
+.thunderstorm,
+.clouds,
+.snow,
+.drizzle,
+.mist,
+.fog,
+.haze {
+  background: none !important;
 }
