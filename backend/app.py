@@ -369,6 +369,7 @@ OPENWEATHER_API_KEY = os.getenv("OPENWEATHER_API_KEY")
 def get_weather():
     city = request.args.get('q')
     zipcode = request.args.get('zip')
+    units = request.args.get('units', 'metric')  # ✅ Add this line
 
     if not city and not zipcode:
         return jsonify({"error": "City or ZIP code is required"}), 400
@@ -396,12 +397,12 @@ def get_weather():
         lon = geo_data[0]['lon']
         location_name = geo_data[0].get('name', city)
 
-    # Step 2: Call One Call API 3.0 with lat/lon
+    # Step 2: Call One Call API 3.0 with lat/lon and units
     one_call_url = (
         f"https://api.openweathermap.org/data/3.0/onecall?"
         f"lat={lat}&lon={lon}"
         f"&exclude=minutely"
-        f"&units=metric"
+        f"&units={units}"  # ✅ Use the selected unit
         f"&appid={OPENWEATHER_API_KEY}"
     )
 

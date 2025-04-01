@@ -1,3 +1,4 @@
+// Updated Alerts.jsx
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import "../styles/Alerts.css";
@@ -43,6 +44,7 @@ const Alerts = () => {
   const [weatherData, setWeatherData] = useState(null);
   const [error, setError] = useState("");
   const [coords, setCoords] = useState({ lat: 29.7604, lon: -95.3698 });
+  const [unit, setUnit] = useState("metric"); // 'metric' = Celsius, 'imperial' = Fahrenheit
 
   const fetchWeather = async () => {
     if (!location.trim()) {
@@ -51,7 +53,9 @@ const Alerts = () => {
     }
 
     try {
-      const params = isNaN(location) ? { q: location } : { zip: location };
+      const params = isNaN(location)
+        ? { q: location, units: unit }
+        : { zip: location, units: unit };
       const response = await axios.get(`${API_BASE_URL}/weather`, { params });
 
       if (response.data.error) {
@@ -72,30 +76,37 @@ const Alerts = () => {
   };
 
   useEffect(() => {
-    fetchWeather();
-  }, []);
+    fetchWeather(); // also re-fetch when unit changes
+  }, [unit]);
 
   const weatherClass = weatherData?.current?.weather[0]?.main?.toLowerCase() || "";
   const iconUrl = weatherIcons[weatherData?.current?.weather[0]?.main] || weatherIcons.Default;
+  const tempSymbol = unit === "metric" ? "°C" : "°F";
+  const windUnit = unit === "metric" ? "m/s" : "mph";
 
   return (
     <div className={`alerts-container ${weatherClass}`}>
       <h2 className="alerts-header">🌍 Weather Alerts & Forecasts</h2>
       <div className="search-wrapper">
+        <div className="search-box">
+          <input
+            type="text"
+            value={location}
+            onChange={(e) => setLocation(e.target.value)}
+            placeholder="Enter city name or ZIP code"
+          />
+          <button className="get-alerts" onClick={fetchWeather}>Search</button>
+          <button className="refresh-btn" onClick={fetchWeather}>
+            <FaSyncAlt /> Refresh
+          </button>
+        </div>
 
-      <div className="search-box">
-        <input
-          type="text"
-          value={location}
-          onChange={(e) => setLocation(e.target.value)}
-          placeholder="Enter city name or ZIP code"
-        />
-        <button className="get-alerts" onClick={fetchWeather}>Search</button>
-        <button className="refresh-btn" onClick={fetchWeather}>
-          <FaSyncAlt /> Refresh
-        </button>
+        <div className="unit-toggle">
+          <button onClick={() => setUnit("metric")} disabled={unit === "metric"}>°C</button>
+          <button onClick={() => setUnit("imperial")} disabled={unit === "imperial"}>°F</button>
+        </div>
       </div>
-      </div>
+
       {error && <p className="error-text">{error}</p>}
 
       {weatherData && (
@@ -104,9 +115,9 @@ const Alerts = () => {
             <h3>📍 {weatherData.location.name}</h3>
             <div className="weather-details">
               <img src={iconUrl} alt="weather icon" style={{ width: 60 }} />
-              <p><FaTemperatureHigh /> Temp: {weatherData.current.temp}°C</p>
+              <p><FaTemperatureHigh /> Temp: {weatherData.current.temp}{tempSymbol}</p>
               <p><FaTint /> Humidity: {weatherData.current.humidity}%</p>
-              <p><FaWind /> Wind: {weatherData.current.wind_speed} m/s</p>
+              <p><FaWind /> Wind: {weatherData.current.wind_speed} {windUnit}</p>
               <p><FaCloudSun /> Condition: {weatherData.current.weather[0].description}</p>
               <p><FaSun /> Sunrise: {new Date(weatherData.current.sunrise * 1000).toLocaleTimeString()}</p>
               <p><FaMoon /> Sunset: {new Date(weatherData.current.sunset * 1000).toLocaleTimeString()}</p>
@@ -136,7 +147,7 @@ const Alerts = () => {
               {weatherData.hourly.slice(0, 12).map((hour, i) => (
                 <div key={i} className="forecast-card">
                   <p>{new Date(hour.dt * 1000).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</p>
-                  <p>{hour.temp}°C</p>
+                  <p>{hour.temp}{tempSymbol}</p>
                   <p>{hour.weather[0].main}</p>
                 </div>
               ))}
@@ -149,7 +160,7 @@ const Alerts = () => {
               {weatherData.daily.map((day, i) => (
                 <div key={i} className="forecast-card">
                   <p>{new Date(day.dt * 1000).toLocaleDateString([], { weekday: "short", month: "short", day: "numeric" })}</p>
-                  <p>{day.temp.max}°C / {day.temp.min}°C</p>
+                  <p>{day.temp.max}{tempSymbol} / {day.temp.min}{tempSymbol}</p>
                   <p>{day.weather[0].main}</p>
                 </div>
               ))}
