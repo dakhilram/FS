@@ -28,6 +28,7 @@ const Login = () => {
 
       if (response.status === 200) {
         localStorage.setItem("username", response.data.username);
+        localStorage.setItem("user_email", email);
         localStorage.setItem("isLoggedIn", "true");
 
         window.dispatchEvent(new Event("storage")); // ✅ Ensures Navbar updates

@@ -213,15 +213,24 @@
 }
 
 .generate-alert-btn {
-  margin-top: 1rem;
-  padding: 0.5rem 1rem;
-  background: #2a9d8f;
-  color: white;
+  margin: 1.5rem auto;
+  padding: 12px 20px;
+  background: linear-gradient(135deg, #2a9d8f, #21867a);
+  color: #fff;
   border: none;
-  border-radius: 6px;
-  font-weight: bold;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 16px;
   cursor: pointer;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  display: block;
+  transition: background 0.3s ease;
 }
+
+.generate-alert-btn:hover {
+  background: linear-gradient(135deg, #21867a, #1b6f65);
+}
+
 
 .confirm-box {
   margin-top: 1rem;

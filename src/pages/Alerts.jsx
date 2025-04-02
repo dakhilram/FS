@@ -45,6 +45,21 @@ const Alerts = () => {
   const [coords, setCoords] = useState({ lat: 29.7604, lon: -95.3698 });
   const [unit, setUnit] = useState("metric");
   const [autoDetected, setAutoDetected] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
+  const [emailStatus, setEmailStatus] = useState("");
+
+  const [userEmail, setUserEmail] = useState(localStorage.getItem("user_email"));
+
+  // Listen for localStorage updates
+  useEffect(() => {
+    const handleStorageChange = () => {
+      setUserEmail(localStorage.getItem("user_email"));
+    };
+
+    window.addEventListener("storage", handleStorageChange);
+    return () => window.removeEventListener("storage", handleStorageChange);
+  }, []);
+
 
   const fetchWeather = async (lat = null, lon = null) => {
     try {
@@ -52,7 +67,6 @@ const Alerts = () => {
 
       if (lat && lon) {
         params = { lat, lon, units: unit };
-        // Don't change autoDetected flag here
       } else {
         if (!location.trim()) {
           setError("Please enter a valid city name or ZIP code.");
@@ -61,7 +75,7 @@ const Alerts = () => {
         params = isNaN(location)
           ? { q: location, units: unit }
           : { zip: location, units: unit };
-        setAutoDetected(false); // User manually searched
+        setAutoDetected(false);
       }
 
       const response = await axios.get(`${API_BASE_URL}/weather`, { params });
@@ -83,12 +97,10 @@ const Alerts = () => {
     }
   };
 
-  // ✅ Run geolocation only once (on initial load)
   useEffect(() => {
     navigator.geolocation.getCurrentPosition(
       (pos) => {
         const { latitude, longitude } = pos.coords;
-        console.log("User location detected:", latitude, longitude);
         fetchWeather(latitude, longitude);
         setAutoDetected(true);
       },
@@ -98,7 +110,6 @@ const Alerts = () => {
     );
   }, []);
 
-  // ✅ On unit change, refetch using the correct source
   useEffect(() => {
     if (weatherData) {
       if (autoDetected) {
@@ -108,6 +119,45 @@ const Alerts = () => {
       }
     }
   }, [unit]);
+
+  const handleGenerateAlert = async () => {
+    if (!weatherData || !userEmail) return;
+
+    const { lat, lon } = weatherData.location;
+
+    try {
+      const response = await axios.post(`${API_BASE_URL}/generate-alert-email`, {
+        lat,
+        lon,
+        email: userEmail,
+      });
+
+      if (response.data.alertAvailable === false) {
+        setShowConfirm(true);
+      } else {
+        setEmailStatus("✅ Alert email sent!");
+      }
+    } catch (err) {
+      console.error("Error sending alert email:", err);
+      setEmailStatus("❌ Failed to send email.");
+    }
+  };
+
+  const sendAnyway = async () => {
+    setShowConfirm(false);
+    const { lat, lon } = weatherData.location;
+
+    try {
+      await axios.post(`${API_BASE_URL}/generate-alert-email`, {
+        lat,
+        lon,
+        email: userEmail,
+      });
+      setEmailStatus("✅ Email sent without active alert.");
+    } catch (err) {
+      setEmailStatus("❌ Failed to send email.");
+    }
+  };
 
   const weatherClass = weatherData?.current?.weather[0]?.main?.toLowerCase() || "";
   const iconUrl = weatherIcons[weatherData?.current?.weather[0]?.main] || weatherIcons.Default;
@@ -126,9 +176,7 @@ const Alerts = () => {
             onChange={(e) => setLocation(e.target.value)}
             placeholder="Enter city name or ZIP code"
           />
-          <button className="get-alerts" onClick={() => fetchWeather()}>
-            Search
-          </button>
+          <button className="get-alerts" onClick={() => fetchWeather()}>Search</button>
           <button className="refresh-btn" onClick={() => {
             if (autoDetected && weatherData?.location) {
               fetchWeather(weatherData.location.lat, weatherData.location.lon);
@@ -146,6 +194,21 @@ const Alerts = () => {
         </div>
       </div>
 
+      {userEmail && weatherData && (
+        <button className="generate-alert-btn" onClick={handleGenerateAlert}>
+          📧 Generate Alert
+        </button>
+      )}
+
+      {showConfirm && (
+        <div className="confirm-box">
+          <p>No alerts found for this location. Do you still want to send an email?</p>
+          <button onClick={sendAnyway}>Yes, send anyway</button>
+          <button onClick={() => setShowConfirm(false)}>Cancel</button>
+        </div>
+      )}
+
+      {emailStatus && <p className="info-text">{emailStatus}</p>}
       {autoDetected && <p className="info-text">📍 Showing weather for your current location.</p>}
       {error && <p className="error-text">{error}</p>}
 
