@@ -466,6 +466,7 @@ def generate_alert_email():
         for i, alert in enumerate(alerts):
             body += f"""
             <hr>
+            <h2>⚠️🚨 Active Weather Alerts</h2>
             <h3>🔔 Alert #{i + 1}: {alert['event']}</h3>
             <p><strong>From:</strong> {datetime.datetime.utcfromtimestamp(alert['start']).strftime('%Y-%m-%d %H:%M UTC')}</p>
             <p><strong>To:</strong> {datetime.datetime.utcfromtimestamp(alert['end']).strftime('%Y-%m-%d %H:%M UTC')}</p>
@@ -476,9 +477,9 @@ def generate_alert_email():
 
         # Prepare email
         msg = MIMEMultipart()
-        msg['From'] = formataddr((str(Header("Foresight Alerts", 'utf-8')), SMTP_USERNAME))
+        msg["From"] = SMTP_USERNAME  # plain ASCII sender
         msg['To'] = email
-        msg['Subject'] = str(Header("⚠️ Weather Alert Summary", "utf-8"))
+        msg["Subject"] = "Weather Alert Summary"  # no emojis
 
         msg.attach(MIMEText(body, "html", "utf-8"))
 
