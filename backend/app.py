@@ -36,6 +36,7 @@ import traceback
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.header import Header
+from email.utils import formataddr
 
 # ✅ Load environment variables
 load_dotenv()
@@ -433,6 +434,7 @@ def get_weather():
     return jsonify(weather_data)
 
 
+
 @app.route('/generate-alert-email', methods=['POST'])
 def generate_alert_email():
     try:
@@ -442,10 +444,9 @@ def generate_alert_email():
         email = data.get("email")
 
         if not lat or not lon or not email:
-            print("Missing input data:", data)
             return jsonify({"error": "Missing lat, lon or email"}), 400
 
-        # Fetch weather data from OpenWeather One Call API
+        # Fetch weather
         url = (
             f"https://api.openweathermap.org/data/3.0/onecall"
             f"?lat={lat}&lon={lon}&exclude=minutely"
@@ -453,21 +454,14 @@ def generate_alert_email():
         )
         response = requests.get(url)
         if response.status_code != 200:
-            print("OpenWeather API failed:", response.text)
             return jsonify({"error": "Failed to fetch weather data"}), 500
 
         weather_data = response.json()
-
         alerts = weather_data.get("alerts", [])
         if not alerts:
             return jsonify({"alertAvailable": False}), 200
 
-        # Build email
-        msg = MIMEMultipart()
-        msg["From"] = SMTP_USERNAME
-        msg["To"] = email
-        msg["Subject"] = str(Header("⚠️ Weather Alert Summary", "utf-8"))
-
+        # Build email body
         body = "<h2>🚨 Active Weather Alerts</h2>"
         for i, alert in enumerate(alerts):
             body += f"""
@@ -480,9 +474,15 @@ def generate_alert_email():
             <pre>{alert['description']}</pre>
             """
 
-        msg.attach(MIMEText(body.encode("utf-8"), "html", _charset="utf-8"))
+        # Prepare email
+        msg = MIMEMultipart()
+        msg['From'] = formataddr((str(Header("Foresight Alerts", 'utf-8')), SMTP_USERNAME))
+        msg['To'] = email
+        msg['Subject'] = str(Header("⚠️ Weather Alert Summary", "utf-8"))
 
-        # Send email via Gmail SMTP
+        msg.attach(MIMEText(body, "html", "utf-8"))
+
+        # Send email
         with smtplib.SMTP(SMTP_SERVER, SMTP_PORT) as server:
             server.starttls()
             server.login(SMTP_USERNAME, SMTP_PASSWORD)
