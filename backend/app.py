@@ -442,6 +442,7 @@ def generate_alert_email():
         lat = data.get("lat")
         lon = data.get("lon")
         email = data.get("email")
+        force_send = data.get("forceSend", False)  # ✅ Support force sending even if no alerts
 
         if not lat or not lon or not email:
             return jsonify({"error": "Missing lat, lon or email"}), 400
@@ -458,28 +459,32 @@ def generate_alert_email():
 
         weather_data = response.json()
         alerts = weather_data.get("alerts", [])
-        if not alerts:
+
+        # Handle no alerts scenario
+        if not alerts and not force_send:
             return jsonify({"alertAvailable": False}), 200
 
         # Build email body
-        body = "<h2>🚨 Active Weather Alerts</h2>"
-        for i, alert in enumerate(alerts):
-            body += f"""
-            <hr>
-            <h2>⚠️🚨 Active Weather Alerts</h2>
-            <h3>🔔 Alert #{i + 1}: {alert['event']}</h3>
-            <p><strong>From:</strong> {datetime.datetime.utcfromtimestamp(alert['start']).strftime('%Y-%m-%d %H:%M UTC')}</p>
-            <p><strong>To:</strong> {datetime.datetime.utcfromtimestamp(alert['end']).strftime('%Y-%m-%d %H:%M UTC')}</p>
-            <p><strong>Issued by:</strong> {alert['sender_name']}</p>
-            <p><strong>Description:</strong></p>
-            <pre>{alert['description']}</pre>
-            """
+        if not alerts and force_send:
+            body = "<h2>📬 No Active Weather Alerts</h2><p>There are currently no alerts, but this is your requested weather notification from Foresight.</p>"
+        else:
+            body = "<h2>🚨 Active Weather Alerts</h2>"
+            for i, alert in enumerate(alerts):
+                body += f"""
+                <hr>
+                <h3>🔔 Alert #{i + 1}: {alert['event']}</h3>
+                <p><strong>From:</strong> {datetime.datetime.utcfromtimestamp(alert['start']).strftime('%Y-%m-%d %H:%M UTC')}</p>
+                <p><strong>To:</strong> {datetime.datetime.utcfromtimestamp(alert['end']).strftime('%Y-%m-%d %H:%M UTC')}</p>
+                <p><strong>Issued by:</strong> {alert['sender_name']}</p>
+                <p><strong>Description:</strong></p>
+                <pre>{alert['description']}</pre>
+                """
 
         # Prepare email
         msg = MIMEMultipart()
-        msg["From"] = SMTP_USERNAME  # plain ASCII sender
-        msg['To'] = email
-        msg["Subject"] = "Weather Alert Summary"  # no emojis
+        msg["From"] = SMTP_USERNAME
+        msg["To"] = email
+        msg["Subject"] = "Weather Alert Summary"  # no emojis in headers
 
         msg.attach(MIMEText(body, "html", "utf-8"))
 
@@ -487,9 +492,12 @@ def generate_alert_email():
         with smtplib.SMTP(SMTP_SERVER, SMTP_PORT) as server:
             server.starttls()
             server.login(SMTP_USERNAME, SMTP_PASSWORD)
-            server.sendmail(SMTP_USERNAME, email, msg.as_string().encode("utf-8"))
+            server.sendmail(SMTP_USERNAME, email, msg.as_string().encode("utf-8"))  # UTF-8 safe
 
-        return jsonify({"message": "Alert email sent!", "alertAvailable": True}), 200
+        return jsonify({
+            "message": "Email sent successfully.",
+            "alertAvailable": bool(alerts)
+        }), 200
 
     except Exception as e:
         print("Error in generate-alert-email:", str(e))
