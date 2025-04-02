@@ -466,7 +466,7 @@ def generate_alert_email():
         msg = MIMEMultipart()
         msg["From"] = SMTP_USERNAME
         msg["To"] = email
-        msg["Subject"] = "⚠️ Weather Alert Summary"
+        msg["Subject"] = str(Header("⚠️ Weather Alert Summary", "utf-8"))
 
         body = "<h2>🚨 Active Weather Alerts</h2>"
         for i, alert in enumerate(alerts):
