@@ -1,4 +1,3 @@
-// Alerts.jsx (updated with geolocation)
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import "../styles/Alerts.css";
@@ -53,7 +52,7 @@ const Alerts = () => {
 
       if (lat && lon) {
         params = { lat, lon, units: unit };
-        setAutoDetected(true);
+        // Don't change autoDetected flag here
       } else {
         if (!location.trim()) {
           setError("Please enter a valid city name or ZIP code.");
@@ -62,7 +61,7 @@ const Alerts = () => {
         params = isNaN(location)
           ? { q: location, units: unit }
           : { zip: location, units: unit };
-        setAutoDetected(false);
+        setAutoDetected(false); // User manually searched
       }
 
       const response = await axios.get(`${API_BASE_URL}/weather`, { params });
@@ -84,20 +83,31 @@ const Alerts = () => {
     }
   };
 
+  // ✅ Run geolocation only once (on initial load)
   useEffect(() => {
     navigator.geolocation.getCurrentPosition(
       (pos) => {
         const { latitude, longitude } = pos.coords;
         console.log("User location detected:", latitude, longitude);
         fetchWeather(latitude, longitude);
+        setAutoDetected(true);
       },
       (err) => {
         console.warn("Geolocation denied or failed:", err.message);
-        fetchWeather(); // fallback
       }
     );
+  }, []);
+
+  // ✅ On unit change, refetch using the correct source
+  useEffect(() => {
+    if (weatherData) {
+      if (autoDetected) {
+        fetchWeather(weatherData.location.lat, weatherData.location.lon);
+      } else {
+        fetchWeather();
+      }
+    }
   }, [unit]);
-  
 
   const weatherClass = weatherData?.current?.weather[0]?.main?.toLowerCase() || "";
   const iconUrl = weatherIcons[weatherData?.current?.weather[0]?.main] || weatherIcons.Default;
@@ -119,7 +129,13 @@ const Alerts = () => {
           <button className="get-alerts" onClick={() => fetchWeather()}>
             Search
           </button>
-          <button className="refresh-btn" onClick={() => fetchWeather()}>
+          <button className="refresh-btn" onClick={() => {
+            if (autoDetected && weatherData?.location) {
+              fetchWeather(weatherData.location.lat, weatherData.location.lon);
+            } else {
+              fetchWeather();
+            }
+          }}>
             <FaSyncAlt /> Refresh
           </button>
         </div>
