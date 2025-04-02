@@ -432,7 +432,6 @@ def get_weather():
 
     return jsonify(weather_data)
 
-from flask import session  # Add at the top if not already imported
 
 @app.route('/generate-alert-email', methods=['POST'])
 def generate_alert_email():
@@ -467,7 +466,7 @@ def generate_alert_email():
         msg = MIMEMultipart()
         msg["From"] = SMTP_USERNAME
         msg["To"] = email
-        msg["Subject"] = Header("⚠️ Weather Alert Summary", "utf-8")
+        msg["Subject"] = "⚠️ Weather Alert Summary"
 
         body = "<h2>🚨 Active Weather Alerts</h2>"
         for i, alert in enumerate(alerts):
@@ -481,7 +480,7 @@ def generate_alert_email():
             <pre>{alert['description']}</pre>
             """
 
-        msg.attach(MIMEText(body, "html", "utf-8"))
+        msg.attach(MIMEText(body.encode("utf-8"), "html", _charset="utf-8"))
 
         # Send email via Gmail SMTP
         with smtplib.SMTP(SMTP_SERVER, SMTP_PORT) as server:
