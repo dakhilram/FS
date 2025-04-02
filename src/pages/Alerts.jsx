@@ -1,4 +1,4 @@
-// Updated Alerts.jsx
+// Alerts.jsx (updated with geolocation)
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import "../styles/Alerts.css";
@@ -44,18 +44,27 @@ const Alerts = () => {
   const [weatherData, setWeatherData] = useState(null);
   const [error, setError] = useState("");
   const [coords, setCoords] = useState({ lat: 29.7604, lon: -95.3698 });
-  const [unit, setUnit] = useState("metric"); // 'metric' = Celsius, 'imperial' = Fahrenheit
+  const [unit, setUnit] = useState("metric");
+  const [autoDetected, setAutoDetected] = useState(false);
 
-  const fetchWeather = async () => {
-    if (!location.trim()) {
-      setError("Please enter a valid city name or ZIP code.");
-      return;
-    }
-
+  const fetchWeather = async (lat = null, lon = null) => {
     try {
-      const params = isNaN(location)
-        ? { q: location, units: unit }
-        : { zip: location, units: unit };
+      let params;
+
+      if (lat && lon) {
+        params = { lat, lon, units: unit };
+        setAutoDetected(true);
+      } else {
+        if (!location.trim()) {
+          setError("Please enter a valid city name or ZIP code.");
+          return;
+        }
+        params = isNaN(location)
+          ? { q: location, units: unit }
+          : { zip: location, units: unit };
+        setAutoDetected(false);
+      }
+
       const response = await axios.get(`${API_BASE_URL}/weather`, { params });
 
       if (response.data.error) {
@@ -76,8 +85,19 @@ const Alerts = () => {
   };
 
   useEffect(() => {
-    fetchWeather(); // also re-fetch when unit changes
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        const { latitude, longitude } = pos.coords;
+        console.log("User location detected:", latitude, longitude);
+        fetchWeather(latitude, longitude);
+      },
+      (err) => {
+        console.warn("Geolocation denied or failed:", err.message);
+        fetchWeather(); // fallback
+      }
+    );
   }, [unit]);
+  
 
   const weatherClass = weatherData?.current?.weather[0]?.main?.toLowerCase() || "";
   const iconUrl = weatherIcons[weatherData?.current?.weather[0]?.main] || weatherIcons.Default;
@@ -87,6 +107,7 @@ const Alerts = () => {
   return (
     <div className={`alerts-container ${weatherClass}`}>
       <h2 className="alerts-header">🌍 Weather Alerts & Forecasts</h2>
+
       <div className="search-wrapper">
         <div className="search-box">
           <input
@@ -95,8 +116,10 @@ const Alerts = () => {
             onChange={(e) => setLocation(e.target.value)}
             placeholder="Enter city name or ZIP code"
           />
-          <button className="get-alerts" onClick={fetchWeather}>Search</button>
-          <button className="refresh-btn" onClick={fetchWeather}>
+          <button className="get-alerts" onClick={() => fetchWeather()}>
+            Search
+          </button>
+          <button className="refresh-btn" onClick={() => fetchWeather()}>
             <FaSyncAlt /> Refresh
           </button>
         </div>
@@ -107,6 +130,7 @@ const Alerts = () => {
         </div>
       </div>
 
+      {autoDetected && <p className="info-text">📍 Showing weather for your current location.</p>}
       {error && <p className="error-text">{error}</p>}
 
       {weatherData && (

@@ -200,3 +200,14 @@
   background-color: #1e90ff;
   color: white;
 }
+
+.info-text {
+  text-align: center;
+  font-size: 1rem;
+  color: #1e90ff;
+  margin: 1rem 0;
+  font-weight: bold;
+  margin-top: -20px;
+  margin-bottom: 20px;
+  font-style: italic;
+}

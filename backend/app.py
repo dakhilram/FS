@@ -367,43 +367,53 @@ OPENWEATHER_API_KEY = os.getenv("OPENWEATHER_API_KEY")
 
 @app.route('/weather', methods=['GET'])
 def get_weather():
+    lat = request.args.get('lat')
+    lon = request.args.get('lon')
     city = request.args.get('q')
     zipcode = request.args.get('zip')
-    units = request.args.get('units', 'metric')  # ✅ Add this line
+    units = request.args.get('units', 'metric')
 
-    if not city and not zipcode:
-        return jsonify({"error": "City or ZIP code is required"}), 400
+    # ✅ Step 1: Use lat/lon directly if present
+    if lat and lon:
+        try:
+            lat = float(lat)
+            lon = float(lon)
+        except ValueError:
+            return jsonify({"error": "Invalid coordinates"}), 400
+        location_name = "Your Location"
 
-    # Step 1: Convert to lat/lon using Geocoding API
-    if zipcode:
-        geo_url = f"http://api.openweathermap.org/geo/1.0/zip?zip={zipcode},US&appid={OPENWEATHER_API_KEY}"
+    # ✅ Step 2: Use city or ZIP to geocode
+    elif city or zipcode:
+        if zipcode:
+            geo_url = f"http://api.openweathermap.org/geo/1.0/zip?zip={zipcode},US&appid={OPENWEATHER_API_KEY}"
+        else:
+            geo_url = f"http://api.openweathermap.org/geo/1.0/direct?q={city}&limit=1&appid={OPENWEATHER_API_KEY}"
+
+        geo_response = requests.get(geo_url)
+        if geo_response.status_code != 200:
+            return jsonify({"error": "Failed to get coordinates"}), geo_response.status_code
+
+        geo_data = geo_response.json()
+        if not geo_data:
+            return jsonify({"error": "Invalid location"}), 400
+
+        if zipcode:
+            lat = geo_data['lat']
+            lon = geo_data['lon']
+            location_name = geo_data.get('name', zipcode)
+        else:
+            lat = geo_data[0]['lat']
+            lon = geo_data[0]['lon']
+            location_name = geo_data[0].get('name', city)
+
     else:
-        geo_url = f"http://api.openweathermap.org/geo/1.0/direct?q={city}&limit=1&appid={OPENWEATHER_API_KEY}"
+        return jsonify({"error": "City, ZIP code, or coordinates are required"}), 400
 
-    geo_response = requests.get(geo_url)
-    if geo_response.status_code != 200:
-        return jsonify({"error": "Failed to get coordinates"}), geo_response.status_code
-
-    geo_data = geo_response.json()
-    if not geo_data:
-        return jsonify({"error": "Invalid location"}), 400
-
-    if zipcode:
-        lat = geo_data['lat']
-        lon = geo_data['lon']
-        location_name = geo_data.get('name', zipcode)
-    else:
-        lat = geo_data[0]['lat']
-        lon = geo_data[0]['lon']
-        location_name = geo_data[0].get('name', city)
-
-    # Step 2: Call One Call API 3.0 with lat/lon and units
+    # ✅ Step 3: Fetch from One Call API 3.0
     one_call_url = (
         f"https://api.openweathermap.org/data/3.0/onecall?"
-        f"lat={lat}&lon={lon}"
-        f"&exclude=minutely"
-        f"&units={units}"  # ✅ Use the selected unit
-        f"&appid={OPENWEATHER_API_KEY}"
+        f"lat={lat}&lon={lon}&exclude=minutely"
+        f"&units={units}&appid={OPENWEATHER_API_KEY}"
     )
 
     weather_response = requests.get(one_call_url)
@@ -418,6 +428,7 @@ def get_weather():
     }
 
     return jsonify(weather_data)
+
 
 # ✅ Fetch WIldFire Data
 UPLOAD_FOLDER = "uploads"
