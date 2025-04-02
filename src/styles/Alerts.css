@@ -211,3 +211,28 @@
   margin-bottom: 20px;
   font-style: italic;
 }
+
+.generate-alert-btn {
+  margin-top: 1rem;
+  padding: 0.5rem 1rem;
+  background: #2a9d8f;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.confirm-box {
+  margin-top: 1rem;
+  background: #ffefc2;
+  padding: 1rem;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.confirm-box button {
+  margin: 0 0.5rem;
+  padding: 0.4rem 0.8rem;
+}
+

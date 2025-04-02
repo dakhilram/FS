@@ -429,6 +429,62 @@ def get_weather():
 
     return jsonify(weather_data)
 
+from flask import session  # Add at the top if not already imported
+
+@app.route('/generate-alert-email', methods=['POST'])
+def generate_alert_email():
+    data = request.json
+    lat = data.get("lat")
+    lon = data.get("lon")
+    email = data.get("email")
+
+    if not lat or not lon or not email:
+        return jsonify({"error": "Missing lat, lon or email"}), 400
+
+    # Fetch weather data
+    url = (
+        f"https://api.openweathermap.org/data/3.0/onecall"
+        f"?lat={lat}&lon={lon}&exclude=minutely"
+        f"&appid={OPENWEATHER_API_KEY}&units=metric"
+    )
+
+    response = requests.get(url)
+    if response.status_code != 200:
+        return jsonify({"error": "Failed to fetch weather data"}), 500
+
+    data = response.json()
+
+    if not data.get("alerts"):
+        return jsonify({"alertAvailable": False}), 200
+
+    alert = data["alerts"][0]  # Just send the first one for simplicity
+    msg = MIMEMultipart()
+    msg["From"] = SMTP_USERNAME
+    msg["To"] = email
+    msg["Subject"] = f"⚠️ Weather Alert: {alert['event']}"
+
+    body = f"""
+    <h2>🚨 Weather Alert: {alert['event']}</h2>
+    <p><strong>Location:</strong> Lat: {lat}, Lon: {lon}</p>
+    <p><strong>From:</strong> {datetime.datetime.utcfromtimestamp(alert['start']).strftime('%Y-%m-%d %H:%M UTC')}</p>
+    <p><strong>To:</strong> {datetime.datetime.utcfromtimestamp(alert['end']).strftime('%Y-%m-%d %H:%M UTC')}</p>
+    <p><strong>Details:</strong></p>
+    <pre>{alert['description']}</pre>
+    """
+
+    msg.attach(MIMEText(body, "html"))
+
+    try:
+        with smtplib.SMTP(SMTP_SERVER, SMTP_PORT) as server:
+            server.starttls()
+            server.login(SMTP_USERNAME, SMTP_PASSWORD)
+            server.sendmail(SMTP_USERNAME, email, msg.as_string())
+
+        return jsonify({"message": "Alert email sent!", "alertAvailable": True}), 200
+    except Exception as e:
+        return jsonify({"error": f"Email sending failed: {str(e)}"}), 500
+
+
 
 # ✅ Fetch WIldFire Data
 UPLOAD_FOLDER = "uploads"
