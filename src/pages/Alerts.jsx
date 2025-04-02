@@ -152,6 +152,7 @@ const Alerts = () => {
         lat,
         lon,
         email: userEmail,
+        forceSend: true,
       });
       setEmailStatus("✅ Email sent without active alert.");
     } catch (err) {
