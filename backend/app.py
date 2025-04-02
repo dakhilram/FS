@@ -487,7 +487,7 @@ def generate_alert_email():
         with smtplib.SMTP(SMTP_SERVER, SMTP_PORT) as server:
             server.starttls()
             server.login(SMTP_USERNAME, SMTP_PASSWORD)
-            server.sendmail(SMTP_USERNAME, email, msg.as_string())
+            server.sendmail(SMTP_USERNAME, email, msg.as_string().encode("utf-8"))
 
         return jsonify({"message": "Alert email sent!", "alertAvailable": True}), 200
 
