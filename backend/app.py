@@ -33,6 +33,9 @@ import jwt
 import datetime
 from flask_mail import Mail, Message
 import traceback
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+from email.header import Header
 
 # ✅ Load environment variables
 load_dotenv()
@@ -443,13 +446,12 @@ def generate_alert_email():
             print("Missing input data:", data)
             return jsonify({"error": "Missing lat, lon or email"}), 400
 
-        # Step 1: Fetch weather data from OpenWeather
+        # Fetch weather data from OpenWeather One Call API
         url = (
             f"https://api.openweathermap.org/data/3.0/onecall"
             f"?lat={lat}&lon={lon}&exclude=minutely"
             f"&appid={OPENWEATHER_API_KEY}&units=metric"
         )
-
         response = requests.get(url)
         if response.status_code != 200:
             print("OpenWeather API failed:", response.text)
@@ -457,29 +459,31 @@ def generate_alert_email():
 
         weather_data = response.json()
 
-        if not weather_data.get("alerts"):
+        alerts = weather_data.get("alerts", [])
+        if not alerts:
             return jsonify({"alertAvailable": False}), 200
 
-        alert = weather_data["alerts"][0]
-
-        # Step 2: Build email message
+        # Build email
         msg = MIMEMultipart()
         msg["From"] = SMTP_USERNAME
         msg["To"] = email
-        msg["Subject"] = f"⚠️ Weather Alert: {alert['event']}"
+        msg["Subject"] = Header("⚠️ Weather Alert Summary", "utf-8")
 
-        body = f"""
-        <h2>🚨 Weather Alert: {alert['event']}</h2>
-        <p><strong>Location:</strong> Lat: {lat}, Lon: {lon}</p>
-        <p><strong>From:</strong> {datetime.datetime.utcfromtimestamp(alert['start']).strftime('%Y-%m-%d %H:%M UTC')}</p>
-        <p><strong>To:</strong> {datetime.datetime.utcfromtimestamp(alert['end']).strftime('%Y-%m-%d %H:%M UTC')}</p>
-        <p><strong>Details:</strong></p>
-        <pre>{alert['description']}</pre>
-        """
+        body = "<h2>🚨 Active Weather Alerts</h2>"
+        for i, alert in enumerate(alerts):
+            body += f"""
+            <hr>
+            <h3>🔔 Alert #{i + 1}: {alert['event']}</h3>
+            <p><strong>From:</strong> {datetime.datetime.utcfromtimestamp(alert['start']).strftime('%Y-%m-%d %H:%M UTC')}</p>
+            <p><strong>To:</strong> {datetime.datetime.utcfromtimestamp(alert['end']).strftime('%Y-%m-%d %H:%M UTC')}</p>
+            <p><strong>Issued by:</strong> {alert['sender_name']}</p>
+            <p><strong>Description:</strong></p>
+            <pre>{alert['description']}</pre>
+            """
 
-        msg.attach(MIMEText(body, "html"))
+        msg.attach(MIMEText(body, "html", "utf-8"))
 
-        # Step 3: Send email
+        # Send email via Gmail SMTP
         with smtplib.SMTP(SMTP_SERVER, SMTP_PORT) as server:
             server.starttls()
             server.login(SMTP_USERNAME, SMTP_PASSWORD)
@@ -490,8 +494,6 @@ def generate_alert_email():
     except Exception as e:
         print("Error in generate-alert-email:", str(e))
         return jsonify({"error": f"Internal server error: {str(e)}"}), 500
-
-
 
 
 # ✅ Fetch WIldFire Data
