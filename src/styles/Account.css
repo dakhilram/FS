@@ -68,23 +68,31 @@
 }
 
 /* === Inputs & Buttons === */
-input,
-textarea {
-  width: 100%;
+input, textarea {
+  width: 95%;
   padding: 12px;
   margin: 10px 0;
-  border-radius: 10px;
-  border: none;
-  background: rgba(255, 255, 255, 0.4);
+  border-radius: 8px;
+
+  /* NEW: Add border and shadow */
+  border: 1px solid rgba(44, 62, 80, 0.2); /* subtle gray border */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* soft shadow */
+
+  background: rgba(255, 255, 255, 0.5); /* keeps your translucent feel */
+  backdrop-filter: blur(10px);
+
   font-size: 16px;
   color: #2c3e50;
+  transition: all 0.3s ease-in-out;
 }
 
-input:focus,
-textarea:focus {
+input:focus, textarea:focus {
+  border: 1px solid #007bff; /* bright blue focus */
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.2);
+  background: rgba(255, 255, 255, 0.9);
   outline: none;
-  background: rgba(255, 255, 255, 0.6);
 }
+
 
 .button {
   width: 100%;
