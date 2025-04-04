@@ -105,17 +105,78 @@ const Hero = () => {
     }
   };
 
+  const [showModal, setShowModal] = useState(false);
+
+  const modelDescriptions = {
+    Wildfire: `
+🔍 The wildfire model uses VIIRS satellite data and applies:
+- Feature engineering
+- Class balancing with SMOTE
+- XGBoost for classification
+
+🧾 The report includes:
+- Feature importance bar chart
+- Confusion matrix
+- Future wildfire risk map (HTML)
+- Fire intensity time-series forecast
+
+📁 Output files:
+- future_wildfire_predictions.csv
+- wildfire_future_predictions_report.pdf
+  `,
+    Earthquake: `
+🔍 The earthquake model uses data like magnitude, depth, and location.
+- It forecasts potential quake zones using historical clustering
+- Uses unsupervised learning (DBSCAN/KMeans)
+
+🧾 The report includes:
+- Earthquake density heatmap
+- Historical trends
+- Risk zone prediction clusters
+
+📁 Output files:
+- earthquake_predictions.csv
+- earthquake_report.pdf
+  `,
+    Tornado: `
+🔍 The tornado model considers wind speed, pressure, severity.
+- Time-series modeling & classification for risk levels
+- Advanced feature extraction + ensemble methods
+
+🧾 The report includes:
+- Severity category predictions
+- Region-wise tornado trend charts
+
+📁 Output files:
+- tornado_predictions.csv
+- tornado_report.pdf
+  `,
+    Hurricane: `
+🔍 The hurricane model uses satellite and weather data:
+- Features: wind speed, pressure, humidity, storm category
+- Model: Gradient boosting with temporal features
+
+🧾 The report includes:
+- Historical vs predicted hurricane map
+- Wind speed visualizations
+
+📁 Output files:
+- hurricane_predictions.csv
+- hurricane_report.pdf
+  `,
+  };
+
   return (
     <div className="page-container">
       {/* ✅ Show Loading Screen When Flask is Processing */}
       {loading && <LoadingScreen />}
-  
+
       {/* Background Video */}
       <video autoPlay loop muted className="hero-video">
         <source src={videoBg} type="video/mp4" />
       </video>
       <div className="overlay"></div>
-  
+
       {/* Hero Section */}
       <div className="hero-container">
         <h1 className="hero-heading">ForeSight</h1>
@@ -147,7 +208,7 @@ const Hero = () => {
           </div>
         </div>
       </div>
-  
+
       {/* Carousel for Disaster Trends */}
       <div className="carousel-container">
         <h2 className="carousel-title">Latest Trends & Insights</h2>
@@ -162,7 +223,7 @@ const Hero = () => {
           </div>
         </div>
       </div>
-  
+
       {/* Service Overview Section */}
       <div className="service-overview" ref={serviceRef}>
         <h2 className="service-title">Select a Service for Prediction</h2>
@@ -179,7 +240,7 @@ const Hero = () => {
               </button>
             ))}
           </div>
-  
+
           {/* Service Details */}
           <div className="service-details">
             {selectedModel && (
@@ -194,7 +255,11 @@ const Hero = () => {
                         {loading ? "Processing..." : "Generate Report"}
                       </button>
                     )}
-  
+                    {/* How It Works Button */}
+                <button className="btn how-it-works-btn" onClick={() => setShowModal(true)}>
+                  📘 How This Works
+                </button>
+
                     {/* Show Download Links */}
                     {downloadLinks && (
                       <div className="download-links">
@@ -206,7 +271,6 @@ const Hero = () => {
                 ) : (
                   <p className="login-prompt">🔒 Please log in to upload files.</p>
                 )}
-
 
                 {/* Display Required Features for Each Model */}
                 {selectedModel === "Wildfire" && (
@@ -224,7 +288,7 @@ const Hero = () => {
                     </ul>
                   </div>
                 )}
-  
+
                 {selectedModel === "Earthquake" && (
                   <div className="feature-requirements">
                     <h4>🌍 Required Features for Earthquake Prediction</h4>
@@ -237,7 +301,7 @@ const Hero = () => {
                     </ul>
                   </div>
                 )}
-  
+
                 {selectedModel === "Tornado" && (
                   <div className="feature-requirements">
                     <h4>🌪 Required Features for Tornado Prediction</h4>
@@ -250,7 +314,8 @@ const Hero = () => {
                     </ul>
                   </div>
                 )}
-  
+
+
                 {selectedModel === "Hurricane" && (
                   <div className="feature-requirements">
                     <h4>🌀 Required Features for Hurricane Prediction</h4>
@@ -264,15 +329,28 @@ const Hero = () => {
                     </ul>
                   </div>
                 )}
-  
+
                 
               </>
             )}
           </div>
         </div>
       </div>
+
+      {/* Modal Popup */}
+      {showModal && (
+        <div className="modal-backdrop" onClick={() => setShowModal(false)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <h3>{selectedModel} Model – How It Works</h3>
+            <pre>{modelDescriptions[selectedModel]}</pre>
+            <button className="btn close-modal-btn" onClick={() => setShowModal(false)}>
+              Close
+            </button>
+          </div>
+        </div>
+      )}
     </div>
-  );  
+  );
 };
 
 export default Hero;
