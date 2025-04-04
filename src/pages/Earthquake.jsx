@@ -94,7 +94,8 @@ const Earthquake = () => {
         It helps in understanding the potential risk areas and planning for wildfire management and prevention.</p>
       <div className="map-container">
         <iframe
-          src={"https://www.weather.gov/#"}
+          src={`${import.meta.env.BASE_URL}USA_Wildfire_Map1.html`}
+          //src={"https://www.weather.gov/#"}
           title="Wildfire Prediction Map"
           className="wildfire-map"
           width="100%"

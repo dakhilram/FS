@@ -73,7 +73,8 @@ const Wildfire = () => {
         It helps in understanding the potential risk areas and planning for wildfire management and prevention.</p>
       <div className="map-container">
         <iframe
-          src={"https://www.arcgis.com/apps/mapviewer/index.html?webmap=df8bcc10430f48878b01c96e907a1fc3"}
+          src={`${import.meta.env.BASE_URL}USA_Wildfire_Map1.html`}
+          //src={"https://www.arcgis.com/apps/mapviewer/index.html?webmap=df8bcc10430f48878b01c96e907a1fc3"}
           title="Wildfire Prediction Map"
           className="wildfire-map"
           width="100%"
