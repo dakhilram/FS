@@ -125,20 +125,23 @@ const AccountTabLayout = () => {
         )}
 
         {activeTab === "Security" && (
-          <div className="account-card">
+          <div>
+            <div className="account-card">
             <h3>Change Password</h3>
             <form onSubmit={handleChangePassword}>
               <input type="password" placeholder="Current Password" value={currentPassword} onChange={(e) => setCurrentPassword(e.target.value)} required />
               <input type="password" placeholder="New Password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} required />
               <button type="submit" className="button update-password">Reset Password</button>
             </form>
+            </div>
 
+            <div className="account-card">
             <h3>Delete Account</h3>
             <form onSubmit={handleDeleteAccount}>
               <input type="password" placeholder="Confirm Password" value={deletePassword} onChange={(e) => setDeletePassword(e.target.value)} required />
               <button type="submit" className="button delete-account">Delete</button>
             </form>
-          </div>
+          </div></div>
         )}
 
         {activeTab === "Preferences" && (
