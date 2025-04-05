@@ -19,7 +19,7 @@ const Hurricane = () => {
         Hurricanes are powerful tropical storms that form over warm ocean waters, 
         bringing extreme winds, heavy rainfall, and devastating storm surges to coastal regions.
         Hurricanes, also known as tropical cyclones, are large and powerful storm systems 
-        that develop over warm ocean waters. These storms are characterized by strong winds, 
+        that develop over warm ocean waters. These storms are characterized by intense winds, 
         heavy rainfall, storm surges, and flooding, causing devastating effects when they 
         make landfall in coastal regions.
       </p>
@@ -41,7 +41,7 @@ const Hurricane = () => {
       <h2>💰 Economic Damage Caused by Hurricanes 💰</h2>
       <div className="chart-container">
         <p className="chart-description">
-          The bar chart illustrates the total economic damage caused by hurricanes across different categories. 
+          The bar chart illustrates the total economic damage caused by hurricanes across various categories. 
           Higher-category hurricanes generally result in greater financial losses, with Category 5 storms 
           causing the most damage. This trend highlights the destructive potential of intense hurricanes, emphasizing 
           the need for disaster preparedness and mitigation efforts. 
@@ -54,7 +54,7 @@ const Hurricane = () => {
       <div className="chart-container right-align">
         <img src={hudeath} alt="Hurricane Deaths" className="chart-image" />
         <p className="chart-description">
-          The bar chart displays the total number of deaths caused by hurricanes across different categories. 
+          The bar chart displays the total number of deaths caused by hurricanes across various categories. 
           While higher-category hurricanes tend to cause more fatalities, some lower-category storms have 
           also resulted in significant death tolls, likely due to flooding, infrastructure damage, and population density. 
           This emphasizes the importance of early warnings and emergency response systems to minimize loss of life. 
