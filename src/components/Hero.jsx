@@ -109,62 +109,54 @@ const Hero = () => {
 
   const modelDescriptions = {
     Wildfire: `
-🔍 The wildfire model uses VIIRS satellite data and applies:
-- Feature engineering
-- Class balancing with SMOTE
-- XGBoost for classification
-
-🧾 The report includes:
-- Feature importance bar chart
-- Confusion matrix
-- Future wildfire risk map (HTML)
-- Fire intensity time-series forecast
-
-📁 Output files:
-- future_wildfire_predictions.csv
-- wildfire_future_predictions_report.pdf
-  `,
+  🔥 The Wildfire Prediction Model is initially trained on historical wildfire and satellite data (VIIRS). 
+  - When the user uploads new data, the model incorporates it through dynamic training to ensure more accurate and personalized predictions. 
+  - It applies advanced feature engineering, balances classes using SMOTE, and uses XGBoost for classification. 
+  - The model predicts wildfire risk levels (Low to Extreme) for the next 30 days and visualizes high-risk zones. 
+  - It outputs a comprehensive PDF report, a CSV file of predictions, and an HTML wildfire risk map.
+  
+  📁 Output files:
+  - future_wildfire_predictions.csv
+  - wildfire_future_predictions_report.pdf
+    `,
+  
     Earthquake: `
-🔍 The earthquake model uses data like magnitude, depth, and location.
-- It forecasts potential quake zones using historical clustering
-- Uses unsupervised learning (DBSCAN/KMeans)
-
-🧾 The report includes:
-- Earthquake density heatmap
-- Historical trends
-- Risk zone prediction clusters
-
-📁 Output files:
-- earthquake_predictions.csv
-- earthquake_report.pdf
-  `,
+  🌍 The Earthquake Prediction Model is trained on historical seismic data including magnitude, depth, and location. 
+  - User-uploaded data is integrated dynamically to update the clustering and risk classification results. 
+  - The model uses unsupervised learning (KMeans, DBSCAN) to identify high-risk zones based on earthquake patterns. 
+  - It generates visual heatmaps, historical activity trends, and risk zone clusters for interpretation. 
+  - A PDF report summarizes seismic activity, predicts potential threats, and provides safety recommendations.
+  
+  📁 Output files:
+  - earthquake_predictions.csv
+  - earthquake_report.pdf
+    `,
+  
     Tornado: `
-🔍 The tornado model considers wind speed, pressure, severity.
-- Time-series modeling & classification for risk levels
-- Advanced feature extraction + ensemble methods
-
-🧾 The report includes:
-- Severity category predictions
-- Region-wise tornado trend charts
-
-📁 Output files:
-- tornado_predictions.csv
-- tornado_report.pdf
-  `,
+  🌪️ The Tornado Prediction Model learns from historical tornado events and real-time user data inputs. 
+  - After being pre-trained on past storms, it dynamically fine-tunes itself using uploaded data for localized predictions. 
+  - It uses XGBoost classification and ensemble methods, alongside feature extraction from wind, pressure, and humidity. 
+  - The model forecasts tornado intensity levels and trends for upcoming days with visual summaries. 
+  - Reports and maps provide insights into regional risk and preparedness recommendations.
+  
+  📁 Output files:
+  - tornado_predictions.csv
+  - tornado_report.pdf
+    `,
+  
     Hurricane: `
-🔍 The hurricane model uses satellite and weather data:
-- Features: wind speed, pressure, humidity, storm category
-- Model: Gradient boosting with temporal features
-
-🧾 The report includes:
-- Historical vs predicted hurricane map
-- Wind speed visualizations
-
-📁 Output files:
-- hurricane_predictions.csv
-- hurricane_report.pdf
-  `,
+  🌊 The Hurricane Prediction Model is pre-trained using global historical data such as hurricane tracks, wind speeds, and pressure. 
+  - User-provided data is used to fine-tune predictions in real-time, improving localized forecasting. 
+  - Gradient boosting techniques are applied on features like wind speed, pressure, and humidity for accurate classification. 
+  - It provides storm path projections, intensity levels, and historical comparisons through visual maps and charts. 
+  - Users receive a PDF report with predicted hurricane paths, safety advice, and forecast maps.
+  
+  📁 Output files:
+  - hurricane_predictions.csv
+  - hurricane_report.pdf
+    `,
   };
+  
 
   return (
     <div className="page-container">
