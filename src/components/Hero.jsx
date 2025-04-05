@@ -17,6 +17,8 @@ const Hero = () => {
   const [downloadLinks, setDownloadLinks] = useState(null);
   const [loading, setLoading] = useState(false);
   const username = localStorage.getItem("username");
+  const fileInputRef = useRef(null);
+
 
   // Disaster Trends Data
   const slides = [
@@ -44,12 +46,16 @@ const Hero = () => {
   // Scroll to Service Details when a service is selected
   const handleServiceClick = (model) => {
     setSelectedModel(model);
-    setFile(null);
-    setDownloadLinks(null);
+    setFile(null); // clears current file from state
+    setDownloadLinks(null); // clears previous download links
+    if (fileInputRef.current) {
+      fileInputRef.current.value = null; // clears file input visually
+    }
     setTimeout(() => {
       serviceRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
     }, 200);
   };
+  
 
   // Handle File Upload
   const handleFileUpload = (event) => {
@@ -241,7 +247,7 @@ const Hero = () => {
                 <p>Upload {selectedModel} data (CSV) to generate predictions.</p>
                 {username ? (
                   <>
-                    <input type="file" accept=".csv" onChange={handleFileUpload} />
+                    <input type="file" accept=".csv" onChange={handleFileUpload} ref={fileInputRef}/>
                     {file && (
                       <button className="btn generate-btn" onClick={handleGenerateReport} disabled={loading}>
                         {loading ? "Processing..." : "Generate Report"}
