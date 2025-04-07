@@ -143,7 +143,6 @@ class User(db.Model):
     email = db.Column(db.String(120), unique=True, nullable=False)
     password = db.Column(db.String(255), nullable=False)
     is_verified = db.Column(db.Boolean, default=False)  # ✅ Email verification status
-    alert_zipcode = db.Column(db.String(10), nullable=True)
 
 # ✅ Create tables
 with app.app_context():
@@ -312,8 +311,7 @@ def user_details():
     return jsonify({
         "username": user.username,
         "email": user.email,
-        "isVerified": user.is_verified,
-        "zipcode": user.alert_zipcode
+        "isVerified": user.is_verified
     }), 200
 
 # ✅ Resend Email Verification API
@@ -504,20 +502,6 @@ def generate_alert_email():
     except Exception as e:
         print("Error in generate-alert-email:", str(e))
         return jsonify({"error": f"Internal server error: {str(e)}"}), 500
-    
-@app.route('/update-alert-zipcode', methods=['POST'])
-def update_alert_zipcode():
-    data = request.get_json()
-    email = data.get('email')
-    zipcode = data.get('zipcode')
-
-    user = User.query.filter_by(email=email).first()
-    if user:
-        user.alert_zipcode = zipcode
-        db.session.commit()
-        return jsonify({"message": "ZIP code updated successfully"}), 200
-    return jsonify({"message": "User not found"}), 404
-
 
 
 # ✅ Fetch WIldFire Data
