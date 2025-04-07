@@ -1,4 +1,3 @@
-🔮 #ForeSight
 ForeSight is an internal forecasting and insights platform designed to support strategic decision-making through intelligent data analysis, predictive modeling, and streamlined workflows.
 
 Note: This is a private repository for internal use only.
