@@ -47,19 +47,33 @@ const Alerts = () => {
   const [autoDetected, setAutoDetected] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const [emailStatus, setEmailStatus] = useState("");
+  const [userZipcode, setUserZipcode] = useState(null);
 
   const [userEmail, setUserEmail] = useState(localStorage.getItem("user_email"));
 
-  // Listen for localStorage updates
   useEffect(() => {
     const handleStorageChange = () => {
       setUserEmail(localStorage.getItem("user_email"));
     };
-
     window.addEventListener("storage", handleStorageChange);
     return () => window.removeEventListener("storage", handleStorageChange);
   }, []);
 
+  useEffect(() => {
+      const storedUsername = localStorage.getItem("username");
+      if (!storedUsername) return;
+  
+      axios.get(`${API_BASE_URL}/user-details`, {
+        params: { username: storedUsername },
+        withCredentials: true
+      }).then((res) => {
+        if (res.data.zipcode) {
+          setUserZipcode(res.data.zipcode);
+        }
+      }).catch((err) => {
+        console.error("Failed to fetch user ZIP:", err);
+      });
+    }, []);
 
   const fetchWeather = async (lat = null, lon = null) => {
     try {
@@ -121,17 +135,37 @@ const Alerts = () => {
   }, [unit]);
 
   const handleGenerateAlert = async () => {
-    if (!weatherData || !userEmail) return;
-
-    const { lat, lon } = weatherData.location;
-
+    if (!userEmail) return;
+    let lat, lon;
     try {
+      // ✅ If user has a saved ZIP code, use it
+      if (userZipcode) {
+        const geoRes = await axios.get("https://api.openweathermap.org/geo/1.0/zip", {
+          params: {
+            zip: userZipcode,
+            appid: "YOUR_OPENWEATHER_API_KEY"  // 🔁 Replace this with your actual key
+          }
+        });
+  
+        lat = geoRes.data.lat;
+        lon = geoRes.data.lon;
+      }
+  
+      // ✅ Fallback to current weather location
+      else if (weatherData) {
+        lat = weatherData.location.lat;
+        lon = weatherData.location.lon;
+      } else {
+        setError("No location available to generate alert.");
+        return;
+      }
+  
       const response = await axios.post(`${API_BASE_URL}/generate-alert-email`, {
         lat,
         lon,
         email: userEmail,
       });
-
+  
       if (response.data.alertAvailable === false) {
         setShowConfirm(true);
       } else {
@@ -142,6 +176,7 @@ const Alerts = () => {
       setEmailStatus("❌ Failed to send email.");
     }
   };
+  
 
   const sendAnyway = async () => {
     setShowConfirm(false);

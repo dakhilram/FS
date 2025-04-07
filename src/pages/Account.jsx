@@ -27,6 +27,7 @@ const AccountTabLayout = () => {
   const [subject, setSubject] = useState("");
   const [message, setMessage] = useState("");
   const [contactStatus, setContactStatus] = useState("");
+  const [zipcode, setZipcode] = useState("");
 
   useEffect(() => {
     const fetchUserDetails = async () => {
@@ -39,12 +40,20 @@ const AccountTabLayout = () => {
       });
 
       setUser(response.data);
+      setZipcode(response.data.zipcode || "");
       setSecurityAlerts(response.data.securityAlerts);
       setNewsUpdates(response.data.newsUpdates);
     };
 
     fetchUserDetails();
   }, []);
+  const handleZipUpdate = async () => {
+    await axios.post(`${API_BASE_URL}/update-alert-zipcode`, {
+      email: user.email,
+      zipcode,
+    }, { withCredentials: true });
+    alert("ZIP code updated!");
+  };
 
   const handleChangePassword = async (e) => {
     e.preventDefault();
@@ -64,7 +73,7 @@ const AccountTabLayout = () => {
     e.preventDefault();
     const confirmDelete = window.confirm("Are you sure you want to delete your account?");
     if (!confirmDelete) return;
-  
+
     try {
       await axios.post(`${API_BASE_URL}/delete-account`, {
         email: user.email,
@@ -72,7 +81,7 @@ const AccountTabLayout = () => {
       }, {
         withCredentials: true,
       });
-  
+
       localStorage.removeItem("username");
       localStorage.removeItem("isLoggedIn");
       window.dispatchEvent(new Event("storage"));
@@ -83,7 +92,7 @@ const AccountTabLayout = () => {
       alert("Failed to delete account.");
     }
   };
-  
+
 
   const handleSavePreferences = async () => {
     await axios.post(`${API_BASE_URL}/update-preferences`, {
@@ -121,27 +130,39 @@ const AccountTabLayout = () => {
             <h3 className={`verification-status ${user.isVerified ? "" : "not-verified"}`}>
               Verification: {user.isVerified ? "✔️ Verified" : "❌ Not Verified"}
             </h3>
+            <h3>
+              Preferred ZIP Code for Alerts:
+              <input
+                type="text"
+                value={zipcode}
+                onChange={(e) => setZipcode(e.target.value)}
+                placeholder="Enter ZIP"
+                style={{ marginLeft: "10px" }}
+              />
+              <button onClick={handleZipUpdate} className="button update-preferences">Save</button>
+            </h3>
+
           </div>
         )}
 
         {activeTab === "Security" && (
           <div>
             <div className="account-card">
-            <h3>Change Password</h3>
-            <form onSubmit={handleChangePassword}>
-              <input type="password" placeholder="Current Password" value={currentPassword} onChange={(e) => setCurrentPassword(e.target.value)} required />
-              <input type="password" placeholder="New Password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} required />
-              <button type="submit" className="button update-password">Reset Password</button>
-            </form>
+              <h3>Change Password</h3>
+              <form onSubmit={handleChangePassword}>
+                <input type="password" placeholder="Current Password" value={currentPassword} onChange={(e) => setCurrentPassword(e.target.value)} required />
+                <input type="password" placeholder="New Password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} required />
+                <button type="submit" className="button update-password">Reset Password</button>
+              </form>
             </div>
 
             <div className="account-card">
-            <h3>Delete Account</h3>
-            <form onSubmit={handleDeleteAccount}>
-              <input type="password" placeholder="Confirm Password" value={deletePassword} onChange={(e) => setDeletePassword(e.target.value)} required />
-              <button type="submit" className="button delete-account">Delete</button>
-            </form>
-          </div></div>
+              <h3>Delete Account</h3>
+              <form onSubmit={handleDeleteAccount}>
+                <input type="password" placeholder="Confirm Password" value={deletePassword} onChange={(e) => setDeletePassword(e.target.value)} required />
+                <button type="submit" className="button delete-account">Delete</button>
+              </form>
+            </div></div>
         )}
 
         {activeTab === "Preferences" && (
