@@ -143,6 +143,7 @@ class User(db.Model):
     email = db.Column(db.String(120), unique=True, nullable=False)
     password = db.Column(db.String(255), nullable=False)
     is_verified = db.Column(db.Boolean, default=False)  # ✅ Email verification status
+    zipcode = db.Column(db.String(10))  # ✅ Used for daily alert location
 
 # ✅ Create tables
 with app.app_context():
@@ -174,6 +175,21 @@ def send_verification_email(email):
 
     except Exception as e:
         print(f"❌ Failed to send email: {e}")
+
+@app.route("/update-zipcode", methods=["POST"])
+def update_zipcode():
+    data = request.json
+    email = data.get("email")
+    zipcode = data.get("zipcode")
+
+    user = User.query.filter_by(email=email).first()
+    if not user:
+        return jsonify({"message": "User not found"}), 404
+
+    user.zipcode = zipcode
+    db.session.commit()
+    return jsonify({"message": "ZIP code updated"}), 200
+
 
 # ✅ Signup Route (Now sends verification email)
 @app.route('/signup', methods=['POST'])
@@ -311,7 +327,8 @@ def user_details():
     return jsonify({
         "username": user.username,
         "email": user.email,
-        "isVerified": user.is_verified
+        "isVerified": user.is_verified,
+        "zipcode": user.zipcode
     }), 200
 
 # ✅ Resend Email Verification API
@@ -795,6 +812,42 @@ def download_file(filename):
     print(f"✅ File served: {file_path}")
     return send_file(file_path, as_attachment=True)  # Allow downloading HTML files
 
+
+from apscheduler.schedulers.background import BackgroundScheduler
+
+def send_daily_alert_emails():
+    with app.app_context():
+        users = User.query.filter(User.zipcode.isnot(None)).all()
+        for user in users:
+            try:
+                # Get coordinates for ZIP code
+                geo_url = f"http://api.openweathermap.org/geo/1.0/zip?zip={user.zipcode},US&appid={OPENWEATHER_API_KEY}"
+                geo_response = requests.get(geo_url)
+                if geo_response.status_code != 200:
+                    print(f"❌ ZIP lookup failed for {user.email}: {user.zipcode}")
+                    continue
+
+                geo_data = geo_response.json()
+                lat = geo_data.get("lat")
+                lon = geo_data.get("lon")
+
+                # Send the email using the existing alert email endpoint
+                response = requests.post(f"{BASE_URL}/generate-alert-email", json={
+                    "lat": lat,
+                    "lon": lon,
+                    "email": user.email,
+                    "forceSend": True  # Always send — even if no alerts
+                })
+
+                print(f"✅ Sent daily alert to {user.email}")
+
+            except Exception as e:
+                print(f"❌ Failed for {user.email}: {str(e)}")
+
+# ⏰ Schedule it to run every day at 12:00 AM
+scheduler = BackgroundScheduler()
+scheduler.add_job(send_daily_alert_emails, "cron", hour=0, minute=0)
+scheduler.start()
 
 
 # ✅ Health Check Route
