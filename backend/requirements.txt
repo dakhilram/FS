@@ -20,3 +20,4 @@ statsmodels
 PyJWT
 Flask-Mail
 imblearn
+apscheduler
