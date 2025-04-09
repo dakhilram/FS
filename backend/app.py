@@ -881,8 +881,9 @@ scheduler.start()
 
 @app.route('/manual-daily-alerts')
 def run_manual_alerts():
-    send_daily_alert_emails()
-    return "✅ Manual daily alerts triggered!", 200
+    #send_daily_alert_emails()
+    #return "✅ Manual daily alerts triggered!", 200
+    return "🚫 This endpoint has been disabled", 403
 
 # ✅ Health Check Route
 @app.route('/')
