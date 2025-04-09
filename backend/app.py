@@ -721,9 +721,9 @@ def predict_wildfire():
         page_height = pdf.h
 
 # 1️⃣ Project Title at 40% from top
-        pdf.set_y(page_height * 0.4)
+        pdf.set_y(page_height * 0.3)
 
-        pdf.set_font("Arial", style='B', size=20)
+        pdf.set_font("Arial", style='B', size=40)
         pdf.cell(0, 12, "ForeSight", ln=True, align='C')
 
 # Tagline just below
@@ -733,7 +733,7 @@ def predict_wildfire():
 # 2️⃣ Wildfire Report at 60% from top
         pdf.set_y(page_height * 0.6)
 
-        pdf.set_font("Arial", style='B', size=16)
+        pdf.set_font("Arial", style='B', size=36)
         pdf.cell(0, 10, "Wildfire Prediction Report", ln=True, align='C')
 
         descriptions = [
