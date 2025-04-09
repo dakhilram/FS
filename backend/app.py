@@ -857,4 +857,6 @@ def home():
 
 # ✅ Run the Flask app
 if __name__ == '__main__':
+    scheduler.start()  # Make sure it's explicitly started
+    send_daily_alert_emails()  # Trigger once for manual test
     app.run(host="0.0.0.0", port=5000, debug=True)
