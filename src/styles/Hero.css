@@ -96,6 +96,27 @@ html {
   transition: all 0.3s ease;
 }
 
+.btn {
+  width: auto;
+  max-width: 90%;
+}
+
+@media (max-width: 600px) {
+  .btn {
+    width: fit-content;
+    padding: 10px 18px;
+    font-size: 14px;
+  }
+
+  .hero-buttons {
+    flex-direction: column;
+    align-items: center;
+  }
+}
+
+
+
+
 .primary-btn {
   background: #007bff;
   color: white;
@@ -418,6 +439,13 @@ input[type="file"] {
     width: 100%;
   }
 
+  .service-details {
+    padding: 15px;
+    font-size: 14px;
+    transform: none;
+    width: 100%;
+  }
+
   .service-list {
     flex-direction: column;
     align-items: center;
@@ -509,7 +537,6 @@ input[type="file"] {
 
   .service-details {
     width: 95%;
-    padding: 15px;
   }
 
   .generate-btn {
@@ -520,8 +547,16 @@ input[type="file"] {
 /* ✅ Mobile View */
 @media (max-width: 600px) {
   .hero-heading {
-    font-size: clamp(32px, 5vw, 50px);
+    font-size: clamp(40px, 10vw, 80px);
+    margin-top: 10px;
+    padding: 0 10px;
   }
+  
+  .hero-tagline {
+    font-size: clamp(14px, 2.5vw, 18px);
+    margin-top: -30px;
+  }
+  
 
   .hero-title {
     font-size: clamp(20px, 3.5vw, 30px);
@@ -547,7 +582,11 @@ input[type="file"] {
   }
 
   .service-details {
-    width: 100%;
+    width: 95%;
+    max-width: 700px;
+    margin-left: 0;
+    transform: none;
+    opacity: 1;
   }
 
   .generate-btn {
