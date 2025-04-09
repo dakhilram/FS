@@ -849,6 +849,10 @@ scheduler = BackgroundScheduler()
 scheduler.add_job(send_daily_alert_emails, "cron", hour=0, minute=0)
 scheduler.start()
 
+@app.route('/manual-daily-alerts')
+def run_manual_alerts():
+    send_daily_alert_emails()
+    return "✅ Manual daily alerts triggered!", 200
 
 # ✅ Health Check Route
 @app.route('/')
@@ -857,6 +861,4 @@ def home():
 
 # ✅ Run the Flask app
 if __name__ == '__main__':
-    scheduler.start()  # Make sure it's explicitly started
-    send_daily_alert_emails()  # Trigger once for manual test
     app.run(host="0.0.0.0", port=5000, debug=True)
