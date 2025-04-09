@@ -715,11 +715,26 @@ def predict_wildfire():
 
         # === PDF Report ===
         pdf = FPDF()
-        pdf.set_auto_page_break(auto=True, margin=15)
         pdf.add_page()
+
+# Get page height for positioning
+        page_height = pdf.h
+
+# 1️⃣ Project Title at 40% from top
+        pdf.set_y(page_height * 0.4)
+
+        pdf.set_font("Arial", style='B', size=20)
+        pdf.cell(0, 12, "ForeSight", ln=True, align='C')
+
+# Tagline just below
+        pdf.set_font("Arial",style='I', size=14)
+        pdf.cell(0, 10, "Predicting disasters ahead", ln=True, align='C')
+
+# 2️⃣ Wildfire Report at 60% from top
+        pdf.set_y(page_height * 0.6)
+
         pdf.set_font("Arial", style='B', size=16)
-        pdf.cell(200, 10, "Wildfire Prediction Report", ln=True, align='C')
-        pdf.ln(10)
+        pdf.cell(0, 10, "Wildfire Prediction Report", ln=True, align='C')
 
         descriptions = [
     ("Class Distribution of Wildfire Risk Levels",
