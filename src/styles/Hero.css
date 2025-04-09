@@ -78,7 +78,7 @@ html {
 
 .hero-description {
   font-size: 18px;
-  margin: 15px 0;
+  margin: 15px 10px;
 }
 
 /* ✅ CTA Buttons */
@@ -113,8 +113,6 @@ html {
     align-items: center;
   }
 }
-
-
 
 
 .primary-btn {
