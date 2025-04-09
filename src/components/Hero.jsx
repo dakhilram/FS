@@ -55,7 +55,7 @@ const Hero = () => {
       serviceRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
     }, 200);
   };
-  
+
 
   // Handle File Upload
   const handleFileUpload = (event) => {
@@ -125,7 +125,7 @@ const Hero = () => {
   - future_wildfire_predictions.csv
   - wildfire_future_predictions_report.pdf
     `,
-  
+
     Earthquake: `
   🌍 The Earthquake Prediction Model is trained on historical seismic data including magnitude, depth, and location. 
   - User-uploaded data is integrated dynamically to update the clustering and risk classification results. 
@@ -137,7 +137,7 @@ const Hero = () => {
   - earthquake_predictions.csv
   - earthquake_report.pdf
     `,
-  
+
     Tornado: `
   🌪️ The Tornado Prediction Model learns from historical tornado events and real-time user data inputs. 
   - After being pre-trained on past storms, it dynamically fine-tunes itself using uploaded data for localized predictions. 
@@ -149,7 +149,7 @@ const Hero = () => {
   - tornado_predictions.csv
   - tornado_report.pdf
     `,
-  
+
     Hurricane: `
   🌊 The Hurricane Prediction Model is pre-trained using global historical data such as hurricane tracks, wind speeds, and pressure. 
   - User-provided data is used to fine-tune predictions in real-time, improving localized forecasting. 
@@ -162,21 +162,20 @@ const Hero = () => {
   - hurricane_report.pdf
     `,
   };
-  
+
 
   return (
     <div className="page-container">
       {/* ✅ Show Loading Screen When Flask is Processing */}
       {loading && <LoadingScreen />}
-
-      {/* Background Video */}
-      <video autoPlay loop muted className="hero-video">
-        <source src={videoBg} type="video/mp4" />
-      </video>
-      <div className="overlay"></div>
-
       {/* Hero Section */}
       <div className="hero-container">
+        <div className="video-wrapper">
+          <video autoPlay loop muted className="hero-video">
+            <source src={videoBg} type="video/mp4" />
+          </video>
+          <div className="overlay"></div>
+        </div>
         <h1 className="hero-heading">ForeSight</h1>
         <p className="hero-tagline">Predicting disasters ahead.</p>
         <div className="hero-content">
@@ -247,16 +246,16 @@ const Hero = () => {
                 <p>Upload {selectedModel} data (CSV) to generate predictions.</p>
                 {username ? (
                   <>
-                    <input type="file" accept=".csv" onChange={handleFileUpload} ref={fileInputRef}/>
+                    <input type="file" accept=".csv" onChange={handleFileUpload} ref={fileInputRef} />
                     {file && (
                       <button className="btn generate-btn" onClick={handleGenerateReport} disabled={loading}>
                         {loading ? "Processing..." : "Generate Report"}
                       </button>
                     )}
                     {/* How It Works Button */}
-                <button className="btn how-it-works-btn" onClick={() => setShowModal(true)}>
-                  📘 How This Works
-                </button>
+                    <button className="btn how-it-works-btn" onClick={() => setShowModal(true)}>
+                      📘 How This Works
+                    </button>
 
                     {/* Show Download Links */}
                     {downloadLinks && (
@@ -328,7 +327,7 @@ const Hero = () => {
                   </div>
                 )}
 
-                
+
               </>
             )}
           </div>
