@@ -133,12 +133,12 @@ input:focus, textarea:focus {
 }
 
 .update-preferences {
-  background: linear-gradient(135deg, #9abda8, #219150);
+  background: linear-gradient(135deg, #6c99b8, #134d8c);
   color: white;
 }
 
 .update-preferences:hover {
-  background: linear-gradient(135deg, #219150, #29583c);
+  background: linear-gradient(135deg, #09365a, #072f6a);
 }
 
 /* === Toggle Switch === */
