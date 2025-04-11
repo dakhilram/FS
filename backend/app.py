@@ -834,7 +834,7 @@ from apscheduler.schedulers.background import BackgroundScheduler
 
 def send_daily_alert_emails():
     with app.app_context():
-        users = User.query.filter(User.zipcode.isnot(None)).all()
+        users = User.query.filter(User.zipcode.isnot(None), User.zipcode != "").all()
         for user in users:
             try:
                 geo_url = f"http://api.openweathermap.org/geo/1.0/zip?zip={user.zipcode},US&appid={OPENWEATHER_API_KEY}"
