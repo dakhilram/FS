@@ -1,9 +1,9 @@
 import React from "react";
 import "../styles/Terrorism.css";
 import terrorismImage from "../assets/te.jpg";
-import attackTypeChart from "../assets/terrorism/attack_type.png";
-import fatalitiesChart from "../assets/terrorism/fatalities_over_years.png";
-import terrortrend from "../assets/terrorism/te_trend.png";
+import attackTypeChart from "../assets/Terrorism/attack_type.png";
+import fatalitiesChart from "../assets/Terrorism/fatalities_over_years.png";
+import terrortrend from "../assets/Terrorism/te_trend.png";
 
 const Terrorism = () => {
   return (
