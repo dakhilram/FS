@@ -37,6 +37,7 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.header import Header
 from email.utils import formataddr
+from datetime import datetime
 
 # ✅ Load environment variables
 load_dotenv()
@@ -668,8 +669,9 @@ def predict_wildfire():
 
         # === Future Predictions & Map ===
         future_days = 30
-        future_dates = pd.date_range(df['datetime'].max(), periods=future_days + 1, freq='D')[1:]
+        future_dates = pd.date_range(start=datetime.today(), periods=future_days, freq='D')
         future_data = []
+
         for date in future_dates:
             for _ in range(50):
                 random_fire = df.sample(1).iloc[0]
