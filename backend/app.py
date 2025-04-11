@@ -37,7 +37,6 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.header import Header
 from email.utils import formataddr
-from datetime import datetime
 
 # ✅ Load environment variables
 load_dotenv()
