@@ -28,7 +28,7 @@ import folium
 #from tensorflow.keras.layers import LSTM, Dense, Conv1D, Flatten
 #from sklearn.ensemble import RandomForestRegressor
 #from statsmodels.tsa.arima.model import ARIMA
-import hashlib
+#import hashlib
 import jwt
 import datetime
 from flask_mail import Mail, Message
@@ -66,7 +66,7 @@ def handle_preflight():
 # ✅ Database Configuration
 app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv(
     "DATABASE_URL",
-    "postgresql://akhil:YvMTFxMVgulJjudfvZ6ovc5XJwZE9G0k@dpg-cukit5a3esus73asth4g-a.oregon-postgres.render.com/foresight_db_uyxi"
+    "postgresql://akhil:YvMTFxMVgulJjudfvZ6ovc5XJwZE9G0k@dpg-cukit5a3esus73asth4g-a.oregon-postgres.render.com/foresight_db_uyxi?sslmode=require"
 )
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
