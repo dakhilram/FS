@@ -890,9 +890,12 @@ def send_daily_alert_emails():
 
 
 # ⏰ Schedule it to run every day at 12:00 AM
-scheduler = BackgroundScheduler()
+from pytz import timezone
+
+central = timezone("US/Central")
+scheduler = BackgroundScheduler(timezone=central)
 scheduler.add_job(send_daily_alert_emails, "cron", hour=0, minute=0)
-scheduler.start()
+#scheduler.start()
 
 @app.route('/manual-daily-alerts')
 def run_manual_alerts():
@@ -907,4 +910,5 @@ def home():
 
 # ✅ Run the Flask app
 if __name__ == '__main__':
+    import scheduler_init
     app.run(host="0.0.0.0", port=5000, debug=True)
