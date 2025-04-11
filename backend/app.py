@@ -911,7 +911,8 @@ def run_manual_alerts():
 def home():
     return "Flask Backend Running!"
 
+import scheduler_init
+
 # ✅ Run the Flask app
 if __name__ == '__main__':
-    import scheduler_init
     app.run(host="0.0.0.0", port=5000, debug=True)
