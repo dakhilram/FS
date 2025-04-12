@@ -830,10 +830,11 @@ def download_file(filename):
 
 
 from apscheduler.schedulers.background import BackgroundScheduler
+from app import db
 
 def send_daily_alert_emails():
     with app.app_context():
-        users = User.query.filter(User.zipcode.isnot(None), User.zipcode != "").all()
+        users = db.session.query(User).filter(User.zipcode.isnot(None), User.zipcode != "").all()
         for user in users:
             try:
                 geo_url = f"http://api.openweathermap.org/geo/1.0/zip?zip={user.zipcode},US&appid={OPENWEATHER_API_KEY}"
@@ -895,7 +896,7 @@ from pytz import timezone
 
 central = timezone("US/Central")
 scheduler = BackgroundScheduler(timezone=central)
-#scheduler.add_job(send_daily_alert_emails, "interval", minutes=1)  # For testing, run every minute
+scheduler.add_job(send_daily_alert_emails, "interval", minutes=1)  # For testing, run every minute
 scheduler.add_job(send_daily_alert_emails, "cron", hour=0, minute=0)
 #scheduler.start()
 
