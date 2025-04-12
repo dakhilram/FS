@@ -896,7 +896,7 @@ from pytz import timezone
 
 central = timezone("US/Central")
 scheduler = BackgroundScheduler(timezone=central)
-scheduler.add_job(send_daily_alert_emails, "interval", minutes=1)  # For testing, run every minute
+#scheduler.add_job(send_daily_alert_emails, "interval", minutes=1)  # For testing, run every minute
 scheduler.add_job(send_daily_alert_emails, "cron", hour=0, minute=0)
 #scheduler.start()
 
