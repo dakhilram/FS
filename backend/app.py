@@ -592,7 +592,7 @@ def predict_wildfire():
         features.append('fire_zone')
 
         class_counts = Counter(y_train_resampled)
-        smote = SMOTE(sampling_strategy={1: int(class_counts[0] * 0.8)}, random_state=42)
+        smote = SMOTE(sampling_strategy={1: int(class_counts[0] * 0.8)}, random_state=42, k_neighbors=1)
         X_train_resampled, y_train_resampled = smote.fit_resample(X_train, y_train)
 
         df['fire_intensity_ratio'] = df['frp'] / (df['bright_ti4'] + df['bright_ti5'])
