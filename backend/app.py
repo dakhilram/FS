@@ -834,6 +834,39 @@ def download_file(filename):
     print(f"✅ File served: {file_path}")
     return send_file(file_path, as_attachment=True)  # Allow downloading HTML files
 
+def send_wildfire_risk_alerts():
+    with app.app_context():
+        users = db.session.query(User).filter(User.zipcode.isnot(None), User.zipcode != "").all()
+
+        for user in users:
+            try:
+                geo_url = f"http://api.openweathermap.org/geo/1.0/zip?zip={user.zipcode},US&appid={OPENWEATHER_API_KEY}"
+                geo_response = requests.get(geo_url)
+                geo_data = geo_response.json()
+
+                if geo_response.status_code != 200 or 'lat' not in geo_data:
+                    print(f"❌ Invalid ZIP for {user.email}")
+                    continue
+
+                lat = geo_data['lat']
+                lon = geo_data['lon']
+
+                weather_url = (
+                    f"https://api.openweathermap.org/data/3.0/onecall"
+                    f"?lat={lat}&lon={lon}&exclude=minutely"
+                    f"&appid={OPENWEATHER_API_KEY}&units=metric"
+                )
+                weather_response = requests.get(weather_url)
+                weather = weather_response.json().get("current", {})
+
+                wildfire_risk = predict_weather_wildfire_risk(weather)
+
+                if wildfire_risk >= 1:
+                    send_wildfire_email(user.email, wildfire_risk, user.zipcode)
+
+            except Exception as e:
+                print(f"❌ Error in wildfire alert for {user.email}: {str(e)}")
+
 
 from apscheduler.schedulers.background import BackgroundScheduler
 from app import db
@@ -911,6 +944,9 @@ central = timezone("US/Central")
 scheduler = BackgroundScheduler(timezone=central)
 #scheduler.add_job(send_daily_alert_emails, "interval", minutes=1)  # For testing, run every minute
 scheduler.add_job(send_daily_alert_emails, "cron", hour=0, minute=0)
+
+scheduler.add_job(send_wildfire_risk_alerts, "cron", hour=8, minute=0)
+scheduler.add_job(send_wildfire_risk_alerts, "cron", hour=18, minute=0)
 #scheduler.start()
 
 def predict_weather_wildfire_risk(weather):
@@ -955,7 +991,10 @@ def send_wildfire_email(recipient_email, risk_level, zipcode):
 def run_manual_alerts():
     #send_daily_alert_emails()
     #return "✅ Manual daily alerts triggered!", 200
-    return "🚫 This endpoint has been disabled", 403
+
+    send_wildfire_risk_alerts()  # 👈 call it manually
+    return "✅ Wildfire alerts triggered manually", 200
+    #return "🚫 This endpoint has been disabled", 403
 
 # ✅ Health Check Route
 @app.route('/')
