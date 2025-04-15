@@ -38,12 +38,17 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.header import Header
 from email.utils import formataddr
+from joblib import load
+
 
 # ✅ Load environment variables
 load_dotenv()
 
 # ✅ Initialize Flask app
 app = Flask(__name__)
+
+# Load the weather-based wildfire risk model
+WILDFIRE_WEATHER_MODEL = load("models/weather_wildfire_model.pkl")
 
 # ✅ Allow CORS for GitHub Pages & Local Development
 allowed_origins = [
@@ -858,6 +863,13 @@ def send_daily_alert_emails():
                 weather_response = requests.get(url)
                 weather_data = weather_response.json()
                 alerts = weather_data.get("alerts", [])
+                weather = weather_response.json().get("current", {})
+                wildfire_risk = predict_weather_wildfire_risk(weather)
+
+                if wildfire_risk >= 1:
+    # Moderate or High Risk
+                    send_wildfire_email(user.email, wildfire_risk, user.zipcode)
+
 
                 # Construct body
                 if not alerts:
@@ -897,9 +909,47 @@ from pytz import timezone
 
 central = timezone("US/Central")
 scheduler = BackgroundScheduler(timezone=central)
-#scheduler.add_job(send_daily_alert_emails, "interval", minutes=1)  # For testing, run every minute
-scheduler.add_job(send_daily_alert_emails, "cron", hour=0, minute=0)
+scheduler.add_job(send_daily_alert_emails, "interval", minutes=1)  # For testing, run every minute
+#scheduler.add_job(send_daily_alert_emails, "cron", hour=0, minute=0)
 #scheduler.start()
+
+def predict_weather_wildfire_risk(weather):
+    df = pd.DataFrame([{
+        "temp": weather.get("temp", 0),
+        "humidity": weather.get("humidity", 100),
+        "wind_speed": weather.get("wind_speed", 0),
+        "clouds": weather.get("clouds", 0),
+        "uvi": weather.get("uvi", 0)
+    }])
+    prediction = WILDFIRE_WEATHER_MODEL.predict(df)[0]
+    return int(prediction)  # risk level: 0, 1, 2
+
+def send_wildfire_email(recipient_email, risk_level, zipcode):
+    risk_text = ["Low", "Moderate", "High"][risk_level]
+
+    subject = f"🔥 Wildfire Risk Alert for ZIP {zipcode}"
+    body = f"""
+    <h2>Wildfire Risk Level: {risk_text}</h2>
+    <p>Our system predicts a <strong>{risk_text}</strong> wildfire risk in your area (ZIP code: <strong>{zipcode}</strong>).</p>
+    <p>Please stay alert and take precautions if necessary.</p>
+    <p>– Foresight Team</p>
+    """
+
+    msg = MIMEMultipart()
+    msg["From"] = SMTP_USERNAME
+    msg["To"] = recipient_email
+    msg["Subject"] = subject
+    msg.attach(MIMEText(body, "html", "utf-8"))
+
+    try:
+        with smtplib.SMTP(SMTP_SERVER, SMTP_PORT) as server:
+            server.starttls()
+            server.login(SMTP_USERNAME, SMTP_PASSWORD)
+            server.sendmail(SMTP_USERNAME, recipient_email, msg.as_string().encode("utf-8"))
+        print(f"✅ Wildfire alert sent to {recipient_email}")
+    except Exception as e:
+        print(f"❌ Failed to send wildfire email to {recipient_email}: {e}")
+
 
 @app.route('/manual-daily-alerts')
 def run_manual_alerts():
