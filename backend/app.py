@@ -834,6 +834,77 @@ def download_file(filename):
     print(f"✅ File served: {file_path}")
     return send_file(file_path, as_attachment=True)  # Allow downloading HTML files
 
+from joblib import load
+TORNADO_MODEL = load("models/tornado_model.pkl")
+
+def predict_tornado_risk(weather):
+    df = pd.DataFrame([{
+        "temp": weather.get("temp", 0),
+        "humidity": weather.get("humidity", 100),
+        "wind_speed": weather.get("wind_speed", 0),
+        "pressure": weather.get("pressure", 1013),
+        "clouds": weather.get("clouds", 0),
+        "uvi": weather.get("uvi", 0)
+    }])
+    prediction = TORNADO_MODEL.predict(df)[0]
+    return int(prediction)
+
+def send_tornado_risk_alerts():
+    with app.app_context():
+        users = db.session.query(User).filter(User.zipcode.isnot(None), User.zipcode != "").all()
+
+        for user in users:
+            try:
+                geo_url = f"http://api.openweathermap.org/geo/1.0/zip?zip={user.zipcode},US&appid={OPENWEATHER_API_KEY}"
+                geo_response = requests.get(geo_url)
+                geo_data = geo_response.json()
+
+                if geo_response.status_code != 200 or 'lat' not in geo_data:
+                    print(f"❌ Invalid ZIP for {user.email}")
+                    continue
+
+                lat = geo_data['lat']
+                lon = geo_data['lon']
+
+                weather_url = (
+                    f"https://api.openweathermap.org/data/3.0/onecall"
+                    f"?lat={lat}&lon={lon}&exclude=minutely"
+                    f"&appid={OPENWEATHER_API_KEY}&units=metric"
+                )
+                weather_response = requests.get(weather_url)
+                weather = weather_response.json().get("current", {})
+                weather["pressure"] = weather_response.json().get("pressure", 1013)
+
+                tornado_risk = predict_tornado_risk(weather)
+                print(f"📍 {user.email} | ZIP: {user.zipcode} | Tornado Risk: {tornado_risk}")
+
+                if tornado_risk >= 1:
+                    subject = "🌪️ Tornado Risk Alert - Foresight"
+                    risk_text = ["Low", "Moderate", "High"][tornado_risk]
+                    body = f"""
+                    <h2>Tornado Risk Level: {risk_text}</h2>
+                    <p>Current weather conditions suggest a <strong>{risk_text}</strong> tornado risk in your area (ZIP code: <strong>{user.zipcode}</strong>).</p>
+                    <p>Please stay alert and monitor local emergency instructions.</p>
+                    <p>– Foresight Team</p>
+                    """
+
+                    msg = MIMEMultipart()
+                    msg["From"] = SMTP_USERNAME
+                    msg["To"] = user.email
+                    msg["Subject"] = subject
+                    msg.attach(MIMEText(body, "html", "utf-8"))
+
+                    with smtplib.SMTP(SMTP_SERVER, SMTP_PORT) as server:
+                        server.starttls()
+                        server.login(SMTP_USERNAME, SMTP_PASSWORD)
+                        server.sendmail(SMTP_USERNAME, user.email, msg.as_string().encode("utf-8"))
+
+                    print(f"✅ Tornado alert sent to {user.email}")
+
+            except Exception as e:
+                print(f"❌ Error in tornado alert for {user.email}: {str(e)}")
+
+
 def send_wildfire_risk_alerts():
     with app.app_context():
         users = db.session.query(User).filter(User.zipcode.isnot(None), User.zipcode != "").all()
@@ -945,9 +1016,12 @@ central = timezone("US/Central")
 scheduler = BackgroundScheduler(timezone=central)
 #scheduler.add_job(send_daily_alert_emails, "interval", minutes=1)  # For testing, run every minute
 scheduler.add_job(send_daily_alert_emails, "cron", hour=0, minute=0)
-
 scheduler.add_job(send_wildfire_risk_alerts, "cron", hour=8, minute=0)
 scheduler.add_job(send_wildfire_risk_alerts, "cron", hour=18, minute=0)
+# Tornado alerts at 9 AM and 5 PM
+scheduler.add_job(send_tornado_risk_alerts, "cron", hour=9, minute=0)
+scheduler.add_job(send_tornado_risk_alerts, "cron", hour=17, minute=0)
+
 #scheduler.start()
 
 def predict_weather_wildfire_risk(weather):
@@ -992,11 +1066,16 @@ def send_wildfire_email(recipient_email, risk_level, zipcode):
 def run_manual_alerts():
     #send_daily_alert_emails()
     #return "✅ Manual daily alerts triggered!", 200
-    return "🚫 This endpoint has been disabled", 403
+    
+    #return "🚫 This endpoint has been disabled", 403
 
     #Wildfire risk alerts
     #send_wildfire_risk_alerts()  # 👈 call it manually
     #return "✅ Wildfire alerts triggered manually", 200
+    
+    #Tornado risk alerts
+    send_tornado_risk_alerts()
+    return "✅ Tornado alerts manually triggered", 200
 
 # ✅ Health Check Route
 @app.route('/')
