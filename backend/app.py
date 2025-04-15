@@ -875,7 +875,7 @@ def send_tornado_risk_alerts():
                 weather = weather_response.json().get("current", {})
                 weather["pressure"] = weather_response.json().get("pressure", 1013)
 
-                tornado_risk = predict_tornado_risk(weather)
+                tornado_risk = 2 #predict_tornado_risk(weather)
                 print(f"📍 {user.email} | ZIP: {user.zipcode} | Tornado Risk: {tornado_risk}")
 
                 if tornado_risk >= 1:
