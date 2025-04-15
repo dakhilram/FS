@@ -578,8 +578,7 @@ def predict_wildfire():
         df['lat_long_interaction'] = df['latitude'] * df['longitude']
 
 # Feature list
-        features = ['bright_ti4', 'bright_ti5', 'latitude', 'longitude', 'daynight',
-            'intensity_ratio', 'temp_diff', 'lat_long_interaction']
+        features = ['bright_ti4', 'bright_ti5', 'latitude', 'longitude', 'daynight', 'intensity_ratio', 'temp_diff', 'lat_long_interaction']
 
 # Split data
         X = df[features]
@@ -705,7 +704,7 @@ def predict_wildfire():
 
         df_future = pd.DataFrame(future_data)
         df_future['intensity_ratio'] = df_future['bright_ti4'] / df_future['bright_ti5']
-        X_future = df_future[['bright_ti4', 'bright_ti5', 'latitude', 'longitude', 'daynight', 'intensity_ratio']]
+        X_future = df_future[['bright_ti4', 'bright_ti5', 'latitude', 'longitude', 'daynight', 'intensity_ratio', 'temp_diff', 'lat_long_interaction']]
         df_future['predicted_risk_level'] = model.predict(X_future)
 
         future_map = folium.Map(location=[df_future["latitude"].mean(), df_future["longitude"].mean()], zoom_start=5)
