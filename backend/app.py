@@ -569,47 +569,36 @@ def predict_wildfire():
             else:
                 return 0
 
-      # Apply risk labels
         df['risk_level'] = df.apply(assign_risk, axis=1)
 
-# Feature engineering before split
         df['intensity_ratio'] = df['bright_ti4'] / df['bright_ti5']
-        df['temp_diff'] = df['bright_ti4'] - df['bright_ti5']
-        df['lat_long_interaction'] = df['latitude'] * df['longitude']
-
-# Feature list
-        features = ['bright_ti4', 'bright_ti5', 'latitude', 'longitude', 'daynight', 'intensity_ratio', 'temp_diff', 'lat_long_interaction']
-
-# Split data
+        features = ['bright_ti4', 'bright_ti5', 'latitude', 'longitude', 'daynight', 'intensity_ratio']
         X = df[features]
         y = df['risk_level']
         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, stratify=y, random_state=42)
 
-# Safely apply SMOTE once
-        class_counts = Counter(y_train)
-        minority_class = min(class_counts, key=class_counts.get)
-        minority_count = class_counts[minority_class]
-        k_neighbors = 1 if minority_count <= 6 else 5
+        df['temp_diff'] = df['bright_ti4'] - df['bright_ti5']
+        df['lat_long_interaction'] = df['latitude'] * df['longitude']
+        features.extend(['temp_diff', 'lat_long_interaction'])
 
-        smote = SMOTE(sampling_strategy='auto', random_state=42, k_neighbors=k_neighbors)
+        smote = SMOTE(sampling_strategy='auto', random_state=42)
         X_train_resampled, y_train_resampled = smote.fit_resample(X_train, y_train)
 
-# More feature engineering (can apply to full df for visualization or to training set as needed)
         kmeans = KMeans(n_clusters=5, random_state=42)
         df['fire_zone'] = kmeans.fit_predict(df[['latitude', 'longitude']])
         dbscan = DBSCAN(eps=0.5, min_samples=5)
         df['fire_zone'] = dbscan.fit_predict(df[['latitude', 'longitude']])
         df['fire_zone'] = np.where(df['fire_zone'] == -1, 0, df['fire_zone'])
-
-# You can optionally append 'fire_zone' to features if you'll use it in future/final predictions
         features.append('fire_zone')
 
-# Final enhancements (for graphs or additional analysis)
+        class_counts = Counter(y_train_resampled)
+        smote = SMOTE(sampling_strategy={1: int(class_counts[0] * 0.8)}, random_state=42)
+        X_train_resampled, y_train_resampled = smote.fit_resample(X_train, y_train)
+
         df['fire_intensity_ratio'] = df['frp'] / (df['bright_ti4'] + df['bright_ti5'])
         df['temp_variation'] = abs(df['bright_ti4'] - df['bright_ti5'])
         df['fire_energy'] = df['frp'] * df['bright_ti4']
         features.extend(['fire_intensity_ratio', 'temp_variation', 'fire_energy'])
-
 
         model = XGBClassifier(n_estimators=200, max_depth=8, learning_rate=0.1, objective='multi:softmax', eval_metric='mlogloss', random_state=42)
         model.fit(X_train_resampled, y_train_resampled)
@@ -704,7 +693,7 @@ def predict_wildfire():
 
         df_future = pd.DataFrame(future_data)
         df_future['intensity_ratio'] = df_future['bright_ti4'] / df_future['bright_ti5']
-        X_future = df_future[['bright_ti4', 'bright_ti5', 'latitude', 'longitude', 'daynight', 'intensity_ratio', 'temp_diff', 'lat_long_interaction']]
+        X_future = df_future[['bright_ti4', 'bright_ti5', 'latitude', 'longitude', 'daynight', 'intensity_ratio']]
         df_future['predicted_risk_level'] = model.predict(X_future)
 
         future_map = folium.Map(location=[df_future["latitude"].mean(), df_future["longitude"].mean()], zoom_start=5)
