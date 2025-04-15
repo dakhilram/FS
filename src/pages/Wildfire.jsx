@@ -32,6 +32,26 @@ const Wildfire = () => {
         and investment in early detection systems can help mitigate their effects.
       </p>
 
+      <h2>🧠 How the Wildfire Prediction Model Works</h2>
+      <p className="intro-text">
+        Our Wildfire Risk Prediction Model helps determine if an area is at risk of experiencing a wildfire using real-time weather data from your ZIP code.
+      
+        When a user registers their ZIP code, the system fetches the latest weather data for that location — including:
+        <ul>
+          <li><strong>Temperature</strong> – Higher temperatures dry out vegetation.</li>
+          <li><strong>Humidity</strong> – Lower humidity increases fire chances.</li>
+          <li><strong>Wind Speed</strong> – Winds can spread fire quickly.</li>
+          <li><strong>Precipitation</strong> – Rain reduces fire risk.</li>
+        </ul>
+        These features are passed into a machine learning model called <strong>Logistic Regression</strong>, which has been trained on thousands of historical wildfire events. The model analyzes the weather data and outputs a result:
+        <ul>
+          <li><strong>0</strong> – No significant risk</li>
+          <li><strong>1</strong> – Moderate wildfire risk</li>
+          <li><strong>2</strong> – High wildfire risk</li>
+        </ul>
+        If the model detects high risk, it will generate an alert that appears on your screen and is also sent to your email. This early warning allows you to stay safe and informed.
+      </p>
+
 
 
       {/* Wildfire Trend Over the Years */}
