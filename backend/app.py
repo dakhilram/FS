@@ -875,7 +875,7 @@ def send_tornado_risk_alerts():
                 weather = weather_response.json().get("current", {})
                 weather["pressure"] = weather_response.json().get("pressure", 1013)
 
-                tornado_risk = 2 #predict_tornado_risk(weather)
+                tornado_risk = predict_tornado_risk(weather) #2
                 print(f"📍 {user.email} | ZIP: {user.zipcode} | Tornado Risk: {tornado_risk}")
 
                 if tornado_risk >= 1:
@@ -903,6 +903,79 @@ def send_tornado_risk_alerts():
 
             except Exception as e:
                 print(f"❌ Error in tornado alert for {user.email}: {str(e)}")
+
+from joblib import load
+HURRICANE_MODEL = load("models/hurricane_model.pkl")
+
+def predict_hurricane_risk(weather):
+    df = pd.DataFrame([{
+        "temp": weather.get("temp", 0),
+        "humidity": weather.get("humidity", 100),
+        "wind_speed": weather.get("wind_speed", 0),
+        "pressure": weather.get("pressure", 1013),
+        "clouds": weather.get("clouds", 0),
+        "uvi": weather.get("uvi", 0)
+    }])
+    prediction = HURRICANE_MODEL.predict(df)[0]
+    return int(prediction)
+
+def send_hurricane_risk_alerts():
+    with app.app_context():
+        users = db.session.query(User).filter(User.zipcode.isnot(None), User.zipcode != "").all()
+
+        for user in users:
+            try:
+                # Get location
+                geo_url = f"http://api.openweathermap.org/geo/1.0/zip?zip={user.zipcode},US&appid={OPENWEATHER_API_KEY}"
+                geo_response = requests.get(geo_url)
+                geo_data = geo_response.json()
+
+                if geo_response.status_code != 200 or 'lat' not in geo_data:
+                    print(f"❌ Invalid ZIP for {user.email}")
+                    continue
+
+                lat = geo_data['lat']
+                lon = geo_data['lon']
+
+                # Get weather data
+                weather_url = (
+                    f"https://api.openweathermap.org/data/3.0/onecall"
+                    f"?lat={lat}&lon={lon}&exclude=minutely"
+                    f"&appid={OPENWEATHER_API_KEY}&units=metric"
+                )
+                weather_response = requests.get(weather_url)
+                weather = weather_response.json().get("current", {})
+                weather["pressure"] = weather_response.json().get("pressure", 1013)
+
+                hurricane_risk = predict_hurricane_risk(weather)
+                print(f"📍 {user.email} | ZIP: {user.zipcode} | Hurricane Risk: {hurricane_risk}")
+
+                if hurricane_risk >= 1:
+                    subject = "🌀 Hurricane Risk Alert - Foresight"
+                    risk_text = ["Low", "Moderate", "High"][hurricane_risk]
+                    body = f"""
+                    <h2>Hurricane Risk Level: {risk_text}</h2>
+                    <p>Current weather conditions suggest a <strong>{risk_text}</strong> hurricane risk in your area (ZIP code: <strong>{user.zipcode}</strong>).</p>
+                    <p>Please stay alert and monitor local emergency updates.</p>
+                    <p>– Foresight Team</p>
+                    """
+
+                    msg = MIMEMultipart()
+                    msg["From"] = SMTP_USERNAME
+                    msg["To"] = user.email
+                    msg["Subject"] = subject
+                    msg.attach(MIMEText(body, "html", "utf-8"))
+
+                    with smtplib.SMTP(SMTP_SERVER, SMTP_PORT) as server:
+                        server.starttls()
+                        server.login(SMTP_USERNAME, SMTP_PASSWORD)
+                        server.sendmail(SMTP_USERNAME, user.email, msg.as_string().encode("utf-8"))
+
+                    print(f"✅ Hurricane alert sent to {user.email}")
+
+            except Exception as e:
+                print(f"❌ Error in hurricane alert for {user.email}: {str(e)}")
+
 
 
 def send_wildfire_risk_alerts():
@@ -1016,11 +1089,16 @@ central = timezone("US/Central")
 scheduler = BackgroundScheduler(timezone=central)
 #scheduler.add_job(send_daily_alert_emails, "interval", minutes=1)  # For testing, run every minute
 scheduler.add_job(send_daily_alert_emails, "cron", hour=0, minute=0)
+# Wildfire alerts at 8 AM and 6 PM
 scheduler.add_job(send_wildfire_risk_alerts, "cron", hour=8, minute=0)
 scheduler.add_job(send_wildfire_risk_alerts, "cron", hour=18, minute=0)
 # Tornado alerts at 9 AM and 5 PM
 scheduler.add_job(send_tornado_risk_alerts, "cron", hour=9, minute=0)
 scheduler.add_job(send_tornado_risk_alerts, "cron", hour=17, minute=0)
+# Hurricane alerts at 10 AM and 7 PM
+scheduler.add_job(send_hurricane_risk_alerts, "cron", hour=10, minute=0)
+scheduler.add_job(send_hurricane_risk_alerts, "cron", hour=19, minute=0)
+
 
 #scheduler.start()
 
@@ -1072,10 +1150,13 @@ def run_manual_alerts():
     #Wildfire risk alerts
     #send_wildfire_risk_alerts()  # 👈 call it manually
     #return "✅ Wildfire alerts triggered manually", 200
-    
+    # Hurricane risk alerts
+    send_hurricane_risk_alerts()
+    return "✅ Hurricane alerts manually triggered", 200
+
     #Tornado risk alerts
-    send_tornado_risk_alerts()
-    return "✅ Tornado alerts manually triggered", 200
+    #send_tornado_risk_alerts()
+    #return "✅ Tornado alerts manually triggered", 200
 
 # ✅ Health Check Route
 @app.route('/')
