@@ -899,6 +899,8 @@ def send_daily_alert_emails():
                 weather = weather_response.json().get("current", {})
                 wildfire_risk = predict_weather_wildfire_risk(weather)
 
+                print(f"📍 {user.email} | ZIP: {user.zipcode} | Wildfire Risk: {wildfire_risk}")
+
                 if wildfire_risk >= 1:
     # Moderate or High Risk
                     send_wildfire_email(user.email, wildfire_risk, user.zipcode)
