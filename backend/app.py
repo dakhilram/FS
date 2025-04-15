@@ -1142,17 +1142,17 @@ def send_wildfire_email(recipient_email, risk_level, zipcode):
 
 @app.route('/manual-daily-alerts')
 def run_manual_alerts():
+    return "🚫 This endpoint has been disabled", 403
     #send_daily_alert_emails()
     #return "✅ Manual daily alerts triggered!", 200
-    
-    #return "🚫 This endpoint has been disabled", 403
 
     #Wildfire risk alerts
     #send_wildfire_risk_alerts()  # 👈 call it manually
     #return "✅ Wildfire alerts triggered manually", 200
+    
     # Hurricane risk alerts
-    send_hurricane_risk_alerts()
-    return "✅ Hurricane alerts manually triggered", 200
+    #send_hurricane_risk_alerts()
+    #return "✅ Hurricane alerts manually triggered", 200
 
     #Tornado risk alerts
     #send_tornado_risk_alerts()
