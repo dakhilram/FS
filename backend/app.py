@@ -992,10 +992,11 @@ def send_wildfire_email(recipient_email, risk_level, zipcode):
 def run_manual_alerts():
     #send_daily_alert_emails()
     #return "✅ Manual daily alerts triggered!", 200
+    return "🚫 This endpoint has been disabled", 403
 
-    send_wildfire_risk_alerts()  # 👈 call it manually
-    return "✅ Wildfire alerts triggered manually", 200
-    #return "🚫 This endpoint has been disabled", 403
+    #Wildfire risk alerts
+    #send_wildfire_risk_alerts()  # 👈 call it manually
+    #return "✅ Wildfire alerts triggered manually", 200
 
 # ✅ Health Check Route
 @app.route('/')
