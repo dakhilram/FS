@@ -26,8 +26,25 @@ const Earthquake = () => {
         While some regions experience frequent minor tremors, others are at risk of major destructive earthquakes.
         Scientists use seismographs to measure earthquakes and determine their magnitude using the Richter scale or the Moment Magnitude Scale (Mw).
       </p>
-
-
+      <h2>🌍 How the Real-Time Earthquake Prediction Model Works</h2>
+      <p className="intro-text">
+        Our Real-Time Earthquake Prediction Model helps forecast potential earthquake activity across the globe by analyzing real-time seismic data from official sources like the USGS.
+        <p>The model continuously gathers data every few minutes, including:</p>
+        <ul>
+          <li><strong>📍 Location (Latitude & Longitude)</strong> – Helps pinpoint seismic hotspots.</li>
+          <li><strong>📏 Depth (in kilometers)</strong> – Shallow quakes often have stronger surface impacts.</li>
+          <li><strong>📊 Magnitude</strong> – Indicates the strength of the earthquake.</li>
+          <li><strong>🕒 Time Difference Between Events</strong> – Reveals clustering patterns or aftershock potential.</li>
+        </ul>
+        These features are processed through an advanced <strong>LSTM (Long Short-Term Memory)</strong> neural network — a type of machine learning model designed for sequence and time-based predictions. Trained on years of historical seismic activity, the model analyzes recent trends and forecasts where and when a new event might occur.
+        <p>The model provides predictions such as:</p>
+        <ul>
+          <li><strong>⚠ Predicted Magnitude</strong></li>
+          <li><strong>🌐 Estimated Location</strong></li>
+          <li><strong>⏳ Time Until Potential Impact</strong></li>
+        </ul>
+        This allows users and emergency services to receive early warnings and take necessary precautions before a significant seismic event occurs.
+      </p>
 
       {/* Section: Earthquake Trend Over Time */}
       <h2>📈 Earthquake Trends Over Time 📉</h2>
@@ -82,19 +99,18 @@ const Earthquake = () => {
       <div className="chart-container">
         <img src={eqtop10} alt="Depth vs Magnitude" className="chart-image" />
         <p className="chart-description">
-        A bar chart ranking the countries with the highest earthquake occurrences from 1995 to 2023. 
-        Indonesia tops the list, followed by Papua New Guinea and Chile. 
-        These regions are located along major tectonic plate boundaries, making them more prone to seismic activity.</p>
+          A bar chart ranking the countries with the highest earthquake occurrences from 1995 to 2023.
+          Indonesia tops the list, followed by Papua New Guinea and Chile.
+          These regions are located along major tectonic plate boundaries, making them more prone to seismic activity.</p>
       </div>
-      
+
 
       <h2>🌍 Real-Time Data 🌍</h2>
       <p className="map-description">
-        This interactive map provides a visual representation of wildfire predictions across the United States.
-        It helps in understanding the potential risk areas and planning for wildfire management and prevention.</p>
+      This is a snapshot of one of the prediction alerts made using real time data from USGS which changes with real values and time.</p>
       <div className="map-container">
         <iframe
-          src={`${import.meta.env.BASE_URL}USA_Wildfire_Map1.html`}
+          src={`${import.meta.env.BASE_URL}earthquake_map.html`}
           //src={"https://www.weather.gov/#"}
           title="Wildfire Prediction Map"
           className="wildfire-map"

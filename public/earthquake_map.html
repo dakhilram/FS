@@ -1,0 +1,116 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Interactive Earthquake Map</title>
+  <style>
+    html, body { height: 100%; margin: 0; padding: 0; }
+    #map { height: 100%; }
+  </style>
+</head>
+<body>
+<div id="map"></div>
+<script>
+  function initMap() {
+    const map = new google.maps.Map(document.getElementById('map'), {
+      zoom: 4,
+      center: { lat: 39.5, lng: -114.5 }
+    });
+
+    
+    const marker1 = new google.maps.Marker({
+      position: { lat: 39.42, lng: -114.82 },
+      map: map,
+      title: "Mag 1.58\nETA: 2025-04-17T02:21:52"
+    });
+
+    const infoWindow1 = new google.maps.InfoWindow({
+      content: `<div><strong>Magnitude:</strong> 1.58<br><strong>ETA:</strong> 2025-04-17T02:21:52</div>`
+    });
+
+    marker1.addListener('mouseover', function() {
+      infoWindow1.open(map, marker1);
+    });
+    marker1.addListener('mouseout', function() {
+      infoWindow1.close();
+    });
+    
+
+    const marker2 = new google.maps.Marker({
+      position: { lat: 39.4, lng: -114.63 },
+      map: map,
+      title: "Mag 1.59\nETA: 2025-04-17T02:21:52"
+    });
+
+    const infoWindow2 = new google.maps.InfoWindow({
+      content: `<div><strong>Magnitude:</strong> 1.59<br><strong>ETA:</strong> 2025-04-17T02:21:52</div>`
+    });
+
+    marker2.addListener('mouseover', function() {
+      infoWindow2.open(map, marker2);
+    });
+    marker2.addListener('mouseout', function() {
+      infoWindow2.close();
+    });
+    
+
+    const marker3 = new google.maps.Marker({
+      position: { lat: 39.5, lng: -114.53 },
+      map: map,
+      title: "Mag 1.61\nETA: 2025-04-17T02:21:52"
+    });
+
+    const infoWindow3 = new google.maps.InfoWindow({
+      content: `<div><strong>Magnitude:</strong> 1.61<br><strong>ETA:</strong> 2025-04-17T02:21:52</div>`
+    });
+
+    marker3.addListener('mouseover', function() {
+      infoWindow3.open(map, marker3);
+    });
+    marker3.addListener('mouseout', function() {
+      infoWindow3.close();
+    });
+    
+
+    const marker4 = new google.maps.Marker({
+      position: { lat: 39.6, lng: -114.21 },
+      map: map,
+      title: "Mag 1.62\nETA: 2025-04-17T02:21:52"
+    });
+
+    const infoWindow4 = new google.maps.InfoWindow({
+      content: `<div><strong>Magnitude:</strong> 1.62<br><strong>ETA:</strong> 2025-04-17T02:21:52</div>`
+    });
+
+    marker4.addListener('mouseover', function() {
+      infoWindow4.open(map, marker4);
+    });
+    marker4.addListener('mouseout', function() {
+      infoWindow4.close();
+    });
+    
+
+    const marker5 = new google.maps.Marker({
+      position: { lat: 40.13, lng: -113.73 },
+      map: map,
+      title: "Mag 1.62\nETA: 2025-04-17T02:21:52"
+    });
+
+    const infoWindow5 = new google.maps.InfoWindow({
+      content: `<div><strong>Magnitude:</strong> 1.62<br><strong>ETA:</strong> 2025-04-17T02:21:52</div>`
+    });
+
+    marker5.addListener('mouseover', function() {
+      infoWindow5.open(map, marker5);
+    });
+    marker5.addListener('mouseout', function() {
+      infoWindow5.close();
+    });
+    
+  }
+</script>
+<script async defer
+  src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBYyAt-pkiPrpzrhub9KmKQZ6PcOoQbIWk&callback=initMap">
+</script>
+</body>
+</html>
