@@ -33,7 +33,7 @@ const Hurricane = () => {
           <li><strong>Atmospheric Pressure</strong> – Lower pressure often signals a developing hurricane.</li>
           <li><strong>Humidity</strong> – High humidity fuels storm systems.</li>
         </ul></p>
-        A <strong>Logistic Regression</strong> model (a simple AI model) uses these inputs to classify:
+        A <strong>Logistic Regression</strong> model (a simple ML model) uses these inputs to classify:
         <ul>
           <li><strong>0</strong> – No Hurricane Risk</li>
           <li><strong>1</strong> – Hurricane Risk Detected</li>
