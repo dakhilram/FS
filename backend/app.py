@@ -1108,13 +1108,13 @@ scheduler = BackgroundScheduler(timezone=central)
 scheduler.add_job(send_daily_alert_emails, "cron", hour=0, minute=0)
 # Wildfire alerts at 8 AM and 6 PM
 scheduler.add_job(send_wildfire_risk_alerts, "cron", hour=8, minute=0)
-scheduler.add_job(send_wildfire_risk_alerts, "cron", hour=22, minute=35)
+scheduler.add_job(send_wildfire_risk_alerts, "cron", hour=23, minute=10)
 # Tornado alerts at 9 AM and 8 PM
 scheduler.add_job(send_tornado_risk_alerts, "cron", hour=9, minute=0)
-scheduler.add_job(send_tornado_risk_alerts, "cron", hour=22, minute=45)
+scheduler.add_job(send_tornado_risk_alerts, "cron", hour=23, minute=5)
 # Hurricane alerts at 10 AM and 7 PM
 scheduler.add_job(send_hurricane_risk_alerts, "cron", hour=10, minute=0)
-scheduler.add_job(send_hurricane_risk_alerts, "cron", hour=22, minute=55)
+scheduler.add_job(send_hurricane_risk_alerts, "cron", hour=23, minute=0)
 
 
 #scheduler.start()
@@ -1159,13 +1159,13 @@ def send_wildfire_email(recipient_email, risk_level, zipcode):
 
 @app.route('/manual-daily-alerts')
 def run_manual_alerts():
-    return "🚫 This endpoint has been disabled", 403
+    #return "🚫 This endpoint has been disabled", 403
     #send_daily_alert_emails()
     #return "✅ Manual daily alerts triggered!", 200
 
     #Wildfire risk alerts
-    #send_wildfire_risk_alerts()  # 👈 call it manually
-    #return "✅ Wildfire alerts triggered manually", 200
+    send_wildfire_risk_alerts()  # 👈 call it manually
+    return "✅ Wildfire alerts triggered manually", 200
     
     # Hurricane risk alerts
     #send_hurricane_risk_alerts()
