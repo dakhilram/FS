@@ -115,7 +115,7 @@ const Hero = () => {
 
   const modelDescriptions = {
     Wildfire: `
-  🔥 The Wildfire Prediction Model is initially trained on historical wildfire and satellite data (VIIRS). 
+  🔥 The Wildfire Prediction Model is initially trained on historical wildfire and satellite data. 
   - When the user uploads new data, the model incorporates it through dynamic training to ensure more accurate and personalized predictions. 
   - It applies advanced feature engineering, balances classes using SMOTE, and uses XGBoost for classification. 
   - The model predicts wildfire risk levels (Low to Extreme) for the next 30 days and visualizes high-risk zones. 
