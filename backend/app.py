@@ -857,7 +857,7 @@ def send_tornado_risk_alerts():
         session = Session()
 
         try:
-            users = db.session.query(User).filter(User.zipcode.isnot(None), User.zipcode != "").all()
+            users = session.query(User).filter(User.zipcode.isnot(None), User.zipcode != "").all()
 
             for user in users:
                 try:
@@ -930,7 +930,7 @@ def send_hurricane_risk_alerts():
         session = Session()
 
         try:
-            users = db.session.query(User).filter(User.zipcode.isnot(None), User.zipcode != "").all()
+            users = session.query(User).filter(User.zipcode.isnot(None), User.zipcode != "").all()
 
             for user in users:
                 try:
@@ -994,7 +994,7 @@ def send_wildfire_risk_alerts():
         session = Session()
 
         try:
-            users = db.session.query(User).filter(User.zipcode.isnot(None), User.zipcode != "").all()
+            users = session.query(User).filter(User.zipcode.isnot(None), User.zipcode != "").all()
 
             for user in users:
                 try:
@@ -1108,13 +1108,13 @@ scheduler = BackgroundScheduler(timezone=central)
 scheduler.add_job(send_daily_alert_emails, "cron", hour=0, minute=0)
 # Wildfire alerts at 8 AM and 6 PM
 scheduler.add_job(send_wildfire_risk_alerts, "cron", hour=8, minute=0)
-scheduler.add_job(send_wildfire_risk_alerts, "cron", hour=22, minute=0)
+scheduler.add_job(send_wildfire_risk_alerts, "cron", hour=22, minute=35)
 # Tornado alerts at 9 AM and 8 PM
 scheduler.add_job(send_tornado_risk_alerts, "cron", hour=9, minute=0)
-scheduler.add_job(send_tornado_risk_alerts, "cron", hour=22, minute=15)
+scheduler.add_job(send_tornado_risk_alerts, "cron", hour=22, minute=45)
 # Hurricane alerts at 10 AM and 7 PM
 scheduler.add_job(send_hurricane_risk_alerts, "cron", hour=10, minute=0)
-scheduler.add_job(send_hurricane_risk_alerts, "cron", hour=22, minute=30)
+scheduler.add_job(send_hurricane_risk_alerts, "cron", hour=22, minute=55)
 
 
 #scheduler.start()
