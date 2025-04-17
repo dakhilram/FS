@@ -31,7 +31,7 @@ import folium
 #import hashlib
 import jwt
 import datetime as dt
-from datetime import datetime
+#from datetime import datetime
 from flask_mail import Mail, Message
 import traceback
 from email.mime.multipart import MIMEMultipart
@@ -275,7 +275,7 @@ def forgot_password():
 
     # Generate JWT Token valid for 1 hour
     token = jwt.encode(
-        {"email": email, "exp": datetime.datetime.utcnow() + datetime.timedelta(hours=1)},
+        {"email": email, "exp": dt.datetime.utcnow() + dt.timedelta(hours=1)},
         app.config["SECRET_KEY"], 
         algorithm="HS256"
     )
@@ -496,8 +496,8 @@ def generate_alert_email():
                 body += f"""
                 <hr>
                 <h3>🔔 Alert #{i + 1}: {alert['event']}</h3>
-                <p><strong>From:</strong> {dt.datetime.datetime.utcfromtimestamp(alert['start']).strftime('%Y-%m-%d %H:%M UTC')}</p>
-                <p><strong>To:</strong> {dt.datetime.datetime.utcfromtimestamp(alert['end']).strftime('%Y-%m-%d %H:%M UTC')}</p>
+                <p><strong>From:</strong> {dt.datetime.utcfromtimestamp(alert['start']).strftime('%Y-%m-%d %H:%M UTC')}</p>
+                <p><strong>To:</strong> {dt.datetime.utcfromtimestamp(alert['end']).strftime('%Y-%m-%d %H:%M UTC')}</p>
                 <p><strong>Issued by:</strong> {alert['sender_name']}</p>
                 <p><strong>Description:</strong></p>
                 <pre>{alert['description']}</pre>
@@ -674,7 +674,7 @@ def predict_wildfire():
 
         # === Future Predictions & Map ===
         future_days = 30
-        future_dates = pd.date_range(start=datetime.today(), periods=future_days, freq='D')
+        future_dates = pd.date_range(start=dt.datetime.today(), periods=future_days, freq='D')
         future_data = []
 
         for date in future_dates:
@@ -1112,8 +1112,8 @@ def send_daily_alert_emails():
                         body += f"""
                             <hr>
                             <h3>🔔 Alert #{i + 1}: {alert['event']}</h3>
-                            <p><strong>From:</strong> {datetime.datetime.utcfromtimestamp(alert['start']).strftime('%Y-%m-%d %H:%M UTC')}</p>
-                            <p><strong>To:</strong> {datetime.datetime.utcfromtimestamp(alert['end']).strftime('%Y-%m-%d %H:%M UTC')}</p>
+                            <p><strong>From:</strong> {dt.datetime.utcfromtimestamp(alert['start']).strftime('%Y-%m-%d %H:%M UTC')}</p>
+                            <p><strong>To:</strong> {dt.datetime.utcfromtimestamp(alert['end']).strftime('%Y-%m-%d %H:%M UTC')}</p>
                             <p><strong>Issued by:</strong> {alert['sender_name']}</p>
                             <p><strong>Description:</strong></p>
                             <pre>{alert['description']}</pre>
