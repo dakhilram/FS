@@ -30,7 +30,7 @@ import folium
 #from statsmodels.tsa.arima.model import ARIMA
 #import hashlib
 import jwt
-import datetime
+import datetime as dt
 from datetime import datetime
 from flask_mail import Mail, Message
 import traceback
@@ -496,8 +496,8 @@ def generate_alert_email():
                 body += f"""
                 <hr>
                 <h3>🔔 Alert #{i + 1}: {alert['event']}</h3>
-                <p><strong>From:</strong> {datetime.datetime.utcfromtimestamp(alert['start']).strftime('%Y-%m-%d %H:%M UTC')}</p>
-                <p><strong>To:</strong> {datetime.datetime.utcfromtimestamp(alert['end']).strftime('%Y-%m-%d %H:%M UTC')}</p>
+                <p><strong>From:</strong> {dt.datetime.datetime.utcfromtimestamp(alert['start']).strftime('%Y-%m-%d %H:%M UTC')}</p>
+                <p><strong>To:</strong> {dt.datetime.datetime.utcfromtimestamp(alert['end']).strftime('%Y-%m-%d %H:%M UTC')}</p>
                 <p><strong>Issued by:</strong> {alert['sender_name']}</p>
                 <p><strong>Description:</strong></p>
                 <pre>{alert['description']}</pre>

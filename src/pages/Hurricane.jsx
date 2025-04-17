@@ -26,20 +26,24 @@ const Hurricane = () => {
 
       <h2>🧠 How the Hurricane Prediction Model Works</h2>
       <p className="intro-text">
-        Our Hurricane Prediction Model forecasts the potential for hurricane activity using weather data for your ZIP code. It focuses on analyzing the kind of atmospheric conditions that typically lead to hurricanes.
-        <p>The model uses:
+        Our Hurricane Prediction Model forecasts the potential for hurricane activity using real-time weather data from your ZIP code. It analyzes atmospheric conditions that are commonly associated with hurricane formation.
+        <p>The model uses the following weather features:</p>
         <ul>
-          <li><strong>Wind Speed</strong> – Strong sustained winds are key hurricane indicators.</li>
-          <li><strong>Atmospheric Pressure</strong> – Lower pressure often signals a developing hurricane.</li>
-          <li><strong>Humidity</strong> – High humidity fuels storm systems.</li>
-        </ul></p>
-        A <strong>Logistic Regression</strong> model (a simple ML model) uses these inputs to classify:
+          <li><strong>🌡 Temperature</strong> – Warm air contributes to storm development.</li>
+          <li><strong>💧 Humidity</strong> – High humidity fuels storm systems and increases instability.</li>
+          <li><strong>🌬 Wind Speed</strong> – Strong sustained winds are key hurricane indicators.</li>
+          <li><strong>📉 Atmospheric Pressure</strong> – Lower pressure often signals a developing hurricane.</li>
+          <li><strong>☁ Cloud Cover</strong> – Dense clouds may indicate storm organization.</li>
+          <li><strong>🔆 UV Index</strong> – High UV levels can impact surface heating and weather patterns.</li>
+        </ul>
+        A <strong>Logistic Regression</strong> model (a lightweight machine learning algorithm) uses these inputs to classify:
         <ul>
           <li><strong>0</strong> – No Hurricane Risk</li>
           <li><strong>1</strong> – Hurricane Risk Detected</li>
         </ul>
-        This model was trained using synthetic weather data that simulates hurricane conditions across the U.S. If the model predicts a risk in your area, you'll be notified with an alert on-screen and via email (if signed in). This helps individuals prepare for potential storms in advance.
+        This model was trained using synthetic weather data simulating hurricane conditions across the U.S. If a risk is detected in your area, you'll receive an on-screen alert and an email notification (if you're signed in). This allows early preparation for potential hurricane threats.
       </p>
+
 
 
       {/* Hurricane Trend Chart */}
