@@ -15,7 +15,7 @@ useEffect(() => {
     setTimeout(() => {
       const el = document.getElementById("graphs");
       if (el) {
-        const yOffset = -120; // Adjust based on your navbar height
+        const yOffset = -80; // Adjust based on your navbar height
         const y = el.getBoundingClientRect().top + window.pageYOffset + yOffset;
         window.scrollTo({ top: y, behavior: "smooth" });
       }
