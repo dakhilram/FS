@@ -341,7 +341,7 @@ const Hero = () => {
           <div className="slide-text">
             <h3>{slides[currentSlide].title}</h3>
             <p>{slides[currentSlide].desc}</p>
-            <button className="btn explore-btn" onClick={() => navigate(slides[currentSlide].link)}>
+            <button className="btn explore-btn" onClick={() => navigate(`${slides[currentSlide].link}#graphs`)}>
               Explore
             </button>
           </div>

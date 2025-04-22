@@ -6,8 +6,24 @@ import eqscatter from "../assets/Earthquake/eqscatter.png";
 import eqtrend from "../assets/Earthquake/eqtrend.png";
 import eqscattergeo from "../assets/Earthquake/eqscattergeo.png";
 import eqtop10 from "../assets/Earthquake/eqtop10.png";
+import { useEffect } from "react";
+import { useLocation } from "react-router-dom";
 
 const Earthquake = () => {
+  const location = useLocation();
+
+useEffect(() => {
+  if (location.hash === "#graphs") {
+    setTimeout(() => {
+      const el = document.getElementById("graphs");
+      if (el) {
+        const yOffset = -120; // Adjust based on your navbar height
+        const y = el.getBoundingClientRect().top + window.pageYOffset + yOffset;
+        window.scrollTo({ top: y, behavior: "smooth" });
+      }
+    }, 100); // Add slight delay to ensure DOM is ready
+  }
+}, [location]);
   return (
     <div className="nature-page">
       <h1>🌍 Earthquake Information 🌍</h1>

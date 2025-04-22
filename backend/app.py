@@ -772,8 +772,7 @@ def predict_wildfire():
      "These high-frequency locations reflect consistent fire activity, likely driven by a combination of environmental conditions such as dry climate, vegetation density, and potential human impact. "
      "The visualization serves as an indicator of fire-prone zones, making it valuable for regional fire monitoring and prevention strategies. "
      "Identifying spatial hotspots allows for more focused deployment of firefighting resources and supports proactive land management decisions. "
-     "These insights can be integrated into early warning systems, enabling targeted interventions in regions with a history of frequent wildfire incidents. "
-     "Geospatial clustering like this also provides a foundation for heatmap visualizations and further analysis of fire patterns over time.")
+     "These insights can show the history of frequent wildfire incidents.")
 ]
 
 

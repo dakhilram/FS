@@ -4,8 +4,26 @@ import wildfireImage from "../assets/wf.jpg";
 import wildhour from "../assets/wildfire/wildfiresbyhour.png";
 import wildoccu from "../assets/wildfire/fireoccurrence.png";
 import wildfireTrend from "../assets/wildfire/WildFiretrend.png"; // ✅ Import new image
+import { useEffect } from "react";
+import { useLocation } from "react-router-dom";
+
 
 const Wildfire = () => {
+  const location = useLocation();
+
+useEffect(() => {
+  if (location.hash === "#graphs") {
+    setTimeout(() => {
+      const el = document.getElementById("graphs");
+      if (el) {
+        const yOffset = -120; // Adjust based on your navbar height
+        const y = el.getBoundingClientRect().top + window.pageYOffset + yOffset;
+        window.scrollTo({ top: y, behavior: "smooth" });
+      }
+    }, 100); // Add slight delay to ensure DOM is ready
+  }
+}, [location]);
+  
   return (
     <div className="nature-page">
       <h1>🌲🔥 WILDFIRES 🔥🌲</h1>
@@ -55,7 +73,7 @@ const Wildfire = () => {
 
 
       {/* Wildfire Trend Over the Years */}
-      <h2>📈 Wildfire Trends Over the Years 📉</h2>
+      <h2 id="graphs">📈 Wildfire Trends Over the Years 📉</h2>
       <div className="chart-container">
         <img src={wildfireTrend} alt="Wildfire Trend" className="chart-image" />
         <p className="chart-description">
