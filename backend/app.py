@@ -760,21 +760,22 @@ def predict_wildfire():
      "This graph emphasizes the usefulness of remote sensing in fire detection by linking temperature variations to fire intensity. The concentration of high-risk cases in specific temperature ranges can help calibrate threshold values for predictive models. "
      "This relationship also validates the use of brightness temperature as a key predictive feature in machine learning models."),
 
-    ("Day vs Night Fire Detections"),
-    "This bar chart represents the distribution of wildfire detections based on the time of day, categorized as Day (0) and Night (1).",
-    "The data reveals a significantly higher number of wildfire detections during the day compared to the night. This disparity may be attributed to improved satellite visibility during daylight or a genuine increase in fire activity in daytime hours.",
-    "Such imbalances in detection timing are important for understanding fire behavior, optimizing satellite monitoring schedules, and designing time-sensitive alert systems.",
-    "Time-of-day analysis is also critical for fire response planning, as fires detected earlier in the day may allow for more effective mitigation efforts.",
-    "Understanding this distribution helps in enhancing detection technologies and informs machine learning models to factor in diurnal variations when predicting wildfire risk levels.)",
-    
+    ("Day vs Night Fire Detections",
+     "This bar chart represents the distribution of wildfire detections based on the time of day, categorized as Day (0) and Night (1). "
+     "The data reveals a significantly higher number of wildfire detections during the day compared to the night. This disparity may be attributed to improved satellite visibility during daylight or a genuine increase in fire activity in daytime hours. "
+     "Such imbalances in detection timing are important for understanding fire behavior, optimizing satellite monitoring schedules, and designing time-sensitive alert systems. "
+     "Time-of-day analysis is also critical for fire response planning, as fires detected earlier in the day may allow for more effective mitigation efforts. "
+     "Understanding this distribution helps in enhancing detection technologies and informs machine learning models to factor in diurnal variations when predicting wildfire risk levels."),
+
     ("Top 10 Fire Detection Locations (Rounded Lat, Lon)",
-     "This bar chart highlights the top 10 geographic clusters with the highest number of wildfire detections, grouped by latitude and longitude rounded to the nearest 0.1 degrees.",
-    "These high-frequency locations reflect consistent fire activity, likely driven by a combination of environmental conditions such as dry climate, vegetation density, and potential human impact.",
-    "The visualization serves as an indicator of fire-prone zones, making it valuable for regional fire monitoring and prevention strategies.",
-    "Identifying spatial hotspots allows for more focused deployment of firefighting resources and supports proactive land management decisions.",
-    "These insights can be integrated into early warning systems, enabling targeted interventions in regions with a history of frequent wildfire incidents.",
-    "Geospatial clustering like this also provides a foundation for heatmap visualizations and further analysis of fire patterns over time.")
+     "This bar chart highlights the top 10 geographic clusters with the highest number of wildfire detections, grouped by latitude and longitude rounded to the nearest 0.1 degrees. "
+     "These high-frequency locations reflect consistent fire activity, likely driven by a combination of environmental conditions such as dry climate, vegetation density, and potential human impact. "
+     "The visualization serves as an indicator of fire-prone zones, making it valuable for regional fire monitoring and prevention strategies. "
+     "Identifying spatial hotspots allows for more focused deployment of firefighting resources and supports proactive land management decisions. "
+     "These insights can be integrated into early warning systems, enabling targeted interventions in regions with a history of frequent wildfire incidents. "
+     "Geospatial clustering like this also provides a foundation for heatmap visualizations and further analysis of fire patterns over time.")
 ]
+
 
         for i, path in enumerate(graph_paths):
             pdf.add_page()
