@@ -632,6 +632,7 @@ def predict_wildfire():
         graph_paths.append(graph_path2)
         plt.close()
 
+        df['daynight_labeled'] = df['daynight'].replace({'D': 'Day', 'N': 'Night'})
         plt.figure(figsize=(10, 6))
         sns.countplot(x="daynight_labeled", data=df, palette="Set2")
         plt.title("Day vs Night Fire Detections")
