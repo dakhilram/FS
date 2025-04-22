@@ -63,7 +63,7 @@ useEffect(() => {
 
 
       {/* Hurricane Trend Chart */}
-      <h2>📈 Hurricane Trends Over the Years 📉</h2>
+      <h2 id="graphs">📈 Hurricane Trends Over the Years 📉</h2>
       <div className="chart-container">
         <img src={hutrend} alt="Hurricane Trend" className="chart-image" />
         <p className="chart-description">

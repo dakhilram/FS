@@ -66,7 +66,7 @@ useEffect(() => {
         damage. Emergency responders advise waiting for official safety confirmations
         before leaving a shelter.
       </p>
-      <h2>🌍 Tornado Trends Over Time</h2>
+      <h2 id="graphs">🌍 Tornado Trends Over Time</h2>
       <div className="chart-container">
         <img src={totrend} alt="Tornado Trend" className="chart-image" />
         <p className="chart-description">This graph depicts the number of tornadoes occurring annually over time.

@@ -63,7 +63,7 @@ useEffect(() => {
       </p>
 
       {/* Section: Earthquake Trend Over Time */}
-      <h2>📈 Earthquake Trends Over Time 📉</h2>
+      <h2 id="graphs">📈 Earthquake Trends Over Time 📉</h2>
       <div className="chart-container">
         <img src={eqtrend} alt="Earthquake Trend" className="chart-image" />
         <p className="chart-description">
