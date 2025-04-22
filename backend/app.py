@@ -633,27 +633,26 @@ def predict_wildfire():
         plt.close()
 
         plt.figure(figsize=(10, 6))
-        sns.kdeplot(x=df['longitude'], y=df['latitude'], cmap="Reds", fill=True, levels=50)
-        plt.title("Wildfire Occurrences Heatmap (Latitude vs. Longitude)")
-        graph_path3 = os.path.join(UPLOAD_FOLDER, "graph3_fire_heatmap.png")
+        sns.countplot(x="daynight_labeled", data=df, palette="Set2")
+        plt.title("Day vs Night Fire Detections")
+        plt.xlabel("Time of Detection")
+        plt.ylabel("Number of Detections")
+        plt.legend(labels=["0 = Day", "1 = Night"], title="Legend")
+        graph_path3 = os.path.join(UPLOAD_FOLDER, "graph3_day_night_detections.png")
         plt.savefig(graph_path3)
         graph_paths.append(graph_path3)
         plt.close()
 
+        df["lat_lon"] = df["latitude"].round(1).astype(str) + ", " + df["longitude"].round(1).astype(str)
+        top_locations = df["lat_lon"].value_counts().nlargest(10)
         plt.figure(figsize=(10, 6))
-        sns.heatmap(df.corr(numeric_only=True), annot=True, cmap="coolwarm", fmt=".2f")
-        plt.title("Feature Correlation Heatmap")
-        graph_path4 = os.path.join(UPLOAD_FOLDER, "graph4_feature_correlation.png")
+        sns.barplot(x=top_locations.values, y=top_locations.index, palette="flare")
+        plt.title("Top 10 Fire Detection Locations (Rounded Lat, Lon)")
+        plt.xlabel("Number of Detections")
+        plt.ylabel("Location (Lat, Lon)")
+        graph_path4 = os.path.join(UPLOAD_FOLDER, "graph4_top_fire_locations.png")
         plt.savefig(graph_path4)
         graph_paths.append(graph_path4)
-        plt.close()
-
-        plt.figure(figsize=(8, 5))
-        sns.boxplot(x=df['risk_level'], y=df['frp'], palette='coolwarm')
-        plt.title("Fire Intensity (FRP) Distribution Across Risk Levels")
-        graph_path5 = os.path.join(UPLOAD_FOLDER, "graph5_frp_vs_risk.png")
-        plt.savefig(graph_path5)
-        graph_paths.append(graph_path5)
         plt.close()
 
         # === Historical Map ===
@@ -760,21 +759,20 @@ def predict_wildfire():
      "This graph emphasizes the usefulness of remote sensing in fire detection by linking temperature variations to fire intensity. The concentration of high-risk cases in specific temperature ranges can help calibrate threshold values for predictive models. "
      "This relationship also validates the use of brightness temperature as a key predictive feature in machine learning models."),
 
-    ("Wildfire Occurrences Heatmap (Latitude vs. Longitude)",
-     "This heatmap visualizes the spatial distribution of wildfire occurrences, highlighting areas with the most frequent fire events. The darker red regions indicate high-density wildfire zones, suggesting repeated fire activity in those locations. Geographic clustering of wildfires may be influenced by factors like dry climate, vegetation type, and human activities."
-     " Such visualizations help in identifying high-risk wildfire-prone areas and prioritizing resource allocation for fire prevention. "
-     " The concentration of fire hotspots suggests that certain regions experience frequent and recurring wildfires, likely due to weather patterns or topography. This heatmap can guide the development of preventive measures and real-time monitoring systems in high-risk zones."
-     "Wildfire intensity may also vary by geographical regions, necessitating different firefighting strategies. Identifying these trends can aid policymakers in formulating better land management and conservation strategies."
-     " This heatmap serves as a vital tool in disaster preparedness and early intervention planning."),
-
-    ("Feature Correlation Heatmap",
-     "This heatmap displays the correlation between different numerical features in the dataset, helping to identify strong relationships between variables. Fire Radiative Power (FRP) and brightness temperature (Ti4 & Ti5) show a strong positive correlation, confirming their significance in wildfire intensity. "
-     "Features with high correlation may indicate redundancy, which is essential when selecting the best predictors for machine learning models. The presence of spatial interaction terms like latitude and longitude provides insight into geographical dependencies in wildfire spread. High correlations between temperature variables suggest that extreme temperature shifts are a key indicator of wildfire activity. "
-     "Some variables may have low correlations with wildfire intensity, suggesting they contribute minimally to risk assessment. Understanding these relationships helps in feature selection and model optimization. "
-     "This heatmap serves as a diagnostic tool for detecting multicollinearity, which can affect model accuracy. Data scientists use such heatmaps to refine predictive algorithms and improve model performance."),
-
-    ("Fire Intensity (FRP) Distribution Across Risk Levels",
-     "This boxplot illustrates how fire radiative power (FRP) varies across different risk levels, giving insight into wildfire intensity. The median FRP increases with higher risk levels, confirming that high-risk wildfires tend to have significantly greater intensity. The presence of outliers in high-risk cases suggests extreme fire events with exceptionally high FRP values. Moderate-risk wildfires display a wider range of FRP values, indicating variability in their intensity. Low-risk cases generally have lower and less variable FRP, which is expected given their classification. The boxplot helps in detecting thresholds for risk categorization, which can aid in wildfire prediction. Understanding fire intensity variations helps in refining machine learning classification boundaries for risk levels. This visualization also validates the importance of FRP as a key determinant in wildfire severity assessment. The overlap between moderate and high-risk cases suggests the need for additional factors in classification. These findings help in developing more accurate models for wildfire risk prediction.")
+    ("Day vs Night Fire Detections"),
+    "This bar chart represents the distribution of wildfire detections based on the time of day, categorized as Day (0) and Night (1).",
+    "The data reveals a significantly higher number of wildfire detections during the day compared to the night. This disparity may be attributed to improved satellite visibility during daylight or a genuine increase in fire activity in daytime hours.",
+    "Such imbalances in detection timing are important for understanding fire behavior, optimizing satellite monitoring schedules, and designing time-sensitive alert systems.",
+    "Time-of-day analysis is also critical for fire response planning, as fires detected earlier in the day may allow for more effective mitigation efforts.",
+    "Understanding this distribution helps in enhancing detection technologies and informs machine learning models to factor in diurnal variations when predicting wildfire risk levels.)",
+    
+    ("Top 10 Fire Detection Locations (Rounded Lat, Lon)",
+     "This bar chart highlights the top 10 geographic clusters with the highest number of wildfire detections, grouped by latitude and longitude rounded to the nearest 0.1 degrees.",
+    "These high-frequency locations reflect consistent fire activity, likely driven by a combination of environmental conditions such as dry climate, vegetation density, and potential human impact.",
+    "The visualization serves as an indicator of fire-prone zones, making it valuable for regional fire monitoring and prevention strategies.",
+    "Identifying spatial hotspots allows for more focused deployment of firefighting resources and supports proactive land management decisions.",
+    "These insights can be integrated into early warning systems, enabling targeted interventions in regions with a history of frequent wildfire incidents.",
+    "Geospatial clustering like this also provides a foundation for heatmap visualizations and further analysis of fire patterns over time.")
 ]
 
         for i, path in enumerate(graph_paths):

@@ -189,16 +189,16 @@ const Hero = () => {
               <>
                 <p className="welcome-message">👋 Hello, {username}!</p>
                 <button className="btn secondary-btn" onClick={handleLearnMore}>
-                  Learn More
+                  Services
                 </button>
               </>
             ) : (
               <>
                 <button className="btn primary-btn" onClick={() => navigate("/register")}>
-                  Get Started
+                  Sign up
                 </button>
                 <button className="btn secondary-btn" onClick={handleLearnMore}>
-                  Learn More
+                  Services
                 </button>
               </>
             )}
@@ -206,20 +206,7 @@ const Hero = () => {
         </div>
       </div>
 
-      {/* Carousel for Disaster Trends */}
-      <div className="carousel-container">
-        <h2 className="carousel-title">Latest Trends & Insights</h2>
-        <div className="carousel-slide">
-          <img src={slides[currentSlide].img} alt={slides[currentSlide].title} className="carousel-image" />
-          <div className="slide-text">
-            <h3>{slides[currentSlide].title}</h3>
-            <p>{slides[currentSlide].desc}</p>
-            <button className="btn explore-btn" onClick={() => navigate(slides[currentSlide].link)}>
-              Explore
-            </button>
-          </div>
-        </div>
-      </div>
+      
 
       {/* Service Overview Section */}
       <div className="service-overview" ref={serviceRef}>
@@ -346,6 +333,20 @@ const Hero = () => {
           </div>
         </div>
       )}
+      {/* Carousel for Disaster Trends */}
+      <div className="carousel-container">
+        <h2 className="carousel-title">Latest Trends & Insights</h2>
+        <div className="carousel-slide">
+          <img src={slides[currentSlide].img} alt={slides[currentSlide].title} className="carousel-image" />
+          <div className="slide-text">
+            <h3>{slides[currentSlide].title}</h3>
+            <p>{slides[currentSlide].desc}</p>
+            <button className="btn explore-btn" onClick={() => navigate(slides[currentSlide].link)}>
+              Explore
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };
